@@ -465,8 +465,9 @@ void read_empire_territory(empire_data *emp, bool check_tech);
 empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e, bool save_all_parts);
+void save_empire_logs(empire_data *emp);
+void save_empire_storage(empire_data *emp);
 void save_all_empires();
-void save_marked_empires();
 void set_empire_adjective(empire_data *emp, char *adjective);
 void set_empire_name(empire_data *emp, char *name);
 int sort_empires(empire_data *a, empire_data *b);
@@ -648,11 +649,13 @@ void init_player(char_data *ch);
 char_data *read_mobile(mob_vnum nr, bool with_triggers);
 char_data *mob_proto(mob_vnum vnum);
 void clear_char(char_data *ch);
+void clear_mob_proto_data(char_data *ch);
 void init_player_specials(char_data *ch);
 int pick_generic_name(int name_set, int sex);
 void remove_mobile_from_table(char_data *mob);
 void reset_char(char_data *ch);
 void free_char(char_data *ch);
+void free_mob_proto_data(struct mob_proto_data *data);
 void set_title(char_data *ch, char *title);
 int sort_mobiles(char_data *a, char_data *b);
 
@@ -965,7 +968,7 @@ void finish_trench(room_data *room);
 void free_complex_data(struct complex_room_data *data);
 void free_shared_room_data(struct shared_room_data *data);
 room_data *get_extraction_room();
-crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact);
+crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact, char *build_string);
 #define get_world_filename(str, vnum, suffix)  sprintf(str, "%s%02d/%d%s", WLD_PREFIX, ((vnum) % 100), (vnum), NULLSAFE(suffix))
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
@@ -1019,7 +1022,7 @@ extern char **tips_of_the_day;
 extern int tips_of_the_day_size;
 
 void load_intro_screens();
-int reload_text_string(int type);
+int reload_text_string(char_data *ch, int type);
 
 // more frees
 void free_apply_list(struct apply_data *list);

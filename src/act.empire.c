@@ -415,7 +415,7 @@ void do_customize_island(char_data *ch, char *argument) {
 			msg_to_char(ch, "That name is already taken by another island.\r\n");
 		}
 		else {
-			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
+			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given the %s of %s the custom name of %s", PERS(ch, ch, TRUE), (IS_SET(island->flags, ISLE_CONTINENT) ? "continent" : "island"), get_island_name_for(island->id, ch), argument);
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
 			
 			if (eisle->name) {
@@ -704,6 +704,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	}
 	
 	build_page_display(ch, "Adjective form: %s", EMPIRE_ADJECTIVE(e));
+	build_page_display(ch, "Banner: %s%s\t0", EMPIRE_BANNER(e), color_name_by_code(EMPIRE_BANNER(e), TRUE));
 
 	build_page_display(ch, "Ranks%s:", (is_own_empire ? " and privileges" : ""));
 	for (iter = 1; iter <= EMPIRE_NUM_RANKS(e); ++iter) {
@@ -738,7 +739,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		build_page_display(ch, "Workforce cap: %d item%s, Max city size: %s", total, PLURAL(total), city_type[type].name);
 	}
 	
-	if (is_own_empire || !EMPIRE_HAS_TECH(e, TECH_HIDDEN_PROGRESS)) {
+	if (is_own_empire || !EMPIRE_ADMIN_FLAGGED(e, EADM_HIDDEN_PROGRESS)) {
 		pline = build_page_display(ch, "Technology: ");
 		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
 			if (EMPIRE_HAS_TECH(e, iter)) {
@@ -833,10 +834,15 @@ void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_wi
 	
 	// header
 	if (only_with) {
-		msg_to_char(ch, "Current diplomatic relations with %s:\r\n", EMPIRE_NAME(only_with));
+		msg_to_char(ch, "Relations with %s: ", EMPIRE_NAME(only_with));
 	}
 	else {
 		msg_to_char(ch, "Current diplomatic relations for %s:\r\n", EMPIRE_NAME(emp));
+	
+		// show mine first
+		if (GET_LOYALTY(ch) && emp != GET_LOYALTY(ch)) {
+			show_empire_diplomacy(ch, emp, GET_LOYALTY(ch));
+		}
 	}
 	any = FALSE;
 	
@@ -1061,9 +1067,10 @@ int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char vstr[256], keepstr[256], totalstr[256];
+	char compstr[256], vstr[256], keepstr[256], totalstr[256], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
+	generic_data *find_component = NULL;
 	struct empire_dropped_item *edi, *next_edi;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
@@ -1079,6 +1086,23 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		*argument = '\0';
 		all = TRUE;
 	}
+	else if (!strn_cmp(argument, "-c", 2)) {
+		half_chop(argument, arg1, arg2);
+		if (is_abbrev(arg1, "-component")) {
+			if (!*arg2) {
+				msg_to_char(ch, "Search for which component type?\r\n");
+				return;
+			}
+			else if (!(find_component = find_generic_component(arg2))) {
+				msg_to_char(ch, "Unknown component type '%s'.\r\n", arg2);
+				return;
+			}
+			// else we've got a good component
+			
+			// clear this out for component search
+			*argument = '\0';
+		}
+	}
 	
 	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !all && !*argument) {
 		msg_to_char(ch, "You don't have anything stored at sea.\r\n");
@@ -1092,18 +1116,17 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				continue;	// none in storage here
 			}
 			
-			// prototype lookup
-			if (store->vnum != last_vnum) {
-				proto = store->proto;
-				last_vnum = store->vnum;
+			if (!store->proto) {
+				continue;
 			}
 			
-			if (!proto) {
+			// component requested but doesn't match?
+			if (find_component && !is_component(store->proto, find_component)) {
 				continue;
 			}
 			
 			// argument given but doesn't match
-			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
 				continue;
 			}
 			
@@ -1193,13 +1216,21 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
-		if (all || einv->local > 0 || *argument) {
+		if ((all || einv->local > 0 || *argument || find_component) && (proto = obj_proto(einv->vnum))) {
 			// prefix
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
 			else {
 				*vstr = '\0';
+			}
+			
+			// component partial-match string
+			if (find_component && GET_OBJ_COMPONENT(proto) != GEN_VNUM(find_component)) {
+				safe_snprintf(compstr, sizeof(compstr), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(proto)));
+			}
+			else {
+				*compstr = '\0';
 			}
 			
 			// keep section
@@ -1230,7 +1261,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			// actual line
-			build_page_display(ch, "(%4d) %s%s%s%s", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
+			build_page_display(ch, "(%4d) %s%s%s%s%s", einv->local, vstr, GET_OBJ_SHORT_DESC(proto), compstr, keepstr, totalstr);
 			any = TRUE;
 		}
 		
@@ -1375,7 +1406,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		UT_hash_handle hh;
 	};
 	
-	char line[256];
+	char line[256], subloc[256];
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
 	struct workforce_where_log *wwl;
 	room_data *room;
@@ -1406,8 +1437,8 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		total = 0;
 		
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
-			if (wwl->chore != only_chore || !wwl->mob) {
-				continue;	// wrong chore or no mob
+			if (wwl->chore != only_chore) {
+				continue;	// wrong chore
 			}
 			if (!(room = real_room(wwl->loc))) {
 				continue;	// no location
@@ -1417,8 +1448,20 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			}
 			
 			// found
+			
+			// build subloc
+			*subloc = '\0';
+			if (wwl->subloc) {
+				safe_snprintf(subloc, sizeof(subloc), " (%s)", skip_filler(wwl->subloc));
+			}
+			
 			++total;
-			build_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+			if (wwl->mob) {
+				build_page_display(to, "%s %s%s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), subloc, GET_SHORT_DESC(wwl->mob));
+			}
+			else {
+				build_page_display(to, "%s %s%s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), subloc);
+			}
 		}
 		if (total) {
 			build_page_display(to, " (%d total workers)", total);
@@ -1432,9 +1475,6 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	else {	// SHOW ALL CHORES
 		// count up workforce mobs
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
-			if (!wwl->mob) {
-				continue;	// no mob?
-			}
 			if (!(room = real_room(wwl->loc))) {
 				continue;	// no location
 			}
@@ -1552,6 +1592,9 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			if (!(room = real_room(wf_log->loc))) {
 				continue;	// room is gone now
 			}
+			if (wf_log->problem == WF_PROB_ADVENTURE_PRESENT && room != IN_ROOM(ch)) {
+				continue;	// special handling: can only see an adventure-present error from the same room
+			}
 			
 			// ok, show it:
 			if (wf_log->count > 1) {
@@ -1577,11 +1620,15 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		any = TRUE;	// this is guaranteed for this mode
 		
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+			if (wf_log->problem == WF_PROB_ADVENTURE_PRESENT && wf_log->loc != GET_ROOM_VNUM(IN_ROOM(ch))) {
+				continue;	// special handling: can only see an adventure-present error from the same room
+			}
+			
 			// count similar
 			last_chore = wf_log->chore;
 			last_problem = wf_log->problem;
 			count = 1;
-			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem) {
+			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem && (last_problem != WF_PROB_ADVENTURE_PRESENT || wf_log->next->loc == GET_ROOM_VNUM(IN_ROOM(ch)))) {
 				count += wf_log->count;
 				wf_log = wf_log->next;	// advance past identical entries
 			}
@@ -1653,10 +1700,15 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
 		safe_snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
-		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
-		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
+		if (PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
+			msg_to_char(ch, " %s\r\n", part);
+		}
+		else {	// columns
+			size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
+			msg_to_char(ch, " %-*.*s%s", size, size, part, !(count % 3) ? "\r\n" : " ");
+		}
 	}
-	if (count % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+	if (count % 3 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 		msg_to_char(ch, "\r\n");
 	}
 }
@@ -2742,22 +2794,30 @@ struct efind_group {
 	obj_data *obj;	// 1st object for this set (used for names, etc)
 	vehicle_data *veh;	// 1st vehicle for this set
 	int count;	// how many found
+	int distance;	// how far
 	bool stackable;	// whether or not this can stack
 	
 	struct efind_group *prev, *next;	// DLL
 };
 
 
+// simple sorter by distance
+int sort_efind_groups(struct efind_group *a, struct efind_group *b) {
+	return a->distance - b->distance;
+}
+
+
 /**
 * simple increment/add function for managing efind groups -- supports obj or
 * vehicle (not both in 1 call).
 *
+* @param char_data *ch Reference character (for start location).
 * @param struct efind_group **list The list to add to/update.
 * @param obj_data *obj The object to add (optional; use NULL if none).
 * @param vehicle_data *veh The vehicle to add (optional; use NULL if none).
 * @param room_data *location Where it is.
 */
-void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *veh, room_data *location) {
+void add_obj_to_efind(char_data *ch, struct efind_group **list, obj_data *obj, vehicle_data *veh, room_data *location) {
 	struct efind_group *eg;
 	bool found = FALSE;
 	
@@ -2768,7 +2828,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 	
 	if (obj && OBJ_CAN_STACK(obj)) {
 		DL_FOREACH(*list, eg) {
-			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj)) {
+			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj) && (GET_OBJ_SHORT_DESC(eg->obj) == GET_OBJ_SHORT_DESC(obj) || !strcmp(GET_OBJ_SHORT_DESC(eg->obj), GET_OBJ_SHORT_DESC(obj)))) {
 				eg->count += 1;
 				found = TRUE;
 				break;
@@ -2800,6 +2860,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		eg->obj = obj;
 		eg->veh = veh;
 		eg->count = 1;
+		eg->distance = ch ? compute_distance(IN_ROOM(ch), location) : 0;
 		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
 		DL_APPEND(*list, eg);
 	}
@@ -2925,7 +2986,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 	
 	// two different things we can show here:
 	
-	if (!partner) {
+	if (!partner || partner == emp) {
 		// show our own imports/exports based on type
 		use_emp = emp;
 		use_type = subcmd;
@@ -2954,7 +3015,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", (round(trade->cost * rate * 10.0) / 10.0));
 			}
 			
 			// figure out indicator
@@ -3029,7 +3090,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", (round(trade->cost * rate * 10.) / 10.0));
 			}
 			else {
 				*coin_conv = '\0';
@@ -3154,6 +3215,8 @@ struct do_islands_data {
 	int id;
 	int territory;
 	int einv_size;
+	int warehouse_size;
+	int shipping_size;
 	int population;
 	UT_hash_handle hh;
 };
@@ -3164,9 +3227,11 @@ struct do_islands_data {
 *
 * @param struct do_islands_data **list Pointer to a do_islands hash.
 * @param int island_id Which island.
-* @param int amount How much einv to add.
+* @param int einv_amount How much einv to add.
+* @param int warehouse_amount How much warehouse to add.
+* @param int shipping_amount How much shipping to add.
 */
-void do_islands_add_einv(struct do_islands_data **list, int island_id, int amount) {
+void do_islands_add_einv(struct do_islands_data **list, int island_id, int einv_amount, int warehouse_amount, int shipping_amount) {
 	struct do_islands_data *isle;
 	
 	HASH_FIND_INT(*list, &island_id, isle);
@@ -3175,7 +3240,9 @@ void do_islands_add_einv(struct do_islands_data **list, int island_id, int amoun
 		isle->id = island_id;
 		HASH_ADD_INT(*list, id, isle);
 	}
-	SAFE_ADD(isle->einv_size, amount, INT_MIN, INT_MAX, TRUE);
+	SAFE_ADD(isle->einv_size, einv_amount, INT_MIN, INT_MAX, TRUE);
+	SAFE_ADD(isle->warehouse_size, warehouse_amount, INT_MIN, INT_MAX, TRUE);
+	SAFE_ADD(isle->shipping_size, shipping_amount, INT_MIN, INT_MAX, TRUE);
 }
 
 
@@ -3222,10 +3289,12 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id, int 
  //////////////////////////////////////////////////////////////////////////////
 //// LAND MANAGEMENT /////////////////////////////////////////////////////////
 
-#define MANAGE_FUNC(name)		void (name)(char_data *ch, bool on)
+#define MANAGE_FUNC(name)		void (name)(char_data *ch, room_data *room, vehicle_data *veh, bool on)
 
 // protos
 MANAGE_FUNC(mng_nowork);
+MANAGE_FUNC(mng_private);
+MANAGE_FUNC(mng_public);
 
 
 // for do_manage
@@ -3247,7 +3316,8 @@ const struct manage_data_type manage_data[] = {
 	{ "no-abandon", "noabandon", PRIV_CLAIM, TRUE, ROOM_AFF_NO_ABANDON, TRUE, 0, NOBITS, NULL },
 	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS, NULL },
 	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, FALSE, 0, NOBITS, mng_nowork },
-	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
+	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, mng_public },
+	{ "private", "privatize", PRIV_CLAIM, TRUE, ROOM_AFF_PRIVATE, TRUE, 0, NOBITS, mng_private },
 	
 	{ "hide-real-name", NULL, NOTHING, FALSE, ROOM_AFF_HIDE_REAL_NAME, FALSE, LVL_CIMPL, NOBITS, NULL },
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
@@ -3265,9 +3335,43 @@ const struct manage_data_type manage_vehicle_data[] = {
 };
 
 
+/**
+* @param char_data *ch The player.
+* @param room_data *room For room management: The room (either current room or its home room) being managed.
+* @param vehicle_data *veh For vehicle management: The vehicle being managed.
+* @param bool on If TRUE, turning the flag on. If FALSE, turning it off.
+*/
 MANAGE_FUNC(mng_nowork) {
-	if (on && ROOM_OWNER(IN_ROOM(ch))) {
-		deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+	if (on && room && ROOM_OWNER(room)) {
+		deactivate_workforce_room(ROOM_OWNER(room), room);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param room_data *room For room management: The room (either current room or its home room) being managed.
+* @param vehicle_data *veh For vehicle management: The vehicle being managed.
+* @param bool on If TRUE, turning the flag on. If FALSE, turning it off.
+*/
+MANAGE_FUNC(mng_private) {
+	if (on && room) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC);
+		affect_total_room(room);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param room_data *room For room management: The room (either current room or its home room) being managed.
+* @param vehicle_data *veh For vehicle management: The vehicle being managed.
+* @param bool on If TRUE, turning the flag on. If FALSE, turning it off.
+*/
+MANAGE_FUNC(mng_public) {
+	if (on && room) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PRIVATE);
+		affect_total_room(room);
 	}
 }
 
@@ -3550,17 +3654,19 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 						}
 					
 						// found a vehicle match but limit what we show
+						if (VEH_PAINT_COLOR(veh)) {
+							sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
+							*paint_str = LOWER(*paint_str);
+							if (strlen(paint_str) < sizeof(paint_str) - 1) {
+								strcat(paint_str, " ");
+							}
+						}
+						else {
+							*paint_str = '\0';
+						}
+						
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-								if (VEH_PAINT_COLOR(veh)) {
-									sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
-									*paint_str = LOWER(*paint_str);
-									strcat(paint_str, " ");
-								}
-								else {
-									*paint_str = '\0';
-								}
-								
 								get_informative_vehicle_string(ch, veh, temp);
 								if (*temp) {
 									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s [%s]", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)), temp);
@@ -3570,10 +3676,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 								}
 							}
 							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 							}
 							else {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s%s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 							}
 						}
 						else if (!scanned_veh || VEH_SIZE(veh) > VEH_SIZE(scanned_veh)) {	// not a building -- save?
@@ -3585,10 +3691,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
 						if (!VEH_OWNER(scanned_veh) || VEH_CLAIMS_WITH_ROOM(scanned_veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-							safe_snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s", paint_str, skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 						else {
-							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s%s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), paint_str, skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 					}
 				}
@@ -3644,6 +3750,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				}
 				else {	// not a vehicle
 					append_page_display_line(pline, "%s", get_room_name(loc, FALSE));
+					
+					if (ROOM_PAINT_COLOR(loc)) {
+						sprinttype(ROOM_PAINT_COLOR(loc), paint_names, paint_str, sizeof(paint_str), "UNDEFINED");
+						*paint_str = LOWER(*paint_str);
+						append_page_display_line(pline, " (%s%s)", (ROOM_AFF_FLAGGED(loc, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), paint_str);
+					}
 				}
 				
 				// coords
@@ -3869,6 +3981,11 @@ ACMD(do_abandon) {
 	confirm_arg_1 = !str_cmp(arg1, "confirm");
 	confirm = confirm_arg_1 || !str_cmp(arg2, "confirm");	// TRUE if they have the confirm arg
 	
+	if (confirm && !confirm_arg_1) {
+		// drop last arg (confirm) specifically for parse_room_from_coords below
+		strcpy(argument, arg1);
+	}
+	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
@@ -3948,7 +4065,7 @@ ACMD(do_barde) {
 	else {
 		// find interact
 		found = FALSE;
-		for (interact = mob->interactions; interact; interact = interact->next) {
+		LL_FOREACH(MOB_INTERACTIONS(mob), interact) {
 			if (interact->type == INTERACT_BARDE && check_exclusion_set(&excl, interact->exclusion_code, interact->percent) && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch), mob, NULL)) {
 				if (!found) {
 					// first one found
@@ -4186,8 +4303,9 @@ ACMD(do_buildcheck) {
 * @param char_data *ch The person doing the burning.
 * @param room_data *room The targeted room (should be a map building).
 * @param obj_data *lighter Optional: If a lighter is given, it will be used for this. If not, we assume they don't need it.
+* @param bool confirmed If TRUE, player typed CONFIRM as the last arg. FALSE if not.
 */
-void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter, bool confirmed) {
 	char to_char[256], to_room[256];
 	
 	// ensure we have the real room
@@ -4198,7 +4316,7 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 		msg_to_char(ch, "NPCs cannot light buildings on fire.\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
-		do_light_vehicle(ch, GET_ROOM_VEHICLE(room), lighter);
+		do_light_vehicle(ch, GET_ROOM_VEHICLE(room), lighter, confirmed);
 	}
 	else if (IS_BURNING(room)) {
 		msg_to_char(ch, "Looks like it's already on fire!\r\n");
@@ -4214,6 +4332,9 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 	}
 	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
+	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !confirmed) {
+		msg_to_char(ch, "You must type 'burn building CONFIRM' to burn a building you own.\r\n");
 	}
 	else if (!ROOM_BLD_FLAGGED(room, BLD_BURNABLE)) {
 		msg_to_char(ch, "It doesn't seem to be flammable.\r\n");
@@ -4256,20 +4377,27 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 
 ACMD(do_burn) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
-	char *argptr = arg;
+	char *argptr = arg, most_args[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
 	obj_data *lighter = NULL;
 	room_data *target;
 	vehicle_data *veh;
-	bool kept = FALSE;
+	bool kept = FALSE, confirmed = FALSE;
 	int number, dir;
 
+	// check for CONFIRM
+	chop_last_arg(argument, most_args, last_arg);
+	if (*last_arg && !str_cmp(last_arg, "confirm")) {
+		confirmed = TRUE;
+		argument = most_args;
+	}
+	
 	one_argument(argument, arg);
 	number = get_number(&argptr);
 
 	if (!objless) {
 		lighter = find_lighter_in_list(ch->carrying, &kept);
 	}
-
+	
 	if (!*argptr) {
 		msg_to_char(ch, "Burn what?\r\n");
 	}
@@ -4291,18 +4419,18 @@ ACMD(do_burn) {
 			msg_to_char(ch, "You can't burn anything in that direction.\r\n");
 		}
 		else {
-			do_burn_building(ch, target, lighter);
+			do_burn_building(ch, target, lighter, confirmed);
 		}
 	}
 	else if ((!str_cmp(arg, "building") || !str_cmp(arg, "build")) && IS_ANY_BUILDING(IN_ROOM(ch))) {
-		do_burn_building(ch, IN_ROOM(ch), lighter);
+		do_burn_building(ch, IN_ROOM(ch), lighter, confirmed);
 	}
 	else if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh)) {
 		// try burning a vehicle
-		do_light_vehicle(ch, veh, lighter);
+		do_light_vehicle(ch, veh, lighter, confirmed);
 	}
 	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
-		do_burn_area(ch);
+		do_burn_area(ch, confirmed);
 	}
 		
 	else if (get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT) || get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT)) {
@@ -4653,6 +4781,7 @@ ACMD(do_defect) {
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		queue_delayed_update(ch, CDU_SAVE);
 		
+		syslog(SYS_EMPIRE, GET_INVIS_LEV(ch), TRUE, "EMPIRE: %s has defected from %s", GET_NAME(ch), EMPIRE_NAME(e));
 		log_to_empire(e, ELOG_MEMBERS, "%s has defected from the empire", PERS(ch, ch, 1));
 		msg_to_char(ch, "You defect from the empire!\r\n");
 		
@@ -5092,7 +5221,7 @@ ACMD(do_efind) {
 			if (ROOM_OWNER(iter) == emp) {
 				DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
-						add_obj_to_efind(&list, obj, NULL, iter);
+						add_obj_to_efind(ch, &list, obj, NULL, iter);
 						++total;
 					}
 				}
@@ -5107,6 +5236,16 @@ ACMD(do_efind) {
 			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
+			
+			// vehicle contents -- BEFORE checking keywords or building
+			DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
+				if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
+					add_obj_to_efind(ch, &list, obj, NULL, IN_ROOM(veh));
+					++total;
+				}
+			}
+			
+			// additional checks to show the vehicle
 			if (all && VEH_FLAGGED(veh, VEH_BUILDING)) {
 				continue;	// 'all' skips buildings
 			}
@@ -5114,7 +5253,7 @@ ACMD(do_efind) {
 				continue;
 			}
 			
-			add_obj_to_efind(&list, NULL, veh, IN_ROOM(veh));
+			add_obj_to_efind(ch, &list, NULL, veh, IN_ROOM(veh));
 			++total;
 		}
 
@@ -5127,6 +5266,7 @@ ACMD(do_efind) {
 			}
 			
 			last_rm = NULL;
+			DL_SORT(list, sort_efind_groups);
 			
 			DL_FOREACH_SAFE(list, eg, next_eg) {
 				// first item at this location?
@@ -5146,7 +5286,15 @@ ACMD(do_efind) {
 					append_page_display_line(line, "%s", skip_filler(get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT)));
 				}
 				else if (eg->veh) {
-					append_page_display_line(line, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
+					if (VEH_SITTING_ON(eg->veh) && GET_LOYALTY(VEH_SITTING_ON(eg->veh)) == emp) {
+						append_page_display_line(line, "%s (%s)", skip_filler(VEH_SHORT_DESC(eg->veh)), PERS(VEH_SITTING_ON(eg->veh), ch, FALSE));
+					}
+					else if (VEH_LED_BY(eg->veh) && GET_LOYALTY(VEH_LED_BY(eg->veh)) == emp) {
+						append_page_display_line(line, "%s (%s)", skip_filler(VEH_SHORT_DESC(eg->veh)), PERS(VEH_LED_BY(eg->veh), ch, FALSE));
+					}
+					else {
+						append_page_display_line(line, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
+					}
 				}
 				
 				DL_DELETE(list, eg);
@@ -5469,8 +5617,8 @@ ACMD(do_enroll) {
 	empire_data *e, *old;
 	room_data *room, *next_room;
 	int iter, island;
-	char_data *targ = NULL, *victim, *mob;
-	bool all_zero, file = FALSE, sub_file = FALSE;
+	char_data *targ = NULL, *victim, *ch_iter, *mob;
+	bool all_zero, any, file = FALSE, sub_file = FALSE;
 	obj_data *obj;
 
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -5500,7 +5648,20 @@ ACMD(do_enroll) {
 		msg_to_char(ch, "You don't have the authority to enroll followers.\r\n");
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Whom did you want to enroll?\r\n");
+		// no-arg enroll: list people around who pledged
+		any = FALSE;
+		DL_FOREACH2(player_character_list, ch_iter, next_plr) {
+			if (GET_PLEDGE(ch_iter) == EMPIRE_VNUM(e)) {
+				if (!any) {
+					msg_to_char(ch, "Online players pledged to %s%s\t0:\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+					any = TRUE;
+				}
+				msg_to_char(ch, " %s\r\n", PERS(ch_iter, ch, TRUE));
+			}
+		}
+		if (!any) {
+			msg_to_char(ch, "No online players are pledging to the empire. Whom did you want to enroll?\r\n");
+		}
 	}
 	else if (!(targ = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
@@ -5532,6 +5693,7 @@ ACMD(do_enroll) {
 	}
 	else {
 		// ok: enroll
+		syslog(SYS_EMPIRE, GET_INVIS_LEV(ch), TRUE, "EMPIRE: %s has enrolled %s into %s", GET_NAME(ch), GET_NAME(targ), EMPIRE_NAME(e));
 		log_to_empire(e, ELOG_MEMBERS, "%s has been enrolled in the empire", PERS(targ, targ, 1));
 		msg_to_char(targ, "You have been enrolled in %s.\r\n", EMPIRE_NAME(e));
 		msg_to_char(ch, "You enroll %s in the empire.\r\n", PERS(targ, targ, FALSE));
@@ -5928,6 +6090,10 @@ ACMD(do_estats) {
 	}
 	msg_to_char(ch, "\r\n");
 	
+	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		msg_to_char(ch, "Banner: %s%s\t0\r\n", EMPIRE_BANNER(emp), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
+	}
+	
 	if (IS_IMMORTAL(ch)) {
 		sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, part, TRUE);
 		msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", part);
@@ -5993,6 +6159,7 @@ ACMD(do_expel) {
 		add_cooldown(targ, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		clear_private_owner(GET_IDNUM(targ));
 
+		syslog(SYS_EMPIRE, GET_INVIS_LEV(ch), TRUE, "EMPIRE: %s has expelled %s from %s", GET_NAME(ch), GET_NAME(targ), EMPIRE_NAME(e));
 		log_to_empire(e, ELOG_MEMBERS, "%s has been expelled from the empire", PERS(targ, targ, 1));
 		msg_to_char(ch, "You expel %s from %s.\r\n", PERS(targ, targ, TRUE), (e == GET_LOYALTY(ch) ? "the empire" : EMPIRE_NAME(e)));
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
@@ -6431,6 +6598,7 @@ ACMD(do_home) {
 
 
 ACMD(do_islands) {
+	bool comma;
 	char emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
 	struct empire_island *eisle, *next_eisle;
@@ -6477,7 +6645,7 @@ ACMD(do_islands) {
 		// mark storage
 		HASH_ITER(hh, eisle->store, store, next_store) {
 			if (store->amount > 0) {
-				do_islands_add_einv(&list, eisle->island, store->amount);
+				do_islands_add_einv(&list, eisle->island, store->amount, 0, 0);
 			}
 		}
 		
@@ -6487,12 +6655,12 @@ ACMD(do_islands) {
 	
 	// add unique storage
 	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
-		do_islands_add_einv(&list, eus->island, eus->amount);
+		do_islands_add_einv(&list, eus->island, 0, eus->amount, 0);
 	}
 	
 	// add shipping
 	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
-		do_islands_add_einv(&list, shipd->from_island, shipd->amount);
+		do_islands_add_einv(&list, shipd->from_island, 0, 0, shipd->amount);
 	}
 	
 	// and then build the display while freeing it up
@@ -6508,19 +6676,31 @@ ACMD(do_islands) {
 		}
 		
 		// only show if they have one of these
-		if (item->territory > 0 || item->einv_size > 0 || item->population > 0) {
+		if (item->territory > 0 || item->einv_size > 0 || item->warehouse_size > 0 || item->shipping_size > 0 || item->population > 0) {
 			isle = get_island(item->id, TRUE);
 			room = real_room(isle->center);
+			comma = FALSE;
 			line = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
-				append_page_display_line(line, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%s%d territory", (comma ? ", " : ""), item->territory);
+				comma = TRUE;
 			}
 			if (item->einv_size > 0) {
-				append_page_display_line(line, "%d einventory%s", item->einv_size, (item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%s%d einventory", (comma ? ", " : ""), item->einv_size);
+				comma = TRUE;
+			}
+			if (item->warehouse_size > 0) {
+				append_page_display_line(line, "%s%d warehouse", (comma ? ", " : ""), item->warehouse_size);
+				comma = TRUE;
+			}
+			if (item->shipping_size > 0) {
+				append_page_display_line(line, "%s%d shipping", (comma ? ", " : ""), item->shipping_size);
+				comma = TRUE;
 			}
 			if (item->population > 0) {
-				append_page_display_line(line, "%d citizen%s", item->population, PLURAL(item->population));
+				append_page_display_line(line, "%s%d citizen%s", (comma ? ", " : ""), item->population, PLURAL(item->population));
+				comma = TRUE;
 			}
 		}
 		
@@ -6534,6 +6714,7 @@ ACMD(do_islands) {
 
 ACMD(do_tomb) {
 	bool any;
+	int tomb_type;
 	struct empire_territory_data *ter, *next_ter;
 	room_data *tomb, *real;
 	
@@ -6551,7 +6732,24 @@ ACMD(do_tomb) {
 			build_page_display(ch, "You have no tomb set.");
 		}
 		else {
-			build_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
+			build_page_display(ch, "Your tomb is at: %s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
+			find_load_room(ch, &tomb_type);
+			// LOAD_ROOM_x
+			switch (tomb_type) {
+				case LOAD_ROOM_MY_TOMB: {
+					// no error
+					break;
+				}
+				case LOAD_ROOM_ANY_TOMB: {
+					msg_to_char(ch, "Your tomb is on a different island but your empire has a tomb on this island.\r\n");
+					break;
+				}
+				case LOAD_ROOM_START_LOC:
+				default: {
+					msg_to_char(ch, "You have no tombs %s.\r\n", (GET_ISLAND(IN_ROOM(ch)) ? "on this island" : "available here"));
+					break;
+				}
+			}
 		}
 		
 		// additional info
@@ -6665,7 +6863,7 @@ ACMD(do_import) {
 	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
 		do_import_analysis(ch, emp, argument, subcmd);
 	}
-	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 		msg_to_char(ch, "Immortal empires cannot trade.\r\n");
 	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_TRADE)) {
@@ -6839,7 +7037,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 		
 		// callback func (optional)
 		if (manage_vehicle_data[type].func) {
-			(manage_vehicle_data[type].func)(ch, on);
+			(manage_vehicle_data[type].func)(ch, NULL, veh, on);
 		}
 	}
 }
@@ -6896,6 +7094,9 @@ ACMD(do_manage) {
 			safe_snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown land management option '%s'.\r\n", arg);
@@ -6956,7 +7157,7 @@ ACMD(do_manage) {
 		
 		// callback func (optional)
 		if (manage_data[type].func) {
-			(manage_data[type].func)(ch, on);
+			(manage_data[type].func)(ch, flag_room, NULL, on);
 		}
 	}
 }
@@ -7284,7 +7485,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		build_page_display(ch, "%s goals (%d points):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
+		build_page_display(ch, "%s goals (%d point%s):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 		
 		// show current goals
 		any = 0;
@@ -7348,7 +7549,7 @@ ACMD(do_progress) {
 				}
 			}
 		}
-		build_page_display(ch, "- %d completed goals, %d rewards bought", complete, bought);
+		build_page_display(ch, "- %d completed goal%s, %d reward%s bought", complete, PLURAL(complete), bought, PLURAL(bought));
 		
 		send_page_display(ch);
 	}
@@ -7422,7 +7623,7 @@ ACMD(do_progress) {
 		
 		// purchase by name
 		if (!(prg = find_purchasable_goal_by_name(emp, arg2))) {
-			msg_to_char(ch, "No available progress by that name.\r\n");
+			msg_to_char(ch, "There is no progress reward available by that name%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'progress buy' for a list)"));
 		}
 		else if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 			// should not be able to hit this condition
@@ -7514,10 +7715,10 @@ ACMD(do_progress) {
 			if (found) {
 				if (!any) {
 					line = build_page_display(ch, "Leads to: %s", PRG_NAME(prg_iter));
+					any = TRUE;
 				}
 				else {
 					append_page_display_line(line, ", %s", PRG_NAME(prg_iter));
-					any = TRUE;
 				}
 			}
 		}
@@ -7825,8 +8026,8 @@ ACMD(do_roster) {
 	// imm usage: roster ["empire"] [all]
 	// mortal usage: roster [all]
 	
-	// override for imm args: roster <empire> (with no quotes and no -all)
-	if (imm_access && *argument && *argument != '"' && (e = get_empire_by_name(argument))) {
+	// are we using: roster <empire> (with no quotes and no -all)
+	if (*argument && *argument != '"' && str_cmp(arg, "all") && str_cmp(arg, "-all") && (e = get_empire_by_name(argument))) {
 		*argument = '\0';	// clear further args and accept the empire name as-is
 	}
 	
@@ -7837,7 +8038,7 @@ ACMD(do_roster) {
 		if (!str_cmp(arg, "all") || is_abbrev(arg, "-all")) {
 			all = TRUE;
 		}
-		else if (*arg && imm_access) {
+		else if (*arg) {
 			if (!(e = get_empire_by_name(arg))) {
 				msg_to_char(ch, "Unknown empire.\r\n");
 				return;
@@ -7852,6 +8053,14 @@ ACMD(do_roster) {
 	if (!e) {
 		msg_to_char(ch, "You must be a member of an empire to do that.\r\n");
 		return;
+	}
+	
+	// allowed to view other empire?
+	if (!imm_access && e != GET_LOYALTY(ch)) {
+		if (!EMPIRE_ADMIN_FLAGGED(e, EADM_ROSTER_SHARING) || !has_relationship(GET_LOYALTY(ch), e, DIPL_ALLIED)) {
+			msg_to_char(ch, "You cannot view the roster for %s%s\t0.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+			return;
+		}
 	}
 	
 	// build roster:
@@ -7944,9 +8153,9 @@ ACMD(do_roster) {
 
 ACMD(do_territory) {
 	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], option_buf[1024], *remain;
-	bool ok, junk;
+	bool ok, junk, will_group;
 	bool check_city, check_outskirts, check_frontier, any_type_found;
-	bool no_abandon, no_dismantle, no_work, public_only;
+	bool no_abandon, no_dismantle, no_work, public_only, private_only;
 	int dist_from_me, total, ttype;
 	crop_data *crop = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
@@ -7982,9 +8191,10 @@ ACMD(do_territory) {
 	*search_str = *exclude_str = '\0';
 	check_city = check_outskirts = check_frontier = TRUE;
 	any_type_found = FALSE;
-	no_abandon = no_dismantle = no_work = public_only = FALSE;
+	no_abandon = no_dismantle = no_work = public_only = private_only = FALSE;
 	dist_from_me = -1;
 	find_island = NULL;
+	will_group = TRUE;	// by default
 	
 	// parse options
 	while (*argument) {
@@ -8017,6 +8227,9 @@ ACMD(do_territory) {
 				check_outskirts = FALSE;
 				any_type_found = TRUE;
 			}
+		}
+		else if (is_abbrev(arg, "-all")) {
+			will_group = FALSE;
 		}
 		else if (is_abbrev(arg, "-distance")) {
 			argument = any_one_arg(argument, arg2);
@@ -8055,6 +8268,9 @@ ACMD(do_territory) {
 		}
 		else if (!str_cmp(arg, "public") || is_abbrev(arg, "-public")) {
 			public_only = TRUE;
+		}
+		else if (!str_cmp(arg, "private") || is_abbrev(arg, "-private")) {
+			private_only = TRUE;
 		}
 		else {
 			// unknown arg: treat as search
@@ -8108,6 +8324,9 @@ ACMD(do_territory) {
 			if (public_only && !VEH_IS_PUBLIC(veh)) {
 				continue;
 			}
+			if (private_only && !VEH_IS_PRIVATE(veh)) {
+				continue;
+			}
 			
 			// distance?
 			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
@@ -8132,7 +8351,8 @@ ACMD(do_territory) {
 		
 			// final ok: add to the list
 			if (ok && (node = find_territory_node_in_hash(&node_hash, IN_ROOM(veh), TRUE))) {
-				++(node->count);
+				// only ensure at least 1 on the count; do not add at this point
+				node->count = MAX(1, node->count);
 				
 				// add notes
 				sprintf(buf, "%s%s%s", NULLSAFE(node->details), (node->details ? ", " : ""), skip_filler(VEH_SHORT_DESC(veh)));
@@ -8178,6 +8398,9 @@ ACMD(do_territory) {
 			continue;
 		}
 		if (public_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC)) {
+			continue;
+		}
+		if (private_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PRIVATE)) {
 			continue;
 		}
 		
@@ -8229,7 +8452,8 @@ ACMD(do_territory) {
 		
 		// final ok: add to the list
 		if (ok && (node = find_territory_node_in_hash(&node_hash, iter, TRUE))) {
-			++(node->count);
+			// only ensure at least 1 on the count; do not add at this point
+			node->count = MAX(1, node->count);
 			
 			// mark as interior?
 			if (GET_ROOM_VNUM(iter) != node->vnum && (!node->details || !strstr(node->details, "interior"))) {
@@ -8273,6 +8497,9 @@ ACMD(do_territory) {
 	if (public_only) {
 		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
 	}
+	if (private_only) {
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis private", (*option_buf ? ", " : ""));
+	}
 	if (*search_str) {
 		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
 	}
@@ -8281,7 +8508,9 @@ ACMD(do_territory) {
 	}
 	
 	if (node_hash) {
-		reduce_territory_node_list(&node_hash);
+		if (will_group) {
+			reduce_territory_node_list(&node_hash);
+		}
 		
 		// start buf
 		build_page_display(ch, "%s%s&0 territory: %s", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
@@ -8358,7 +8587,7 @@ ACMD(do_unpublicize) {
 */
 void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	any_vnum vnum;
-	bool found;
+	bool found, unkeep = FALSE;
 	char lim_arg[MAX_INPUT_LENGTH], local_arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH], kept[24];
 	int limit = 0, number;
 	obj_data *proto, *obj;
@@ -8456,7 +8685,10 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 		half_chop(argument, lim_arg, temp);	// find a number
 		strcpy(argument, temp);
 		limit = atoi(lim_arg);
-		if (limit < 0) {
+		if (limit == 0) {
+			unkeep = TRUE;
+		}
+		else if (limit < 0) {
 			msg_to_char(ch, "Invalid number to keep.\r\n");
 			return;
 		}
@@ -8484,10 +8716,14 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 		if (limit == UNLIMITED || limit > 0) {
 			store->keep = limit;
 		}
+		else if (unkeep) {
+			// always set to 0
+			store->keep = 0;
+		}
 		else {	// toggle off/all
 			store->keep = store->keep ? 0 : UNLIMITED;
 		}
-		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", (store->keep ? "now" : (unkeep ? "not" : "no longer")), limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
 		
 		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		break;
@@ -8517,8 +8753,8 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			HASH_ADD_INT(eisle->store, vnum, store);
 		}
 		
-		store->keep = (limit == UNLIMITED || limit > 0) ? limit : (store->keep ? 0 : UNLIMITED);
-		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		store->keep = (limit == UNLIMITED || limit > 0) ? limit : ((store->keep || unkeep) ? 0 : UNLIMITED);
+		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", (store->keep ? "now" : (unkeep ? "not" : "no longer")), limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
 		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
 }

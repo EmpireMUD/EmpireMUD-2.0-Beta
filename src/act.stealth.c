@@ -401,7 +401,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	// GAIN SKILL NOW -- it at least attempts an application
-	if (can_gain_exp_from(ch, vict)) {
+	if (can_gain_exp_from(ch, vict, NULL)) {
 		gain_player_tech_exp(ch, PTECH_POISON, 2);
 		gain_player_tech_exp(ch, PTECH_POISON_UPGRADE, 2);
 	}
@@ -419,7 +419,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	
 	// attempt immunity/resist
 	if (has_player_tech(vict, PTECH_NO_POISON)) {
-		if (can_gain_exp_from(vict, ch)) {
+		if (can_gain_exp_from(vict, ch, NULL)) {
 			gain_player_tech_exp(vict, PTECH_NO_POISON, 10);
 		}
 		run_ability_hooks_by_player_tech(vict, PTECH_NO_POISON, ch, NULL, NULL, NULL);
@@ -431,7 +431,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		return 0;
 	}
 	if (has_player_tech(vict, PTECH_RESIST_POISON)) {
-		if (can_gain_exp_from(vict, ch)) {
+		if (can_gain_exp_from(vict, ch, NULL)) {
 			gain_player_tech_exp(vict, PTECH_RESIST_POISON, 10);
 		}
 		run_ability_hooks_by_player_tech(vict, PTECH_RESIST_POISON, ch, NULL, NULL, NULL);
@@ -492,7 +492,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	// fire a consume trigger but it can't block execution here
-	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL, 1)) {
 		if (GET_POISON_CHARGES(obj) <= 0) {
 			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
 			extract_obj(obj);
@@ -637,21 +637,22 @@ ACMD(do_infiltrate) {
 		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			msg_to_char(ch, "You fail.\r\n");
 		}
-		else if (!pre_greet_mtrigger(ch, to_room, dir, "move")) {
+		else if (!pre_greet_mtrigger(ch, to_room, dir, "move", was_in)) {
 			// no message
 		}
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
 			
-			if (!enter_triggers(ch, dir, "move", TRUE)) {
+			if (!enter_triggers(ch, dir, "move", TRUE, was_in)) {
 				char_to_room(ch, was_in);
 				return;
 			}
 			
+			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
 			
-			if (!greet_triggers(ch, dir, "move", TRUE)) {
+			if (!greet_triggers(ch, dir, "move", TRUE, was_in)) {
 				char_to_room(ch, was_in);
 				look_at_room(ch);
 				return;
@@ -659,7 +660,6 @@ ACMD(do_infiltrate) {
 			
 			msg_to_char(ch, "\r\nInfiltration successful.\r\n");
 			GET_LAST_DIR(ch) = dir;
-			qt_visit_room(ch, IN_ROOM(ch));
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
@@ -724,7 +724,7 @@ ACMD(do_pickpocket) {
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL, NULL)) {
 		return;
 	}
-	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (!MOB_FLAGGED(vict, MOB_COINS) && AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
+	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (!MOB_FLAGGED(vict, MOB_COINS) && AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(MOB_INTERACTIONS(vict), INTERACT_PICKPOCKET))) {
 		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else {
@@ -747,7 +747,7 @@ ACMD(do_pickpocket) {
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
 
 			// any will tell us if we got at least 1 item (also sends messages)
-			any = run_interactions(ch, vict->interactions, INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, NULL, pickpocket_interact);
+			any = run_interactions(ch, MOB_INTERACTIONS(vict), INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, NULL, pickpocket_interact);
 			any |= run_global_mob_interactions(ch, vict, INTERACT_PICKPOCKET, pickpocket_interact);
 			
 			if (coins > 0) {
@@ -796,7 +796,7 @@ ACMD(do_pickpocket) {
 		}
 		
 		// gain either way
-		if (can_gain_exp_from(ch, vict) && !AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		if (can_gain_exp_from(ch, vict, NULL) && !AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
 			gain_player_tech_exp(ch, PTECH_PICKPOCKET, 25);
 		}
 		run_ability_hooks_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL, NULL, NULL);
@@ -809,7 +809,10 @@ ACMD(do_search) {
 	char_data *targ;
 	bool found = FALSE, earthmeld = FALSE;
 	
-	if (AFF_FLAGGED(ch, AFF_BLIND)) {
+	if (get_cooldown_time(ch, COOLDOWN_SEARCH)) {
+		msg_to_char(ch, "You can't search again yet.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "How can you do that? You're blind!\r\n");
 	}
 	else if (!has_player_tech(ch, PTECH_SEARCH_COMMAND) || !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
@@ -938,7 +941,7 @@ ACMD(do_steal) {
 						gain_player_tech_exp(ch, PTECH_STEAL_UPGRADE, 50);
 					}
 
-					read_vault(emp);
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 					run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, NULL, NULL, NULL);

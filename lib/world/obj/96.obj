@@ -31,4 +31,33 @@ C
 1 1
 T 9680
 S
+#9682
+clear spawned mobs from room~
+clear spawned mobs from room~
+Clear spawned mobs from room is here.~
+   On load, this object clears spawned mobs from the room and then purges
+itself. Mobs linked to an instance here are excluded.
+~
+3 0 0 0 0 1
+0 0 0
+0 0
+T 9682
+S
+#9684
+ability bonus~
+a bonus ability~
+A bonus ability is here.~
+   This item grants a player 1 to 3 new bonus abilities after a very brief
+delay, with an announcement message. This helps separate the 'you gain an
+ability' message from other text. Set val0, val1, and val2 to up to 3 abilities
+you want the player to gain.
+   Load this item with a script and change the vals before the 'wait' happens.
+~
+3 0 a 0 0 7
+0 0 0
+0 1
+C
+1 1
+T 9684
+S
 $

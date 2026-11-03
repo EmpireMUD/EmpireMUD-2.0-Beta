@@ -1,6 +1,10 @@
 #12300
 Fur Dragon load, restring, and move~
-0 n 100
+0 n 100 4
+L e 12300
+L e 12301
+L e 12302
+L e 12303
 ~
 set loc %instance.real_location%
 if !%loc%
@@ -55,7 +59,7 @@ dg_affect %self% !ATTACK on -1
 ~
 #12301
 Fur Dragon: leash and update loc~
-0 i 100
+0 i 100 0
 ~
 * max distance from home (configurable)
 set leash_distance 25
@@ -70,13 +74,14 @@ nop %instance.set_location(%room%)%
 ~
 #12302
 Fur Dragon: delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12303
 Fur Dragon: block enter portal when scaled~
-0 c 0
+0 c 0 1
+L c 12301
 enter~
 return 0
 set portal %actor.obj_target(%arg%)%
@@ -93,7 +98,7 @@ end
 ~
 #12304
 Fur Dragon: can't leave the burrow once scaled~
-0 q 100
+0 q 100 0
 ~
 if !%self.varexists(scaled)% || %actor.nohassle% || %actor.level% < 225
   return 1
@@ -104,26 +109,36 @@ end
 ~
 #12305
 Fur Dragon: difficulty selection and retreat to burrow~
-0 c 0
+0 c 0 5
+L e 12300
+L e 12301
+L e 12302
+L e 12303
+L j 12300
 difficulty~
 if !%arg%
-  %send% %actor% You must specify a level of difficulty. (Hard, Group, or Boss)
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
   return 1
   halt
-end
-if %self.fighting%
+elseif %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
   return 1
   halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
 end
-if hard /= %arg%
+if normal /= %arg%
+  set difficulty 1
+elseif hard /= %arg%
   set difficulty 2
 elseif group /= %arg%
   set difficulty 3
 elseif boss /= %arg%
   set difficulty 4
 else
-  %send% %actor% That is not a valid difficulty level for this adventure. (Hard, Group, or Boss)
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
   return 1
   halt
 end
@@ -192,13 +207,10 @@ if %loc% && %self.room% != %loc%
 ~
 #12306
 Fur Dragon: attack info before difficulty selection~
-0 B 0
+0 B 0 1
+L f 12306
 ~
 if %self.aff_flagged(!ATTACK)%
-  if %actor.char_target(%arg%)% != %self%
-    return 1
-    halt
-  end
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
   %send% %actor% Usage: difficulty <hard \| group \| boss>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
@@ -211,7 +223,10 @@ end
 ~
 #12307
 Fur Dragon: death of the dragon~
-0 f 100
+0 f 100 3
+L b 12318
+L c 12302
+L j 12300
 ~
 if %self.room.template% == 12300
   %load% obj 12302 room
@@ -220,15 +235,21 @@ else
 end
 set person %self.room.people%
 while %person%
+  set next %person.next_in_room%
   if %person.vnum% == 12318
     %purge% %person%
   end
-  set person %person.next_in_room%
+  set person %next%
 done
 ~
 #12308
 Fur Dragon: adventure cleanup~
-2 e 100
+2 e 100 5
+L e 12300
+L e 12301
+L e 12302
+L e 12303
+L e 12308
 ~
 if %room.building_vnum% >= 12300 && %room.building_vnum% <= 12303
   %build% %room% 12308
@@ -236,7 +257,9 @@ end
 ~
 #12309
 Fur Dragon: furry drake familiar flute~
-1 c 2
+1 c 2 2
+L b 12308
+L o 122
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -249,9 +272,9 @@ if %actor.has_companion(12308)%
   %send% %actor% You already have that familiar in your companion list.
   halt
 end
-* check ability 122 Familiar
+* check ability 122 Feline Familiars
 if !%actor.ability(122)%
-  %send% %actor% You need to have the Familiar ability to use @%self%.
+  %send% %actor% You need to have the Feline Familiars ability to use @%self%.
   halt
 end
 * grant familiar
@@ -262,7 +285,8 @@ nop %actor.add_companion(12308)%
 ~
 #12310
 Fur Dragon: furry drake load script~
-0 nt 100
+0 nt 100 1
+L o 122
 ~
 wait 1
 set pc %self.leader%
@@ -272,9 +296,9 @@ if !%pc%
   %purge% %self%
   halt
 end
-* check for familiar
+* check for feline familiars
 if !%pc.ability(122)%
-  %send% %pc% You must have the Familiar ability to summon ~%self%.
+  %send% %pc% You must have the Feline Familiars ability to summon ~%self%.
   %echo% ~%self% runs away.
   %purge% %self%
   halt
@@ -282,7 +306,8 @@ end
 ~
 #12311
 Fur Dragon: greet and slaughter and start progress~
-0 h 100
+0 h 100 1
+L y 12300
 ~
 set room %self.room%
 * attempt to kill an npc if it qualifies
@@ -311,7 +336,7 @@ done
 ~
 #12314
 Fur Dragon: block learn on patterns~
-1 c 2
+1 c 2 0
 learn~
 * ensure it targeted me
 if %actor.obj_target_inv(%arg%)% != %self%
@@ -334,7 +359,13 @@ return 0
 ~
 #12315
 Fur Dragon: loot/craft bop/boe twiddler and restringer~
-1 n 100
+1 n 100 6
+L c 12336
+L c 12337
+L c 12338
+L c 12339
+L c 12340
+L f 12316
 ~
 * items default to BOP but are set BOE if they come from a craft
 * if they remain BOP, this will also randomly restring them
@@ -389,21 +420,22 @@ else
     set adjective dilapidated
   end
   * restringing: determine start
-  set short_car %self.shortdesc.car%
+  set shortdesc %_obj.name(%self.vnum%)%
+  set short_car %shortdesc.car%
   if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair))
     * add anything that would make this need a "some"
     set prefix some
-    set short %self.shortdesc%
+    set short %shortdesc%
     set is_are are
   elseif %short_car% == a || %short_car% == an || %short_car% == the
     * basic insert
     set prefix %adjective.ana%
-    set short %self.shortdesc.cdr%
+    set short %shortdesc.cdr%
     set is_are is
   else
     * this is a guess? might also just set it to 0 to skip prefixes
     set prefix %adjective.ana%
-    set short %self.shortdesc%
+    set short %shortdesc%
     set is_are is
   end
   * restringing: build strings
@@ -442,9 +474,11 @@ else
   end
   * restringing: add to the look desc
   %mod% %self% append-lookdesc It looks like the last owner's fateful encounter with a fur dragon has left it a bit %adjective%.
-  set keywords %self.keywords%
-  %mod% %self% append-lookdesc-noformat Type 'study %keywords.car%' to take it apart and learn to craft it.
-  %mod% %self% append-lookdesc-noformat (Be sure to 'keep' any copies of it you don't want to lose.)
+  if %item.is_flagged(HARD-DROP)% || %item.is_flagged(GROUP-DROP)%
+    set keywords %self.keywords%
+    %mod% %self% append-lookdesc-noformat Type 'study %keywords.car%' to take it apart and learn to craft it.
+    %mod% %self% append-lookdesc-noformat (Be sure to 'keep' any copies of it you don't want to lose.)
+  end
   * add study script
   attach 12316 %self.id%
 end
@@ -452,7 +486,8 @@ detach 12315 %self.id%
 ~
 #12316
 Fur Dragon: study loot to learn craft~
-1 c 2
+1 c 2 1
+L c 12314
 study~
 * Note: requires 1x boss, 2x group, 3x hard, or 1x group + 1x hard (of same vnum)
 return 1
@@ -464,6 +499,10 @@ if !%arg%
 elseif %actor.obj_target_inv(%arg%)% != %self%
   * possibly trying to study something else
   return 0
+  halt
+elseif !%self.is_flagged(HARD-DROP)% && !%self.is_flagged(GROUP-DROP)%
+  * Normal
+  %send% %actor% @%self% is too damaged to learn anything of use.
   halt
 elseif !%actor.empire%
   %send% %actor% You need to be in an empire to do this. Only members of your empire will be able to use the notes.
@@ -598,7 +637,11 @@ end
 ~
 #12317
 Fur Dragon Combat: Baby spawner~
-0 k 30
+0 k 30 4
+L b 12318
+L w 12317
+L w 12318
+L w 12321
 ~
 if %self.cooldown(12317)% || %self.cooldown(12318)%
   halt
@@ -649,7 +692,7 @@ nop %self.set_cooldown(12317, %timer%)%
 ~
 #12318
 Fur Dragon Combat: Purge baby dragons on enter~
-0 h 100
+0 h 100 0
 ~
 set mother %self.leader%
 if !%mother.fighting%
@@ -659,7 +702,9 @@ end
 ~
 #12319
 Fur Dragon Combat: Itchy mother~
-0 b 15
+0 b 15 2
+L w 12318
+L w 12319
 ~
 if !%self.fighting%
   halt
@@ -699,7 +744,9 @@ dg_affect #12319 %self% BONUS-PHYSICAL %buff% -1
 ~
 #12320
 Fur Dragon Combat: Scratch the ear~
-0 c 0
+0 c 0 2
+L w 12318
+L w 12320
 scratch~
 if %arg% != ear
   set target %actor.char_target(%arg%)%
@@ -740,7 +787,10 @@ remote FurScratching %actor.id%
 ~
 #12321
 Fur Dragon Combat: Buff the baby fur dragon~
-0 b 30
+0 b 30 3
+L b 12318
+L w 12319
+L w 12321
 ~
 if %self.cooldown(12321)%
   halt
@@ -839,7 +889,9 @@ nop %self.set_cooldown(12321, 90)%
 ~
 #12322
 Fur Dragon Combat: pounce~
-0 l 40
+0 l 40 2
+L b 12318
+L w 12322
 ~
 if %self.cooldown(12322)%
   halt
@@ -870,7 +922,9 @@ end
 ~
 #12350
 Hoarfrost Serragon: Leave pit on load~
-0 n 100
+0 n 100 2
+L j 12350
+L w 12350
 ~
 dg_affect #12350 %self% !ATTACK on -1
 if (!%instance.location% || %self.room.template% != 12350)
@@ -881,13 +935,14 @@ mgoto %instance.location%
 ~
 #12351
 Hoarfrost Serragon: Delayed completion~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12352
 Hoarfrost Serragon: Death trigger~
-0 f 100
+0 f 100 1
+L c 12350
 ~
 set inside %instance.start%
 if %inside%
@@ -896,24 +951,140 @@ end
 ~
 #12353
 Hoarfrost Serragon: Terraformer~
-0 i 100
+0 i 100 115
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 5
+L h 6
+L h 7
+L h 8
+L h 9
+L h 12
+L h 13
+L h 14
+L h 19
+L h 20
+L h 21
+L h 23
+L h 24
+L h 25
+L h 26
+L h 32
+L h 33
+L h 36
+L h 37
+L h 38
+L h 39
+L h 40
+L h 41
+L h 42
+L h 43
+L h 44
+L h 45
+L h 46
+L h 47
+L h 50
+L h 51
+L h 53
+L h 54
+L h 56
+L h 57
+L h 58
+L h 59
+L h 60
+L h 63
+L h 64
+L h 70
+L h 71
+L h 72
+L h 73
+L h 74
+L h 75
+L h 76
+L h 77
+L h 78
+L h 79
+L h 80
+L h 81
+L h 82
+L h 83
+L h 84
+L h 85
+L h 87
+L h 88
+L h 89
+L h 90
+L h 91
+L h 98
+L h 99
+L h 200
+L h 201
+L h 202
+L h 203
+L h 204
+L h 210
+L h 211
+L h 212
+L h 220
+L h 221
+L h 222
+L h 223
+L h 224
+L h 230
+L h 231
+L h 232
+L h 233
+L h 234
+L h 240
+L h 241
+L h 242
+L h 243
+L h 244
+L h 245
+L h 250
+L h 251
+L h 252
+L h 253
+L h 260
+L h 12350
+L h 12351
+L h 12352
+L h 12353
+L h 12354
+L h 12355
+L h 12356
+L h 12357
+L h 12358
+L h 12359
+L h 12360
+L h 12361
+L h 12362
+L h 12363
+L h 12364
+L h 12365
+L h 12366
+L h 12367
 ~
 * freezes the tile as the creature walks in, or leashes it
 * configs:
-set avoid_sects 6 15 16 27 28 29 34 35 55 61 62 63 64 65
+set avoid_sects 6 63 64 200 201 202 203 204 210 211 212 220 221 222 223 224 230 231 232 233 234 240 241 242 243 244 245 250 251 252 253 260
 set ignore_sects 8 9
 set frozen_plains 0 7 13 36 40 41 46 50 54 56 59
 set frozen_forest 1 2 3 4 37 38 39 42 43 44 45 47 60 90
 set frozen_desert 20 23
 set frozen_grove 12 14 26 24 25
 set frozen_oasis 21 80 81 83 84
+set frozen_foothills 58 98 99
 set irrigated_field 70 73 75 77 78
 set irrigated_forest 71 74 79
 set irrigated_jungle 72 76
 set dry_oasis 82 91
 set irrigated_oasis 88 89
 set frozen_lake 32 33
-* note: sects 5, 19, 51, 53, 57, 58, 85, and 87 are checked individually below as well
+* note: sects 5, 19, 51, 53, 57, 85, and 87 are checked individually below as well
 * basic checks
 set room %self.room%
 if %self.fighting% || %self.disabled%
@@ -928,82 +1099,127 @@ wait 1
 * check leash
 set dist %room.distance(%instance.location%)%
 if %instance.location% && (%dist% > 4 && %random.2% == 2)
-  if !%self.aff_flagged(!SEE)%
+  if !%self.aff_flagged(NO-SEE-IN-ROOM)%
     %echo% ~%self% burrows down and vanishes from sight!
   end
   mgoto %instance.location%
-  if !%self.aff_flagged(!SEE)%
+  if !%self.aff_flagged(NO-SEE-IN-ROOM)%
     %echo% The ground shakes as ~%self% bursts forth from the pit!
   end
   halt
 end
 * check if we can terraform
+set elog 0
 if %room.sector_vnum% >= 100 || %ignore_sects% ~= %room.sector_vnum%
   * everything outside of this block is forbidden
   * ignore_sects is meant to avoid single-digit vnums matching partial strings
   halt
 elseif %frozen_plains% ~= %room.sector_vnum%
   %echo% Hoarfrost grows over the grass as a bitter cold descends upon the plains.
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some plains
+  end
   %terraform% %room% 12366
 elseif %frozen_forest% ~= %room.sector_vnum%
   %echo% The trees wither and die as hoarfrost overtakes the leaves and ice pours down the trunks!
+  set elog some trees
   %terraform% %room% 12365
 elseif %frozen_desert% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on each plant and every grain of sand, until the desert is covered in ice!
+  set elog some desert
   %terraform% %room% 12350
 elseif %frozen_grove% ~= %room.sector_vnum%
   %echo% The grove is glazed with ice as hoarfrost grows on every branch and leaf!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog a grove
+  end
   %terraform% %room% 12351
 elseif %frozen_oasis% ~= %room.sector_vnum%
-  %echo% The oases glazes over with ice as hoarfrost forms on the plants around it!
+  %echo% The oasis glazes over with ice as hoarfrost forms on the plants around it!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog an oasis
+  end
   %terraform% %room% 12352
 elseif %room.sector_vnum% == 51
   %echo% Hoarfrost spreads across the sandy beach like an arctic wave!
+  set elog a beach
   %terraform% %room% 12353
 elseif %room.sector_vnum% == 57
   %echo% Icebergs form in the water around the frozen shore!
+  set elog the shore
   %terraform% %room% 12354
 elseif %irrigated_field% ~= %room.sector_vnum%
   %echo% Hoarfrost covers every plant as the whole field ices over!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some irrigated fields
+  end
   %terraform% %room% 12355
 elseif %irrigated_forest% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on the trees as the entire forest freezes over!
+  set elog some forest
   %terraform% %room% 12356
 elseif %irrigated_jungle% ~= %room.sector_vnum%
   %echo% Ice and hoarfrost overtake the jungle!
+  set elog some jungle
   %terraform% %room% 12357
 elseif %dry_oasis% ~= %room.sector_vnum%
   %echo% Hoarfrost forms on every plant and rock as ice overtakes the whole area!
+  set elog some desert
   %terraform% %room% 12358
 elseif %room.sector_vnum% == 85
   %echo% The canal freezes over with thick ice!
+  set elog a canal
   %terraform% %room% 12359
 elseif %room.sector_vnum% == 87
   %echo% The canal freezes over with thick ice!
+  set elog a canal
   %terraform% %room% 12360
 elseif %room.sector_vnum% == 19
   %echo% The canal freezes over with thick ice!
+  set elog a canal
   %terraform% %room% 12361
 elseif %irrigated_oasis% ~= %room.sector_vnum%
-  %echo% The oases glazes over with ice as hoarfrost forms on the plants around it!
+  %echo% The oasis glazes over with ice as hoarfrost forms on the plants around it!
+  set elog an oasis
   %terraform% %room% 12362
 elseif %room.sector_vnum% == 5
   %echo% The river grinds to a halt as it rapidly turns to ice!
+  set elog a river
   %terraform% %room% 12363
 elseif %room.sector_vnum% == 53
   %echo% The river grinds to a halt as the entire estuary turns to ice!
+  set elog an estuary
   %terraform% %room% 12364
-elseif %room.sector_vnum% == 58
+elseif %frozen_foothills% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on the grass as any icy cold overtakes the foothills!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog the foothills
+  end
   %terraform% %room% 12367
 elseif %frozen_lake% ~= %room.sector_vnum%
   %echo% Frost grows on the surface of the lake, freezing it in the blink of an eye!
+  set elog a lake
   %terraform% %room% 12368
+end
+* log?
+if %room.empire% && %elog%
+  %log% %room.empire% territory A hoarfrost serragon has frozen %elog% at %room.coords%!
 end
 ~
 #12354
 Hoarfrost Serragon: Start progress goal (pit)~
-2 g 100
+2 g 100 1
+L y 12350
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12350)%
@@ -1011,7 +1227,8 @@ end
 ~
 #12355
 Hoarfrost Serragon: Start progress goal (mob)~
-0 h 100
+0 h 100 1
+L y 12350
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12350)%
@@ -1019,7 +1236,10 @@ end
 ~
 #12356
 Hoarfrost Serragon: Difficulty selector with retreat~
-0 c 0
+0 c 0 3
+L f 12358
+L w 12350
+L w 12351
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
@@ -1028,6 +1248,10 @@ if !%arg%
 end
 if %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
   return 1
   halt
 end
@@ -1095,12 +1319,14 @@ attach 12358 %self.id%
 ~
 #12357
 Hoarfrost Serragon: Instruction to diff-sel~
-0 B 0
+0 B 0 2
+L w 12350
+L w 12360
 ~
 if %self.affect(12360)%
   %send% %actor% You can't attack ~%self% while it's in its death throes!
   return 0
-elseif %self.affect(12350)% && %actor.char_target(%arg%)% == %self%
+elseif %self.affect(12350)%
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
   %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
@@ -1112,7 +1338,10 @@ end
 ~
 #12358
 Hoarfrost Serragon: Resume wandering if nobody fights.~
-0 ab 10
+0 ab 10 3
+L w 12350
+L w 12351
+L w 12360
 ~
 * cancel sentinel and resume movement if nobody is around and fighting me
 if !%self.affect(12351)% && !%self.affect(12360)% && !%self.fighting% && %room.players_present% == 0
@@ -1127,7 +1356,15 @@ end
 ~
 #12359
 Hoarfrost Serragon combat: Avalanche Slam, Coil, Snapping Jaws, Frost Pores / Heat Drain~
-0 k 100
+0 k 100 8
+L w 9602
+L w 12352
+L w 12353
+L w 12355
+L w 12356
+L w 12357
+L w 12358
+L w 12359
 ~
 if %self.cooldown(12352)% || %self.disabled%
   halt
@@ -1376,7 +1613,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12360
 Hoarfrost Serragon: Moving adventure command~
-0 c 0
+0 c 0 0
 adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.location%
@@ -1389,7 +1626,8 @@ end
 ~
 #12361
 Hoarfrost Serragon: Leash for ice creatures~
-0 i 100
+0 i 100 1
+L e 12350
 ~
 set room %self.room%
 if %room.building_vnum% == 12350
@@ -1405,7 +1643,11 @@ end
 ~
 #12362
 Hoarfrost Serragon: Pickpocket rejection strings~
-0 p 100
+0 p 100 4
+L b 12350
+L b 12352
+L b 12353
+L o 142
 ~
 if %ability% != 142
   * not pickpocket
@@ -1417,27 +1659,32 @@ else
 end
 switch %self.vnum%
   case 12350
-    case 12352
-      * hoarfrost serragon, juvenile serragon
-      if !%self.aff_flagged(!ATTACK)%
-        %send% %actor% You can't imagine which part of it might be the "pocket" but it doesn't matter... you've attracted too much attention!
-        %aggro% %actor%
-      else
-        %send% %actor% You can't imagine which part of it might be the "pocket".
-      end
-    break
-    case 12353
-      * rabbit ice
-      %send% %actor% It doesn't seem to have any pockets.
-    break
-    default
-      %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
-    break
-  done
+  case 12352
+    * hoarfrost serragon, juvenile serragon
+    if !%self.aff_flagged(!ATTACK)%
+      %send% %actor% You can't imagine which part of it might be the "pocket" but it doesn't matter... you've attracted too much attention!
+      %aggro% %actor%
+    else
+      %send% %actor% You can't imagine which part of it might be the "pocket".
+    end
+  break
+  case 12353
+    * rabbit ice
+    %send% %actor% It doesn't seem to have any pockets.
+  break
+  default
+    %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
+  break
+done
 ~
 #12363
 Hoarfrost Serragon: Frostscale hatchling combat: Coil, Snapping Jaws~
-0 k 100
+0 k 100 5
+L w 9602
+L w 12352
+L w 12353
+L w 12355
+L w 12358
 ~
 if %self.cooldown(12352)% || %self.disabled%
   halt
@@ -1562,9 +1809,9 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12364
 Hoarfrost Serragon: Fighting characters cannot flee~
-0 c 0
+0 c 0 0
 flee~
-if %actor.fighting%
+if %self.fighting% && %actor.fighting%
   %send% %actor% PANIC! You couldn't escape! The serragon's enormous body is coiled around the entire area!
   return 1
 else
@@ -1573,7 +1820,13 @@ end
 ~
 #12365
 Hoarfrost Serragon: Phase Transition~
-0 l 10
+0 l 10 6
+L b 12357
+L b 12358
+L c 9680
+L f 12366
+L j 12351
+L w 12360
 ~
 * Serragon has dropped below 10% and will teleport players inside for phase 2
 makeuid to_room room i12351
@@ -1632,7 +1885,7 @@ while %ch%
     eval moved %moved% + 1
     %teleport% %ch% %to_room%
     %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
-    %load% obj 11805 %ch% inv
+    %load% obj 9680 %ch% inv
   elseif %ch.is_npc% && %ch.leader%
     if %self.is_tagged_by(%ch.leader%)%
       %teleport% %ch% %to_room%
@@ -1644,7 +1897,11 @@ done
 ~
 #12366
 Hoarfrost Serragon: Check end of phase 2~
-0 ab 100
+0 ab 100 4
+L b 12357
+L b 12358
+L j 12351
+L w 12360
 ~
 * Brings the serragon out of phase 2 if everyone died inside
 set cancel 0
@@ -1680,7 +1937,11 @@ end
 ~
 #12367
 Hoarfrost Serragon: Inside serragon craw death trig~
-0 f 100
+0 f 100 4
+L b 12350
+L b 12357
+L b 12358
+L w 12360
 ~
 set room %self.room%
 set mob %instance.mob(12350)%
@@ -1722,7 +1983,8 @@ return 0
 ~
 #12368
 Hoarfrost Serragon: Craw survival timer~
-0 bw 100
+0 bw 100 1
+L c 12370
 ~
 * Tracks each player's time inside and kills them if it's been too long.
 set room %self.room%
@@ -1764,7 +2026,11 @@ done
 ~
 #12369
 Hoarfrost Serragon: Post-kill safety teleporter~
-0 h 100
+0 h 100 4
+L b 12357
+L b 12358
+L c 9680
+L j 12351
 ~
 * Ensure no players accidentally log in inside this creature when it's not in phase 2
 if %actor.nohassle%
@@ -1805,14 +2071,14 @@ while %ch%
   elseif %ch.is_pc% || !%ch.linked_to_instance%
     * Move ch
     %teleport% %ch% %to_room%
-    %load% obj 11805 %ch%
+    %load% obj 9680 %ch%
   end
   set ch %next_ch%
 done
 ~
 #12370
 Hoarfrost Serragon: You died in the craw~
-1 n 100
+1 n 100 0
 ~
 wait 0
 set actor %self.carried_by%

@@ -2,7 +2,7 @@
 Elemental Rift~
 A Rift Between Worlds~
 &o\()/~
-1000 0 d 0
+1000 0 dA 0
 0 0 0 -1
 E
 rift elemental~
@@ -11,11 +11,109 @@ Flames lash out at you as you move closer and closer, and the wind becomes too
 hot to handle. You will not be able to enter this rift.
 ~
 S
+#12625
+Strange Plant~
+A Strange Plant in the Jungle~
+@.&L\/@.~
+15 0 bdj 0
+0 0 0 -1
+A
+d
+E
+pit ground hole~
+   The jungle floor sinks into a large depression, now totally filled by a
+large, bulbous plant with a large hole in the top.
+~
+E
+plant strange bulbous~
+The plant seems to have died.
+~
+E
+jungle trees forest around~
+   The impenetrable wall of jungle around you is teeming with beautiful and
+exotic plants, none so much as the one in front of you.
+~
+T 12628
+T 12639
+T 12630
+T 12638
+S
+#12626
+Gleaming Plant~
+A Gleaming Plant in the Jungle~
+@.&W*&r\@.~
+15 0 bdjA 0
+0 0 0 -1
+A
+d
+E
+jungle trees forest around~
+   The impenetrable wall of jungle around you is teeming with beautiful and
+exotic plants, none so much as the one in front of you.
+~
+T 12638
+T 12630
+S
+#12627
+Glowing Plant~
+A Glowing Plant in the Jungle~
+@.&Y*&L|@.~
+15 0 bdjA 0
+0 0 0 -1
+A
+d
+E
+shadows canopy~
+Light from the glowing pods illuminates the canopy of leaves above.
+~
+E
+floor ground shimmer~
+   The glowing pods cast a transfixing shimmer across the dry and crunch leaves
+on the jungle floor.
+~
+E
+jungle trees forest around~
+   The impenetrable wall of jungle around you is teeming with beautiful and
+exotic plants, none so much as the one in front of you.
+~
+T 12638
+T 12630
+S
+#12628
+Burbling Swamp~
+A Burbling Spot in the Swamp~
+@.&bo&G^@.~
+15 0 bdj 0
+0 0 0 -1
+A
+d
+E
+swamp murky river water trees forest jungle around muck~
+   The air in the swamp is thick with moisture, and the ground is soft and
+muddy beneath your feet. Strange, burbling noises leave you wondering an
+important question: what lies beneath the mud?
+~
+T 12638
+T 12630
+S
+#12636
+Jungle Tree Complex~
+A Complex of Buildings High in the Jungle~
+&0[  ]~
+1 0 aR 0
+0 4 0 -1
+D
+   The trunk of a mighty jungle tree divides this small wooden building in two,
+providing both support and protection from the ground far below. Other
+buildings attach to nearby trees, connected by skybridges and ropes to create a
+secure complex away from prying eyes.
+~
+S
 #12650
 Grove Portal~
 A Portal in the Forest~
 @.&L()@.~
-50 0 d 0
+50 0 dA 0
 0 0 0 -1
 C
 enter portal~

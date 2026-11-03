@@ -8,7 +8,7 @@ rewards and compete for a high event rank.
    Type 'event Winter Wonderland' for more information.
 ~
 10700 10729 0-400
-50 0 eko 0
+50 0 ekoq 0
 L
 5 0
 240 -1 -1 -1
@@ -50,6 +50,10 @@ L
 1 0
 10775 -1 -1 -1
 9 d 0
+L
+20 0
+-1 -1 -1 -1
+-1 l 0
 T 10778
 S
 $

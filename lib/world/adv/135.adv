@@ -1,0 +1,31 @@
+#13500
+High Temple: Long-Lost Labyrinth~
+Paul Clarke~
+   A small tremor has opened a narrow opening in the foundation of the temple.
+Something lies below. It seems the temple was built upon an older structure,
+long forgotten, unexplored and unknown. It certainly predates the empire. But
+who built it -- and why -- are lost to time. With any luck, it has been sealed
+so long that no one has looted it. Yet.
+~
+13500 13599 250-350
+5 0 eklp 0
+L
+0 a
+5150 -1 -1 -1
+9 0 0
+L
+5 0
+1440 -1 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1 -1
+-1 0 0
+Z1 2
+_
+   This adventure has a strong "unreliable narrator" -- the labyrinth is a
+maze, the minotaur is a cyclops. Be careful assuming anything in here is an
+error.
+~
+S
+$

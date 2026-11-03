@@ -1,7 +1,7 @@
 #11988
 Clear-Cut Calamander~
 A Clear-Cut Calamander Grove~
-'.' 10 il 4 a p
+'.' 10 il 4 aD p
 C
 dig~
 D0
@@ -37,7 +37,7 @@ S
 #11989
 Calamander Thicket~
 A Calamander Thicket~
-'.' 4 ilq 6 ad gp
+'.' 4 ilq 6 adD gp
 C
 chop, dig~
 D0
@@ -80,7 +80,7 @@ S
 #11990
 Calamander Grove~
 A Calamander Grove~
-'.' 4 iq 8 ad gp
+'.' 4 ilq 8 adD gp
 C
 chop, dig~
 D0
@@ -127,7 +127,7 @@ S
 #11991
 Calamander Jungle~
 A Calamander Jungle~
-'Y' 4 iq 12 ad gp
+'Y' 4 ilq 12 adD gp
 C
 chop, dig~
 D0
@@ -209,11 +209,11 @@ D0
 YYY&g.~
 &b~
 E
-0 0 100.00 61
+0 0 100.00 222
 E
-4 0 0.80 65
+4 0 0.80 224
 E
-9 0 50.00 27
+9 0 50.00 221
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 91.00 125 d  # DIG: rock
 I 6 3017 75.00 25  # FORAGE: plump fig

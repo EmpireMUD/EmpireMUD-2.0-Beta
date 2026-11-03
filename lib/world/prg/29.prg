@@ -86,10 +86,13 @@ Moonstone Smelting~
 eventide ingots, which are used in the making of powerful weapons and armor.
 Any member with Imperial Armors can smelt these two ingots.
 ~
-3 2 30 0 b
+4 2 30 0 ab
 K 2 610
 K 2 611
 P 2016
+_
+Replaced by object 12848, 12849 in Celestial Forge.
+~
 S
 #2909
 Herbcloth Weaving~
@@ -115,7 +118,8 @@ P 2018
 S
 #2911
 Faster Prospecting~
-Everyone in your empire will now prospect faster.
+   Everyone in your empire will now prospect faster. Note that this only
+applies to players, not workforce NPCs.
 ~
 1 2 50 0 b
 K 0 17

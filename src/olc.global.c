@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -229,7 +230,10 @@ char *list_one_global(struct global_data *glb, bool detail) {
 */
 void olc_delete_global(char_data *ch, any_vnum vnum) {
 	struct global_data *glb;
+	descriptor_data *desc;
+	trig_data *trig, *next_trig;
 	char name[256];
+	bool found;
 	
 	if (!(glb = global_proto(vnum))) {
 		msg_to_char(ch, "There is no such global %d.\r\n", vnum);
@@ -250,6 +254,26 @@ void olc_delete_global(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_GLB);
 	save_library_file_for_vnum(DB_BOOT_GLB, vnum);
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_GLOBAL, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to global [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
+	// update olc editors
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_GLOBAL, vnum);
+			if (found) {
+				msg_to_desc(desc, "Global [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
+			}
+		}
+	}
+	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted global %d %s", GET_NAME(ch), vnum, name);
 	msg_to_char(ch, "Global %d (%s) deleted.\r\n", vnum, name);
 	
@@ -266,6 +290,7 @@ void olc_delete_global(char_data *ch, any_vnum vnum) {
 void olc_search_global(char_data *ch, any_vnum vnum) {
 	struct global_data *glb = global_proto(vnum);
 	int found;
+	trig_data *trig, *next_trig;
 	
 	if (!glb) {
 		msg_to_char(ch, "There is no global %d.\r\n", vnum);
@@ -275,7 +300,13 @@ void olc_search_global(char_data *ch, any_vnum vnum) {
 	found = 0;
 	build_page_display(ch, "Occurrences of global %d (%s):", vnum, GET_GLOBAL_NAME(glb));
 	
-	// globals are not actually used anywhere else
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_GLOBAL, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		}
+	}
 	
 	if (found > 0) {
 		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
@@ -308,6 +339,9 @@ void save_olc_global(descriptor_data *desc) {
 	if (GET_GLOBAL_NAME(proto)) {
 		free(GET_GLOBAL_NAME(proto));
 	}
+	if (GET_GLOBAL_NOTES(proto)) {
+		free(GET_GLOBAL_NOTES(proto));
+	}
 	free_interactions(&GET_GLOBAL_INTERACTIONS(proto));
 	free_archetype_gear(GET_GLOBAL_GEAR(proto));
 	while ((spawn = GET_GLOBAL_SPAWNS(proto))) {
@@ -321,6 +355,10 @@ void save_olc_global(descriptor_data *desc) {
 			free(GET_GLOBAL_NAME(glb));
 		}
 		GET_GLOBAL_NAME(glb) = str_dup(default_glb_name);
+	}
+	if (GET_GLOBAL_NOTES(glb) && !*GET_GLOBAL_NOTES(glb)) {
+		free(GET_GLOBAL_NOTES(glb));
+		GET_GLOBAL_NOTES(glb) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -352,6 +390,7 @@ struct global_data *setup_olc_global(struct global_data *input) {
 
 		// copy things that are pointers
 		GET_GLOBAL_NAME(new) = GET_GLOBAL_NAME(input) ? str_dup(GET_GLOBAL_NAME(input)) : NULL;
+		GET_GLOBAL_NOTES(new) = GET_GLOBAL_NOTES(input) ? str_dup(GET_GLOBAL_NOTES(input)) : NULL;
 		
 		// copy pointers
 		GET_GLOBAL_INTERACTIONS(new) = copy_interaction_list(GET_GLOBAL_INTERACTIONS(input));
@@ -509,6 +548,8 @@ void olc_show_global(char_data *ch) {
 		}
 	}
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_NOTES(glb)), NULLSAFE(GET_GLOBAL_NOTES(glb)));
+	
 	send_page_display(ch);
 }
 
@@ -573,7 +614,7 @@ OLC_MODULE(gedit_climateexclude) {
 		msg_to_char(ch, "You can't set climateexclude on this type.\r\n");
 	}
 	else {
-		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "climate", "climateexclude", climate_flags, GET_GLOBAL_TYPE_EXCLUDE(glb));
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "climate exclusion", "climateexclude", climate_flags, GET_GLOBAL_TYPE_EXCLUDE(glb));
 	}
 }
 
@@ -694,6 +735,19 @@ OLC_MODULE(gedit_mobflags) {
 OLC_MODULE(gedit_name) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_GLOBAL_NAME(glb));
+}
+
+
+OLC_MODULE(gedit_notes) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_GLOBAL_NAME(glb));
+		start_string_editor(ch->desc, buf, &GET_GLOBAL_NOTES(glb), MAX_NOTES, TRUE);
+	}
 }
 
 

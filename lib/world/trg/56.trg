@@ -1,6 +1,7 @@
 #5608
 Study: create board~
-2 o 100
+2 o 100 1
+L c 1
 ~
 %load% obj 1
 set board %room.contents%
@@ -9,7 +10,8 @@ detach 5608 %self.id%
 ~
 #5609
 Study: remove board~
-2 s 0
+2 s 0 1
+L c 1
 ~
 set obj %room.contents%
 while %obj%

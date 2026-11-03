@@ -188,25 +188,25 @@ Rare Stockpiles~
 resources: leather, gems, and rare metals. Completing this goal earns you a
 higher workforce cap, if you have a workforce.
 ~
-8 2 0 50 0
+9 2 0 50 0
 K 6 100
 P 2016
 W
-34 1206 0 150 a
+34 1206 0 75 a
 W
-34 1300 0 150 a
+34 1300 0 75 a
 W
-34 103 0 150 a
+34 103 0 75 a
 W
-34 104 0 150 a
+34 104 0 75 a
 W
 34 177 0 75 a
 W
 34 176 0 75 a
 W
-35 6521 0 250 a
+35 6521 0 150 a
 W
-35 6530 0 250 a
+35 6530 0 150 a
 S
 #2018
 Collecting Herbs~

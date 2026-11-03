@@ -1,0 +1,973 @@
+#15900
+goblin scrapboss boss~
+the goblin scrapboss~
+The goblin scrapboss is dragging a bag of nails.
+~
+75 175 adyzIJLM cm 2
+1 0 0 6 -1 -1
+D
+   The scrapboss is stocky, for a goblin. His skin is the palest shade of
+green, to the point that it almost shimmers in direct light. His clothing is
+leather, but bulges all over reveal the plates of metal and wood that are
+crammed into every pocket. Near him sit a bag of nails and a travois laden with
+scrapwood.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+15
+The goblin scrapboss is wading through the water.~
+T 15905
+T 15902
+T 15900
+T 15903
+T 15901
+T 15909
+S
+#15901
+goblin wavewhisperer whisperer wave-whisperer~
+the goblin wavewhisperer~
+The goblin wavewhisperer stares serenely off into the distance.
+~
+75 175 adxyIJLM c 2
+2 0 86 39 -1 -1
+D
+   The old whisperer has a deep jade complexion, though she has smeared a light
+paste over her face and upper arms. Her violet cloth robes are stitched with
+gleaming silver, though the edges are frayed and torn. Her face bears a serene
+demeanor and her eyes never fix on a single point as she looks off. There's a
+glass water pipe tucked under her arm.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+T 15905
+T 15900
+T 15901
+T 15904
+T 15909
+T 15916
+T 15910
+S
+#15902
+goblin crabherd crab-herd herd~
+the goblin crabherd~
+The goblin crabherd is looking for something.
+~
+75 175 adyIJLM c 2
+2 0 86 3 -1 -1
+D
+   The young crabherd has wisely bound both of her pale green legs with strips
+of hardened leather; the strips are etched and marred by the pinch-marks of
+crustacean claws. She has also tied her long red hair up out of reach of the
+little crawlers.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+T 15905
+T 15900
+T 15901
+T 15904
+T 15909
+T 15916
+T 15910
+S
+#15903
+goblin raidscribe raid-scribe scribe~
+the goblin raidscribe~
+The goblin raidscribe is carving notches into a long pole.
+~
+75 175 adyIJLM c 2
+1 0 86 3 -1 -1
+D
+   The raidscribe has aged to the point that his skin, now almost gray, cracks
+like stone. Here and there, dried blood is caked to the cracks, though there's
+no way to tell from here if it's his blood or someone else's. He holds a long
+wooden pole with a series of notched and grooved patterns, and it looks like
+he's finishing the work.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+T 15905
+T 15900
+T 15901
+T 15904
+T 15909
+T 15916
+T 15910
+S
+#15904
+goblin ropesnarl rope-snarl snarl !#n~
+a goblin ropesnarl~
+A goblin ropesnarl is twirling a net.
+~
+75 175 acdIJM c 2
+0 0 77 38 -1 -1
+D
+   The lime-green old ropesnarl is dressed in tattered canvas shorts and little
+else, save for the spare rope and netting slung around the shoulder.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+say Me gonna kill a human today!~
+M
+7
+say Hold still, me make it quick with the net.~
+M
+8
+say This is me net.~
+M
+8
+say Many nets like it, but this one is me's.~
+M
+9
+set line_gap 2 sec~
+M
+9
+say Me gonna kill a hu...~
+M
+9
+set line_gap 9 sec~
+M
+9
+say Uh, mongous elephant. That's what me meant.~
+M
+10
+say Me thought it was trouble, but just you again.~
+M
+10
+say You should be more careful around goblins.~
+M
+10
+say You look a lot like food.~
+M
+10
+say Not very good food.~
+M
+10
+say But goblins not picky.~
+M
+0
+$n repairs a knot in $s net.~
+M
+0
+$n curses as $e pinches $s finger while fixing $s net.~
+M
+0
+$n spits on the ground.~
+M
+0
+$n tosses $s net up into the air to check for holes.~
+M
+0
+$n picks up a pebble and ties it in as a new net weight.~
+T 15905
+T 15902
+T 15900
+T 9506
+T 9621
+S
+#15905
+goblin bonecounter bone-counter counter !#n~
+a goblin bonecounter~
+A goblin bonecounter is eyeing you up and down.
+~
+75 175 acdIJM c 2
+0 0 77 4 -1 -1
+D
+   The funny little bonecounter peers at you through comically oversized
+spectacles that magnify gold and jade eyes to the size of goblin saucers.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+say You sure got a lot of bones there...~
+M
+7
+say Shame if anything were to happen to them.~
+M
+8
+say You using all those bones?~
+M
+8
+say Could take some of them off of your hands for you.~
+M
+9
+set line_gap 2 sec~
+M
+9
+say Smells like filthy hu...~
+M
+9
+set line_gap 9 sec~
+M
+9
+say ...mpthing. Smells like filthy something.~
+M
+9
+say Definitely not you. You smells fine.~
+M
+9
+say Not at all like a goblin gong farm.~
+M
+10
+say You sure got a lot of bones there...~
+M
+10
+say Let me know if you lose any of them. Lots to spare.~
+M
+0
+The goblin counts on $s fingers.~
+M
+0
+$n eyes you suspiciously.~
+M
+0
+$n sharpens $s knife on $s teeth.~
+M
+0
+$n picks at $s teeth.~
+M
+0
+$n holds $s nose as $e passes you.~
+T 15905
+T 15902
+T 15900
+T 9621
+S
+#15906
+goblin shellpicker shell-picker picker !#n~
+a goblin shellpicker~
+A goblin shellpicker is gleaming in the light.
+~
+75 175 acdIJM c 2
+0 0 0 5 -1 -1
+D
+   The shellpicker is tall for a goblin and decked out in hundreds of shells,
+forming a rather clattering dress.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+say You say something to me?~
+M
+7
+say People who say wrong things to me wind up dead.~
+M
+7
+say Save me trouble and die, ok?~
+M
+8
+say You using all them bones?~
+M
+8
+say Could make nice display rack for my shells.~
+M
+8
+say What's your favorite color?~
+M
+8
+say That's what color shells I put on your bones.~
+M
+9
+set line_gap 5 sec~
+M
+9
+emote $n picks up a shell and rubs it on $s shirt.~
+M
+9
+say Little shell down on the groundy,~
+M
+9
+say Lost by someone, now I found ye.~
+M
+9
+say Spit a bit and polish gently,~
+M
+9
+say Soon I'll sell ye and make money.~
+M
+10
+say Don't take any shells.~
+M
+10
+say Just 'cause we let you be here don't mean you can have shells.~
+M
+10
+say All the shells are claimed. Even that one.~
+M
+10
+emote $n picks up a shell.~
+M
+0
+$n picks up a shell and inspects it.~
+M
+0
+$n picks up a shell but tosses it back.~
+M
+0
+$n picks up a shell and pockets it.~
+M
+0
+$n bumps into you while looking at the ground.~
+M
+0
+$n pushes your foot aside to pick up a shell.~
+T 15905
+T 15902
+T 15900
+T 9621
+S
+#15907
+goblin lootcaller loot-caller caller !#n~
+a goblin lootcaller~
+A goblin lootcaller is barking out orders.
+~
+75 175 acdIJM c 2
+0 0 0 17 -1 -1
+D
+   The little green lootcaller's pockets are absolutely bulging, giving a
+distinct, high-pitched rattle with each step.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+emote $n considers $s chances at selling your gear.~
+M
+7
+say Lot o' nice stuff you've got.~
+M
+7
+say Shame if someone were to... take it.~
+M
+8
+say Fresh fish!~
+M
+8
+say Do us a favor, Fish.~
+M
+8
+say Take off all o' that gear and set it in a neat pile.~
+M
+8
+say And scratch in what you think it's worth.~
+M
+9
+emote $n considers $s chances at selling your gear.~
+M
+9
+say Could probably make a lot o' money off you.~
+M
+9
+say You're lucky I like you.~
+M
+9
+say Even if you are reeeeeal ugly.~
+M
+10
+say You shoulda been born a goblin.~
+M
+10
+say You kinda got the ears for it.~
+M
+0
+Sparks fly as $n polishes $s staff.~
+M
+0
+$n holds $s staff up toward the sky, where little bolts of lightning crackle over it.~
+M
+0
+$n taps the ground with $s staff, sending thunderous tremors that can be felt several feet away.~
+M
+1
+Fish.~
+T 15905
+T 15902
+T 15900
+T 9621
+S
+#15908
+goblin banner-lugger bannerlugger lugger !#n~
+a goblin banner-lugger~
+A goblin banner-lugger is standing here.
+~
+75 175 acdIJM c 2
+0 0 61 3 -1 -1
+D
+The gray-green goblin drags a tall banner across the field.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+emote $n plants $s banner in the ground and wipes $s brow.~
+M
+7
+say You makin' that dumb face because you want to fight?~
+M
+8
+emote $n plants $s banner in the ground and wipes $s brow.~
+M
+8
+say Welcome to Goblinville, new home for goblins. You not welcome.~
+M
+9
+emote $n plants $s banner in the ground and wipes $s brow.~
+M
+9
+say Oh hey, you again.~
+M
+10
+emote $n plants $s banner in the ground and wipes $s brow.~
+M
+10
+say We gotta get one more goblin. New guy carries the banner.~
+M
+0
+Sweat drips down $n's gray-green brow.~
+M
+0
+$n stops to catch $s little breath.~
+M
+0
+$n sighs.~
+M
+0
+The little goblin struggles with the banner.~
+M
+1
+Why's it always me?~
+T 15905
+T 15902
+T 15900
+T 9621
+S
+#15909
+goblin flame-skulker flameskulker skulker !#n~
+a goblin flame-skulker~
+A goblin flame-skulker is lurking nearby.
+~
+75 175 acdIJM c 2
+0 0 77 12 -1 -1
+D
+   Unlike the other goblins, this flame-skulker has black skin without even the
+slightest hint of green. Wisps of soot flow behind, too, so perhaps this goblin
+is just very dirty.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+say You know what happens to a human caught on fire?~
+M
+7
+emote $n plays with some firesteel, sending sparks flying.~
+M
+7
+say Same thing as happens to everybody else!~
+M
+8
+emote You catch $n trying to set your clothes on fire.~
+M
+8
+say To every person, burn, burn, burn.~
+M
+9
+emote $n plays with some firesteel, sending sparks flying.~
+M
+9
+say Want to get lit?~
+M
+9
+say Probably doesn't mean what you think it means.~
+M
+9
+say Bet you'd smell good on fire.~
+M
+10
+emote $n plays with some firesteel, sending sparks flying.~
+M
+10
+say We gotta stop making friends and do more conquering.~
+M
+0
+$n plays with some firesteel, sending sparks flying.~
+M
+0
+$n tries to wipe off $s face, but it's no use.~
+M
+0
+$n shrieks as $e plays with fire.~
+M
+0
+$n applies some balm to $s burns.~
+M
+1
+Burn!~
+T 15905
+T 15902
+T 15900
+T 9621
+S
+#15910
+goblin tarflinger tar-flinger flinger !#n~
+a goblin tarflinger~
+A goblin tarflinger is holding a bucket.
+~
+75 175 acdIJM c 2
+0 0 11 15 -1 -1
+D
+   As you're trying to work out what a tarflinger is, the goblin lobs a ball of
+tar in your direction.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+say I found one! I found one!~
+M
+7
+say How many teeth you got? Looks like a lot.~
+M
+7
+say Might double my collection.~
+M
+8
+emote $n juggles some balls of tar.~
+M
+8
+emote $n juggles some balls of tar.~
+M
+8
+emote $n juggles some balls of tar.~
+M
+8
+emote A tar ball comes down right on $n's head as $e tries to juggle.~
+M
+8
+say Should've been a sewer goblin.~
+M
+9
+say I found one! I found one!~
+M
+9
+emote $n takes a good look at your mouth.~
+M
+9
+say Oh, it's just you.~
+M
+9
+say Scrapboss says I can't have your teeth.~
+M
+10
+emote $n juggles some balls of tar.~
+M
+10
+emote $n juggles some balls of tar.~
+M
+10
+emote $n juggles some balls of tar.~
+M
+10
+emote A tar ball comes down right on $n's head as $e tries to juggle.~
+M
+10
+say Should've gone to that tower instead. Bet they got rich.~
+T 15905
+T 15902
+T 15900
+T 9621
+S
+#15911
+goblin deadwright dead-wright wright !#n~
+a goblin deadwright~
+A goblin deadwright seems to be chanting something.
+~
+75 175 dxIJM c 2
+0 0 9 19 -1 -1
+D
+   The old goblin is draped in white robes that have so much extra material
+you can hardly see the green under them. Whispers echo in your ears, softly at
+first, but as you approach the deadwright, the sounds of the damned become
+deafening.
+~
+F 15900
+I 4 15945 0.20 1 a  # LOOT: chest of silver
+I 4 15941 0.30 1 a  # LOOT: calendar stick
+I 4 15939 0.50 1 a  # LOOT: True Fragment of Waur
+I 4 15944 0.50 1 a  # LOOT: modified brass chamberpot
+I 4 15943 1.50 1 a  # LOOT: goblin art bone
+I 4 15940 3.50 1 a  # LOOT: cracked ceramic gnome
+I 4 15942 3.50 1 a  # LOOT: up-market brass doorknob
+M
+7
+say By the pricking of my bones...~
+M
+7
+say Something living this way comes.~
+M
+7
+say For now, that is.~
+M
+8
+say I sense death in the air.~
+M
+8
+say Yours, maybe. Mine, maybe.~
+M
+8
+say But either way, lots and lots of death.~
+M
+8
+say Just as the bones foretell.~
+M
+9
+say Fury of the Godlins guide us...~
+M
+9
+say Roil the grass and fell the treezy.~
+M
+9
+say Bring us goblins up to greatness...~
+M
+9
+say With these humans, should be easy.~
+M
+10
+say In the beginning, we were cut from jade.~
+M
+10
+say A sacred cleaving that cannot be undone.~
+M
+10
+say The ancestors tried once.~
+M
+10
+say It wasn't good.~
+T 15905
+T 15902
+T 15900
+T 15911
+T 9621
+S
+#15912
+#n tender crabherd herd~
+the crabherd~
+#n is tending the crab pens.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1 -1
+D
+   This effervescent fellow has been stuck with the odious task of mucking out
+the crab pens.
+~
+M
+0
+$n pins $s nose.~
+M
+0
+$n mucks out one of the pens.~
+M
+0
+$n tosses a dead crab in the bin.~
+M
+0
+$n leans out of the pens in a futile search for fresh air.~
+M
+0
+You can almost see the stink lines over the crab pens.~
+M
+0
+Something skitters past you.~
+M
+0
+Something pinches your ankle.~
+M
+0
+The odor threatens to overpower you.~
+S
+#15913
+crab skittering~
+a skittering crab~
+A crab skitters around.
+~
+25 50 djloz cGU 1
+0 0 8 3 -1 -1
+D
+   The red-orange crab skitters around on four pairs of pointed legs, stopping
+from time to time to snip at something with its outsized claws.
+~
+I 0 15913 100.00 1  # BUTCHER: delectable crabmeat
+M
+6
+A crab is scuttling along sideways.~
+M
+6
+A crab is here, waving one claw.~
+M
+6
+A crab lurks nearby.~
+M
+6
+A crab is here, trying to dig a shallow pit.~
+M
+6
+A crab scuttles about.~
+M
+6
+A crab skitters around.~
+M
+6
+A crab darts over your foot.~
+M
+6
+A crab snaps at you.~
+S
+#15914
+crab skittering~
+a skittering crab~
+A crab skitters around.
+~
+25 50 bdjloz cGU 1
+0 0 8 3 -1 -1
+D
+   The red-orange crab skitters around on four pairs of pointed legs, stopping
+from time to time to snip at something with its outsized claws.
+~
+I 0 15913 100.00 1  # BUTCHER: delectable crabmeat
+M
+6
+A crab is scuttling along sideways.~
+M
+6
+A crab is here, waving one claw.~
+M
+6
+A crab lurks nearby.~
+M
+6
+A crab is here, trying to dig a shallow pit.~
+M
+6
+A crab scuttles about.~
+M
+6
+A crab skitters around.~
+M
+6
+A crab darts over your foot.~
+M
+6
+A crab snaps at you.~
+S
+#15915
+deck-rat deckrat rat privateer~
+a deck-rat privateer~
+A deck-rat privateer sniffs the air in its little jacket.
+~
+1 1 bdo n 3
+0 0 11 9 -1 -1
+D
+   The scruffy little rat is decked out in its own little captain's jacket and
+tricorne. It sits on its hind legs, sniffing the air with an upturned nose that
+gives it an almost human erudition.
+~
+M
+0
+$n cleans $s whiskers.~
+M
+0
+$n takes off $s hat and brushes $s head with one paw.~
+M
+0
+$n squeaks out an order.~
+M
+0
+$n squeaks.~
+M
+0
+$n lets out a little squeak.~
+M
+0
+$n nibbles an olive.~
+M
+0
+$n sniffs at your leg.~
+S
+#15916
+manatee trained~
+a trained manatee~
+A trained manatee rolls around on the ground.
+~
+100 125 bdejl 0 4
+0 0 6 9 -1 -1
+D
+   This bulky gray-green creature has tiny, sad eyes, which seem to watch you
+rather intently. It smells of salt and spoiled fish, particularly when it opens
+its mouth. It bears saddle marks and doesn't flee from your presence, so it
+seems as if it's been trained for riding. Imagine how good it'd look if you put
+some armor on it!
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1357 100.00 2  # SKIN: large piece of leather
+I 3 15917 100.00 1  # BARDE: manatee o' war
+M
+15
+A trained manatee floats idly just below the surface.~
+S
+#15917
+manatee o' war~
+a manatee o' war~
+A manatee o' war stands on makeshift legs.
+~
+100 125 bdej L 4
+0 0 6 9 -1 -1
+D
+   Someone has outfitted this trained manatee with articulated legs made from
+bits of metal and rough wood. Still stranger, the creature has learned to
+operate them and now functions on both land and see as a powerful mount.
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1357 100.00 2  # SKIN: large piece of leather
+M
+15
+A manatee o' war lurks just beneath the surface.~
+S
+#15918
+#n sharkherd herd~
+#n the sharkherd~
+The sharkherd, #n, watches from a small raft.
+~
+20 40 bdqI 0 3
+1 0 3 5 -1 -1
+D
+   The sharkherd is a small, green fellow, seated on a raft. Though he seems to
+be a goblin, he has taken a human name and is dutifully tending the empire's
+sea creatures.
+~
+I 4 3812 100.00 1  # LOOT: fillet of grilled fish
+S
+#15922
+haberdasher goblin~
+a goblin haberdasher~
+A goblin haberdasher stands here in his finery.
+~
+75 175 bdoG cm 3
+1 0 0 4 -1 -1
+D
+   This little goblin is bedazzled with gleaming sequins that cover his suit,
+his hat, his shoes, and even his gloves. He drags with him a kit full of
+threads, buttons, and cloths and he works industriously to turn them into fine
+goblincraft clothing.
+~
+M
+0
+$n gasps as $e accidentally jabs $s finger with a needle.~
+M
+0
+$n works on some stitching.~
+M
+0
+$n sews some cloth.~
+M
+0
+$n cuts some cloth.~
+M
+0
+$n trims a piece of leather.~
+M
+0
+$n hums.~
+M
+0
+$n hums.~
+M
+0
+$n hums.~
+M
+0
+$n hums softly.~
+M
+0
+$n holds a piece of clothing up to you.~
+M
+0
+$n works on something.~
+T 9803
+T 15925
+T 15924
+T 15923
+T 9903
+T 9809
+S
+$

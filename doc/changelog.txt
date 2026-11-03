@@ -152,7 +152,7 @@ cost.
 - Unseen Passing: Changed this ability similar to No Trace. It now correctly
 functions in all buildings, on roads, and all claimed city tiles. It also no
 longer works inside adventure zones.
-- Various: Updated backstab, bash, kick, and damage spells (lightingbolt, et
+- Various: Updated backstab, bash, kick, and damage spells (lightningbolt, et
 al) to start combat meters early, so that they track damage from the opening
 hit.
 - Weaken: Now drains both Strength and Intelligence.

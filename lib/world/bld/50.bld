@@ -12,10 +12,8 @@ C
 tomb~
 E
 grave tomb headstone~
-   You come amarker a solitary grave, marked only by a plain wooden cross. The
-marker bears a single name, etched in faded letters. The surrounding area is
-peaceful, as if nature has taken it upon itself to guard the final resting
-place of this unknown soul.
+   You come across a solitary grave, marked only by a simple wooden symbol and
+a few rocks.
 ~
 F
 B
@@ -202,11 +200,7 @@ The City Center~
 0 0 0 -1
 E
 city center plaza building around~
-   The bustling plaza at the center of the city seems to act as an anchor -- a
-fixed point for people to gather. The city stretches in all directions from
-here, such that you can hardly see the edge. The paved ground beneath your feet
-bustles with activity as people hurry to and fro, chatting and laughing along
-the way.
+This bustling plaza is the heart of the city.
 ~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 S
@@ -224,13 +218,8 @@ C
 dismantle~
 E
 ruins flooded flooding building~
-   As you wade through the water, you realize you're standing in what must have
-been a grand structure, now reduced to ruins. The murky water obscures the
-floor beneath, making it difficult to discern any details about the original
-use of the building. Broken pillars jut up from the water, hinting at the
-building's former grandeur. The only sounds are the lapping of the waves and
-the occasional creaking of timbers, as if the ruins are trying to hold
-themselves together.
+   The ruins around you are unrecognizable, mostly sunken into the water, with
+only the stray pillar jutting up.
 ~
 T 5010
 S
@@ -341,11 +330,7 @@ C
 dismantle~
 E
 ruins gatehouse house building around~
-   The ruins of a gatehouse loom over you, its walls and towers broken and
-crumbled. You can see the remnants of a once-sturdy gate, now rusted and
-twisted on its hinges. Moss and vines cling to the crumbling stones, hinting at
-the long passage of time. Despite the destruction, there is a sense of history
-and importance to the place, as if it played a crucial role in the past.
+The broken walls and crumbled tower of the gatehouse lie in ruins.
 ~
 T 5007
 S

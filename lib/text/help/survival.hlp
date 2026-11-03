@@ -46,7 +46,7 @@ Find Herbs (Survival ability)
 Usage:  pick
 
 With the ability to find herbs, your "pick" command will find new things
-instead of flowers.
+in addition to flowers.
 
 Find Herbs gains experience when you pick herbs.
 
@@ -184,6 +184,8 @@ Usage:  where [name]
 Range:  75 tiles
 
 Increases the base range of your "where" command to 75 tiles.
+
+Gains experience when you use the "where" command.
 
 See also: WHERE
 #

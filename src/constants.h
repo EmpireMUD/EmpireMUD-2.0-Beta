@@ -74,6 +74,13 @@ struct climate_temperature_t {
 	double heat_modifier;	// multiplies hot temperatures by this
 };
 
+// for eedit_toggles
+struct eedit_toggle_data_t {
+	char *name;
+	int tech_required;	// TECH_ needed on the empire (may be NO_TECH)
+	bitvector_t admin_flag;	// EADM_ flag to be set (may be NOBITS)
+};
+
 // used to determine the order and value of reputations
 struct faction_reputation_type {
 	int type;	// REP_ type
@@ -152,7 +159,8 @@ struct wear_data_type {
 //// EXTERNS /////////////////////////////////////////////////////////////////
 
 // empiremud constants
-extern const char *level_names[][2];
+extern struct eedit_toggle_data_t eedit_toggle_data[];
+extern const char *level_names[LVL_TOP+1][2];
 extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];
 extern const char *reboot_types[];
@@ -216,6 +224,7 @@ extern const char *combat_message_types[];
 extern const char *friend_status_types[];
 extern const char *grant_bits[];
 extern const char *informative_view_bits[];
+extern const char *lore_types[];
 extern const char *mount_flags[];
 extern const char *player_bits[];
 extern const char *preference_bits[];
@@ -247,6 +256,7 @@ extern const char *partial_dirs[][2];
 extern const char *affected_bits[];
 extern const char *affected_bits_consider[];
 extern const bool aff_is_bad[];
+extern const bool allow_affect_flag_on_items[];
 extern const char *health_levels[];
 extern const char *move_levels[];
 extern const char *mana_levels[];
@@ -376,12 +386,14 @@ extern const char *quest_reward_types[];
 extern const char *bld_on_flags[];
 extern const bitvector_t bld_on_flags_order[];
 extern const char *bld_flags[];
+extern const char *bld_flag_notes[];
 extern const char *bld_relationship_types[];
 extern const int bld_relationship_vnum_types[];
 extern const char *climate_flags[];
 extern const struct climate_temperature_t climate_temperature[];
 extern const bitvector_t climate_flags_order[];
 extern const bool climate_ruins_vehicle_slowly[][2];
+extern const struct color_code_info_t color_code_info[];
 extern const char *crop_flags[];
 extern const char *crop_custom_types[];
 extern const char *depletion_types[];
@@ -396,9 +408,10 @@ extern const char *function_flags_long[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char mapout_color_tokens[];
-extern const char banner_to_mapout_token[][2];
+extern const char *mine_levels[];
 extern const char *road_types[];
 extern const char *room_aff_bits[];
+extern const char *room_aff_notes[];
 extern const char *room_extra_types[];
 extern const char *sector_flags[];
 extern const char *sect_custom_types[];
@@ -480,6 +493,7 @@ extern const struct gen_craft_data_t gen_craft_data[];
 extern const int base_hit_chance;
 extern const int base_player_pools[NUM_POOLS];
 extern const char *book_name_list[];
+extern const int default_rep_per_kill;
 extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
 extern const char *pk_modes[];

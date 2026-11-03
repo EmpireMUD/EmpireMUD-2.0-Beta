@@ -91,6 +91,71 @@ tiny broom whistle~
 T0
 Your tiny broom whistle cooldown has ended.~
 S
+#12626
+caught in the sundew~
+4 0
+0 0 0 0
+T5
+...$e's stuck to part of the plant!~
+S
+#12627
+entwined by the lantern vines~
+4 0
+0 0 0 0
+T5
+...$e's being strangled by the vines!~
+S
+#12628
+burnt~
+4 0
+65 0 0 0
+T0
+You manage to put out all the little fires that were on you.~
+T2
+A burning vine lights you on fire!~
+T3
+$n catches fire!~
+T5
+...$e's trying to pat out fires on $s body.~
+S
+#12629
+stuck in the bog maw~
+4 0
+0 0 0 0
+T5
+...$e's stuck in something under the water!~
+S
+#12630
+choked by tendrils~
+4 0
+0 0 0 0
+S
+#12631
+bitten and bleeding~
+4 0
+0 0 0 0
+S
+#12632
+burnt~
+4 0
+65 0 0 0
+T0
+You manage to put out all the little fires that were on you.~
+T2
+Bits of burning plant fall on you and light you on fire!~
+T3
+$n catches fire!~
+T5
+...$e's trying to pat out fires on $s body.~
+S
+#12633
+cassava stem cutting~
+6 0
+0 12631 0 0
+R 6422
+T0
+cassava stem cuttings~
+S
 #12650
 Grove Token~
 5 c

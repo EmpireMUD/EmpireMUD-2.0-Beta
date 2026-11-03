@@ -87,9 +87,9 @@ A huge dragon steak is lying on the ground.~
 long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
 roast dragon feast and boost the party's damage significantly.
 ~
-3 C a 0 0 9
+3 0 a 0 0 10
 0 0 0
-7 48
+7 0
 O+ 1 6204
 R
 4 5119 0
@@ -1036,9 +1036,9 @@ R
 T 10970
 S
 #10971
-whistle ant giant~
-a giant ant whistle~
-A giant ant whistle is lying here.~
+whistle ant giant minipet~
+a giant ant minipet whistle~
+A giant ant minipet whistle is lying here.~
    The whistle is actually surprisingly small. It's the summoned ant that's
 giant. Type 'use whistle' to summon this noncombat pet.
 ~

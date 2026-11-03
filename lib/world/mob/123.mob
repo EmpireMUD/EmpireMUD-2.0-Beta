@@ -4,17 +4,19 @@ the fur dragon~
 An enormous fur dragon is stalking low to the ground.
 ~
 225 325 dghkLM choCD 6
-0 0 9 10 -1
+0 0 9 44 -1 -1
 D
    This tremendous brown creature is undoubtedly a dragon, but its scales are
 covered with fur from snout to tail. If it can fly, you don't see where the
 wings would be. Its eyes, huge yellow orbs with thin black slits for pupils,
 watch you as you watch them. Its ears follow you as you move, and it seems
 hungry.
-To fight it, type: difficulty <Hard | Group | Boss>
+To fight it, type: difficulty <Normal | Hard | Group | Boss>
 ~
 I 0 10907 100.00 4  # BUTCHER: raw dragon steak
 I 1 12310 100.00 8  # SKIN: fur dragon pelt
+I 1 10006 33.33 1  # SKIN: dragon scale
+I+ 3 0  # Normal
 I 1 10006 66.66 1  # SKIN: dragon scale
 I+ 4 0  # Hard
 I 1 10006 66.66 1 s  # SKIN: dragon scale
@@ -47,7 +49,7 @@ a flying fur dragon~
 A fur dragon is flying overhead.
 ~
 100 300 dej m 5
-0 0 2 9 -1
+0 0 2 45 -1 -1
 D
    Though it's on the small side for a dragon, this vicious fluffy creature is
 easily large enough to carry you on its back. When it lands, its thick fur and
@@ -61,7 +63,7 @@ a tiny fur dragon~
 A tiny fur dragon is running back and forth.
 ~
 1 1 bdo n 3
-0 0 11 9 -1
+0 0 11 9 -1 -1
 D
    This adorable creature, called Dracofelis by the erudite sorcerers who study
 it, is a fur dragon. It has the wide jaws and cunning mind of a dragon, but
@@ -104,13 +106,14 @@ a furry drake~
 A furry drake is stalking back and forth. (familiar)
 ~
 100 0 dozGM cfmG 4
-0 0 2 9 -1
+0 0 2 9 -1 -1
 D
    The drake is like a small dragon. Perhaps not as smart as a true dragon, it
 is nevertheless formidable in combat and voracious after each victory. It seems
 loyal to its mage -- a rare characteristic in dragons.
 ~
 T 12310
+T 9903
 S
 #12318
 fledgling fluffy~
@@ -118,7 +121,7 @@ a fluffy fledgling~
 A fluffy fledgling gambles about.
 ~
 225 325 abdhoD 0 2
-0 0 9 9 -1
+0 0 9 9 -1 -1
 D
 It looks like the fur dragon has had kittens, and boy are they sharp!
 ~
@@ -131,7 +134,7 @@ the hoarfrost serragon~
 An enormous serragon coils around the frozen landscape, baring its teeth.
 ~
 100 200 dhxyAJKLM cEGL 6
-0 0 51 25 -1
+0 0 51 25 -1 -1
 D
    The serragon is so big it could be mistaken for a mountain of ice! Its long,
 slender, limbless body twists and coils around the area, making it difficult to
@@ -328,7 +331,7 @@ the hoarfrost spreader~
 A hoarfrost spreader is here.
 ~
 100 200 dhxyAJKL cklnEGL 0
-0 0 51 25 -1
+0 0 51 25 -1 -1
 D
 This invisible mob helps spread hoarfrost.
 ~
@@ -357,7 +360,7 @@ a frostscale hatchling~
 A frostscale hatchling coils and raises its head above you.
 ~
 100 200 acdouxyJKM cEGL 5
-0 0 51 25 -1
+0 0 51 25 -1 -1
 D
    Though it's larger than a horse, the hatchling is miniscule in comparison to
 the full-grown serragon that left the long grooves in the frost. The palm-sized
@@ -426,7 +429,7 @@ some rabbit ice~
 Some ice has formed on the ground in the shape of a rabbit.
 ~
 30 50 djo 0 1
-0 0 15 20 -1
+0 0 15 20 -1 -1
 D
 You can't tell if it's a frozen rabbit or just a clump of ice!
 ~
@@ -454,7 +457,7 @@ a chillflame phoenix~
 A chillflame phoenix billows above you!
 ~
 100 200 dehjo mG 3
-0 0 2 20 -1
+0 0 2 20 -1 -1
 D
    This mighty phoenix is an icy shade of white as blue flames billow from its
 wings and tail. It pays you little mind as it circles overhead, perhaps in
@@ -467,7 +470,7 @@ a shaggy frost worm~
 A shaggy frost worm is coiled up before you.
 ~
 100 100 dehj L 4
-0 0 5 9 -1
+0 0 5 9 -1 -1
 D
    This odd creature is nearly the size of a horse, with the appearance of a
 fuzzy snake or worm. Its fur is pale blue, nearly white, though that could
@@ -481,7 +484,7 @@ the enchanted hoarfrost~
 Hoarfrost covers the area.
 ~
 1 1 bdo dn 3
-0 0 11 9 -1
+0 0 11 9 -1 -1
 D
    The area is covered in a delicate carpet of crystalline ice though, you
 notice, this is no ordinary hoarfrost. It seems to be enchanted, moving at
@@ -492,12 +495,12 @@ M
 The hoarfrost gleams on the ground.~
 S
 #12357
-serragon wall craw hoarfrost frost~
+serragon wall craw hoarfrost frost enormous~
 the wall of the craw~
 The serragon convulses and contracts around you as it thrashes.
 ~
 100 200 bdhnGL 0 6
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
 From here, all you can see of the serragon is the wall of its dark blue stomach.
 ~
@@ -513,7 +516,7 @@ a sense of completion~
 A sense of completion hangs in the air (toggle hassle off to prevent being teleported).
 ~
 100 200 bdL ln 3
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
 This mob teleports people out of the hoarfrost serragon after the fight is complete.
 ~

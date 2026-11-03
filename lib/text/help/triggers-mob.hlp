@@ -188,7 +188,8 @@ target, the mob will still try to hit someone else but WON'T change focus to
 them.
 
 Calling %aggro% with no argument will simply attempt to attack someone in the
-room with the mob, similar to the AGGR flag.
+room with the mob, similar to the AGGR flag. This will prefer a player, if
+present, over an NPC.
 
 No error is sent if the mob cannot find a valid target in the room.
 
@@ -375,12 +376,17 @@ Mobs can trigger on the following events:
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
 &cCan-Fight&0 - Triggers when someone tries to attack.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command, random, receive, bribe).
 
 For each type, there is a help file named &yMTRIG <type>&0.
 #d
 "MTRIG VARS" "MTRIG VARIABLES" CHAR-VARS MOB-VAR TRIGEDIT-CHAR-VAR TRIGEDIT-VARIABLES-CHARACTERS MOBVARS MOB-VARS 
 
-All mob scripts provide the &c%self%&0 variable.
+Character Variables
+
+All mob scripts provide the &c%self%&0 variable. Many other scripts provide
+%actor%, but there are other ways to get character variables, too. The fields
+below are accessed like %self.name%.
 
 Names and pronouns:
 &c~%person%&0 - name, someone, you
@@ -419,11 +425,13 @@ When using field  - The variable returns:
 &cbonus_physical&0 - Character's Bonus-Physical damage trait.
 &ccan_act&0 - True if the character could take a timed action (not stunned, etc).
 &ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
+&ccan_fight(person)&0 - Checks if the character is allowed to fight someone else.
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
 &ccan_recognize_lang(lang,on|off)&0 - Whether the character can at least
    recognize a language. Optional on/off 2nd arg grants/removes this from the
    player. Cannot add/remove if the player speaks (instead of recognizes) it.
 &ccan_see(target)&0 - Whether the character can see a person/object/vehicle.
+&ccan_see_in_room&0 - Is not blind and room is light or char sees in dark.
 &ccan_speak(lang,on|off)&0 - Whether the character can speak a language. Optional
    on/off 2nd arg grants/removes this from the player.
 &ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.
@@ -478,7 +486,7 @@ When using field  - The variable returns:
 &cend_adventure_summon&0 - Returns a pc to where they were summoned from, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
-   (0-18) or the name of the location * checks all positions. &yHELP %LOAD%&0
+   (0-23) or the name of the location * checks all positions. &yHELP %LOAD%&0
 &cevent_points(vnum)&0 - The character's score in the event, if it's running.
 &cfaction_name&0 - The name of the mob's 'allegiance' faction, if any.
 &cfighting&0 - The unique id of the mob fighting the actor.
@@ -567,6 +575,7 @@ When using field  - The variable returns:
 &cmaxblood&0 - The maximum blood points of the actor.
 &cmaxcarrying&0 - Inventory size limit (total they can carry).
 &cmaxhealth&0 - The maximum hit points of the actor.
+&cmaxlevel, minlevel&0 - For NPCs, their upper and lower level limits.
 &cmaxmana&0 - The maximum mana points of the actor.
 &cmaxmove&0 - The maximum movement points of the actor.
 &cmob_flagged(FLAG)&0 - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
@@ -584,9 +593,12 @@ When using field  - The variable returns:
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
+&cnohunger&0 - If TRUE, player never gets hungry.
 &cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
+&cnothirst&0 - If TRUE, player never gets thirsty.
 &cobj_target(name)&0 - Finds a targeted object the character can see/has.
 &cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
+&cobj_target_room(name)&0 - Finds a targeted object in the room only (like 'get').
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
 &cparse_dir(dir)&0 - Gets the real direction that the char thinks is 'dir',
    based on whether or not they have Navigation/alcohol. Bad directions return
@@ -614,6 +626,7 @@ When using field  - The variable returns:
 &cresist_physical&0 - Returns the amount of physical resistance the player has.
 &cresist_poison&0 - Returns TRUE if the player has Resist Poison.
 &criding&0 - TRUE if the character is currently mounted.
+&crole&0 - One of the class roles, or "none". (&yHELP CLASS ROLE&0)
 &croom&0 - The room the actor is in as a room variable.
 &cset_cooldown(vnum, seconds)&0 - Sets the character's cooldown time.
 &cset_reputation(faction,rep)&0 - Sets reputation to a given level ("Liked").

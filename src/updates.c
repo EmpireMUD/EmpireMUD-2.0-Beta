@@ -37,8 +37,20 @@
 *   Update Data -- Add to the end of this array to activate the function
 *     (search for ADD HERE)
 *   Core Functions
+*   Helper Functions
 *   Pre-b5.116 World Loading
 */
+
+
+// local prototypes
+void update_replace_instances(const adv_vnum *vnum_list);
+
+// external prototypes used in multiple updaters
+PLAYER_UPDATE_FUNC(refresh_companions_player);
+
+// external vars used in multiple updates
+extern any_vnum refresh_companions_mob;
+extern any_vnum refresh_companions_trigger;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -295,7 +307,7 @@ void b3_2_map_and_gear(void) {
 		// crops
 		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
 			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
-			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, NOTHING));
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, NOTHING, NULL));
 			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
@@ -436,7 +448,7 @@ void b3_15_crop_update(void) {
 		if (map->crop_type) {
 			// update crop
 			if (room || (room = real_room(map->vnum))) {
-				new_crop = get_potential_crop_for_location(room, NOTHING);
+				new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 				set_crop_type(room, new_crop ? new_crop : crop_table);
 			}
 		}
@@ -945,7 +957,7 @@ void b5_19_world_fix(void) {
 	bld_data *bld;
 	
 	bitvector_t flags_to_wipe = ROOM_AFF_MAGIC_DARKNESS | ROOM_AFF_SILENT | ROOM_AFF_NO_WEATHER | ROOM_AFF_NO_TELEPORT;
-	bitvector_t empire_only_flags = ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_ABANDON;
+	bitvector_t empire_only_flags = ROOM_AFF_PUBLIC | ROOM_AFF_PRIVATE | ROOM_AFF_NO_WORK | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_ABANDON;
 	
 	LL_FOREACH(land_map, map) {
 		if (!map->shared->affects && !map->shared->base_affects) {
@@ -1492,6 +1504,7 @@ void b5_47_mine_update(void) {
 		if (!(room = tile->room) || !room_has_function_and_city_ok(ROOM_OWNER(room), room, FNC_MINE)) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_ORIGINAL_AMOUNT);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
 		}
 	}
@@ -3214,7 +3227,7 @@ void b5_151_terrain_fix(void) {
 		
 		// LAST: do the work
 		if ((to_sect != NOTHING || to_base != NOTHING)) { // && (room = map->room ? map->room : real_room(map->vnum))) {
-			if (to_sect && !b5151_no_sect_change(GET_SECT_VNUM(map->sector_type))) {
+			if (to_sect != NOTHING && !b5151_no_sect_change(GET_SECT_VNUM(map->sector_type))) {
 				perform_change_sect(NULL, map, sector_proto(to_sect));
 				++changed_sect;
 			}
@@ -4406,6 +4419,681 @@ PLAYER_UPDATE_FUNC(b5_189_molds_update_plr) {
 }
 
 
+// b5.194: adjust tropics for new terrains
+void b5_194_tropical_terrain_overhaul(void) {
+	struct map_data *map;
+	int iter;
+	int changed_sect = 0, changed_base = 0, changed_nat = 0;
+	sector_vnum to_sect, to_base, to_natural, trench_original;
+	bool is_tropic;
+	crop_data *new_crop;
+	room_data *room;
+	struct room_extra_data *red;
+	
+	// tropical base tile list
+	sector_vnum jungle_base_list[] = { 16, 27, 28, 29, 34, 35, 55, 61 ,62 ,63, 64, 65, -1 };
+	
+	// converts from-vnum -> to-vnum, when base tile was temperate (bad jungle)
+	sector_vnum temperate_conversion[][2] = {
+		{ 15, 13 },	// Jungle Field -> Seeded Field
+		{ 16, 7 },	// Jungle Crop -> Crop
+		{ 27, 3 },	// Partial Jungle -> Shady Forest
+		{ 28, 4 },	// Jungle -> Overgrown Forest
+		{ 29, 4 },	// Swamp -> Overgrown Forest
+		{ 34, 4 },	// Damaged Jungle -> Overgrown Forest
+		{ 35, 4 },	// Marsh -> Overgrown Forest
+		{ 55, 54 },	// Seaside Jungle -> Shoreside Tree
+		{ 61, 36 },	// Jungle Stumps -> Stumps
+		{ 62, 38 },	// Jungle Copse -> Copse
+		{ 63, 59 },	// Seaside Jungle Stumps -> Seaside Stumps
+		{ 64, 60 },	// Seaside Jungle Copse -> Seaside Copse
+		{ 65, 39 },	// Jungle Edge -> Forest Edge
+		
+		{ -1, -1 }	// last
+	};
+	
+	// converts from-vnum -> to-vnum, when base tile was tropical (make tropical)
+	sector_vnum tropic_conversion[][2] = {
+		{ 0, 200 },		// Plains -> Grassland
+		{ 1, 221 },		// Light Forest -> Partial Jungle
+		{ 2, 221 },		// Forest -> Partial Jungle
+		{ 3, 220 },		// Shady Forest -> Jungle
+		{ 4, 220 },		// Overgrown Forest -> Jungle
+		{ 7, 203 },		// Crop -> Tropical Crop
+		{ 13, 202 },	// Seeded Field -> Seeded Soil
+		{ 15, 202 },	// Jungle Field -> Seeded Soil
+		{ 16, 203 },	// Jungle Crop -> Tropical Crop
+		{ 17, 201 },	// Trench -> Marshy Trench
+		{ 19, 260 },	// Canal -> Overgrown Canal
+		{ 27, 221 },	// Partial Jungle -> Partial Jungle
+		{ 28, 220 },	// Jungle -> Jungle
+		{ 29, 250 },	// Swamp -> Swamp
+		{ 34, 221 },	// Damaged Jungle -> Partial Jungle
+		{ 35, 252 },	// Marsh -> Marsh
+		{ 36, 222 },	// Stumps -> Wasteland
+		{ 37, 223 },	// Small Copse -> Jungle Copse
+		{ 38, 223 },	// Copse -> Jungle Copse
+		{ 39, 224 },	// Forest Edge -> Jungle Edge
+		{ 40, 240 },	// Riverbank -> Grassy Riverbank
+		{ 41, 242 },	// Floodplains -> Flooded Riverbank
+		{ 42, 221 },	// Flooded Woods -> Partial Jungle
+		{ 43, 221 },	// Flooded Forest -> Partial Jungle
+		{ 44, 221 },	// Light Riverbank Forest -> Partial Jungle
+		{ 45, 221 },	// Forested Riverbank -> Partial Jungle
+		{ 46, 223 },	// Stumped Riverbank -> Jungle Copse
+		{ 47, 223 },	// Riverside Copse -> Jungle Copse
+		{ 50, 230 },	// Shore -> Grassy Seaside
+		{ 54, 224 },	// Shoreside Tree -> Jungle Edge
+		{ 55, 232 },	// Seaside Jungle -> Mangrove Forest
+		{ 56, 234 },	// Estuary Shore -> Estuary Shore
+		{ 59, 233 },	// Seaside Stumps -> Seaside Wasteland
+		{ 60, 223 },	// Seaside Copse -> Jungle Copse
+		{ 61, 222 },	// Jungle Stumps -> Wasteland
+		{ 62, 223 },	// Jungle Copse -> Jungle Copse
+		{ 63, 233 },	// Seaside Jungle Stumps -> Seaside Wasteland
+		{ 64, 232 },	// Seaside Jungle Copse -> Mangrove Forest
+		{ 65, 224 },	// Jungle Edge -> Jungle Edge
+		{ 90, 220 },	// Old-Growth Forest -> Jungle
+		{ 10300, 10310 },	// Scorched Woods -> Scorched Jungle
+		{ 10302, 10311 },	// Scorched Plains -> Scorched Grassland
+		{ 10303, 10309 },	// Scorched Crop -> Scorched Tropical Crop
+		{ 10307, 10310 },	// Scorched Spruce -> Scorched Jungle
+		{ 10552, 10556 },	// Frozen Canal -> Frozen Canal
+		{ 10562, 221 },		// Thin Evergreen Forest -> Partial Jungle
+		{ 10563, 221 },		// Evergreen Forest -> Partial Jungle
+		{ 10564, 220 },		// Overgrown Evergreen Forest -> Jungle
+		{ 10565, 220 },		// Thick Evergreen Forest -> Jungle
+		{ 10566, 222 },		// Stumps -> Wasteland
+		{ 10775, 222 },		// Withered Tree -> Wasteland
+		{ 12361, 260 },		// Frozen Canal -> Overgrown Canal
+		{ 12365, 220 },		// Frozen Forest -> Jungle
+		{ 12366, 200 },		// Frozen Plains -> Grassland
+		{ 16697, 11988 },	// Nordlys Stumps -> Clear-Cut Calamander
+		{ 16698, 11990 },	// Nordlys Tree -> Calamander Grove
+		{ 16699, 11991 },	// Nordlys Grove -> Calamander Jungle
+		{ 18100, 222 },		// Stumps -> Wasteland
+		{ 18451, 18458 },	// Flooded Plains -> Flooded Grassland
+		{ 18452, 250 },		// Flooded Woods -> Swamp
+		{ 18451, 18458 },	// Flooded Plains -> Flooded Grassland
+		{ 18452, 250 },		// Flooded Woods -> Swamp
+		{ 600, 11988 },		// Enchanted Saplings -> Clear-Cut Calamander
+		{ 601, 11988 },		// Clear-Cut Starwood Forest -> Clear-Cut Calamander
+		{ 602, 11989 },		// Starwood Copse -> Calamander Thicket
+		{ 603, 11990 },		// Starwood Stand -> Calamander Grove
+		{ 604, 11991 },		// Starwood Forest -> Calamander Jungle
+		{ 605, 11992 },		// Dead Forest -> Dead Calamanders
+		{ 606, 11989 },		// Sprouting Starwood Stumps -> Calamander Thicket
+		{ 607, 11990 },		// Sprouting Starwood Copse -> Calamander Grove
+		{ 608, 11991 },		// Sprouting Starwood Stand -> Calamander Jungle
+
+		{ -1, -1 }	// last
+	};
+	
+	LL_FOREACH(land_map, map) {
+		to_sect = to_base = to_natural = NOTHING;
+		
+		// just skip ocean
+		if (map->shared == &ocean_shared_data) {
+			continue;
+		}
+		
+		// PRESERVE
+		if ((red = find_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR))) {
+			trench_original = red->value;
+		}
+		else {
+			trench_original = NOTHING;
+		}
+		
+		// FIRST: see if it began as a tropic tile
+		is_tropic = FALSE;
+		for (iter = 0; jungle_base_list[iter] != -1 && !is_tropic; ++iter) {
+			if (jungle_base_list[iter] == GET_SECT_VNUM(map->natural_sector)) {
+				is_tropic = TRUE;
+			}
+		}
+		
+		// DETERMINE: sectors to change
+		if (is_tropic) {
+			for (iter = 0; tropic_conversion[iter][0] != -1; ++iter) {
+				if (GET_SECT_VNUM(map->sector_type) == tropic_conversion[iter][0]) {
+					to_sect = tropic_conversion[iter][1];
+				}
+				if (GET_SECT_VNUM(map->base_sector) == tropic_conversion[iter][0]) {
+					to_base = tropic_conversion[iter][1];
+				}
+				if (GET_SECT_VNUM(map->natural_sector) == tropic_conversion[iter][0]) {
+					to_natural = tropic_conversion[iter][1];
+				}
+			}
+		}
+		else {	// temperate
+			for (iter = 0; temperate_conversion[iter][0] != -1; ++iter) {
+				if (GET_SECT_VNUM(map->sector_type) == temperate_conversion[iter][0]) {
+					to_sect = temperate_conversion[iter][1];
+				}
+				if (GET_SECT_VNUM(map->base_sector) == temperate_conversion[iter][0]) {
+					to_base = temperate_conversion[iter][1];
+				}
+				if (GET_SECT_VNUM(map->natural_sector) == temperate_conversion[iter][0]) {
+					to_natural = temperate_conversion[iter][1];
+				}
+			}
+		}
+		
+		// LAST: do the work
+		if ((to_sect != NOTHING || to_base != NOTHING)) { // && (room = map->room ? map->room : real_room(map->vnum))) {
+			if (to_sect != NOTHING) {
+				perform_change_sect(NULL, map, sector_proto(to_sect));
+				++changed_sect;
+				
+				if (map->crop_type) {
+					if (!IS_SET(GET_CROP_CLIMATE(map->crop_type), (is_tropic ? CLIM_TROPICAL : CLIM_TEMPERATE))) {
+						if ((room = real_room(map->vnum))) {
+							new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
+							set_crop_type(room, new_crop ? new_crop : crop_table);
+						}
+					}
+				}
+			}
+			if (to_base != NOTHING) {
+				perform_change_base_sect(NULL, map, sector_proto(to_base));
+				++changed_base;
+			}
+			if (to_natural != NOTHING) {
+				set_natural_sector(map, sector_proto(to_natural));
+				++changed_nat;
+			}
+			
+			// translate trench
+			if (trench_original != NOTHING) {
+				if (is_tropic) {
+					for (iter = 0; tropic_conversion[iter][0] != -1; ++iter) {
+						if (trench_original == tropic_conversion[iter][0]) {
+							trench_original = tropic_conversion[iter][1];
+							break;
+						}
+					}
+				}
+				else {
+					for (iter = 0; temperate_conversion[iter][0] != -1; ++iter) {
+						if (trench_original == temperate_conversion[iter][0]) {
+							trench_original = temperate_conversion[iter][1];
+						}
+					}
+				}
+				
+				// and update
+				set_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, trench_original);
+			}
+		}
+	}
+	
+	log("- total: %d sector%s, %d base sector%s, %d natural sector%s", changed_sect, PLURAL(changed_sect), changed_base, PLURAL(changed_base), changed_nat, PLURAL(changed_nat));
+}
+
+
+// b5.196 pt 1: Set fullness data on mine tiles
+void b5_196_mine_data(void) {
+	int amt;
+	room_data *iter;
+	struct map_data *map;
+	
+	// land_map
+	LL_FOREACH(land_map, map) {
+		if ((amt = get_extra_data(map->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT)) > 0) {
+			set_extra_data(&map->shared->extra_data, ROOM_EXTRA_MINE_ORIGINAL_AMOUNT, amt);
+			request_world_save(map->vnum, WSAVE_ROOM | WSAVE_MAP);
+		}
+	}
+	
+	// interior
+	DL_FOREACH2(interior_room_list, iter, next_interior) {
+		if ((amt = get_room_extra_data(iter, ROOM_EXTRA_MINE_AMOUNT)) > 0) {
+			set_room_extra_data(iter, ROOM_EXTRA_MINE_ORIGINAL_AMOUNT, amt);
+		}
+	}
+}
+
+
+// b5.196 pt 2: Additional Mountain Engineering benefit
+void b5_196_mountain_eng(void) {
+	empire_data *emp, *next_emp;
+	
+	const any_vnum MOUNTAIN_ENGINEERING_PROG = 1904;
+	const any_vnum TERRACED_MOUNTAIN_CRAFT = 5222;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (empire_has_completed_goal(emp, MOUNTAIN_ENGINEERING_PROG)) {
+			add_learned_craft_empire(emp, TERRACED_MOUNTAIN_CRAFT);
+		}
+	}
+}
+
+
+// b5.201: Replace artisan in celestial forges
+void b5_201_starsmith(void) {
+	bool found_new;
+	empire_data *emp, *next_emp;
+	struct empire_npc_data *npc, *next_npc;
+	struct empire_territory_data *ter, *next_ter;
+	
+	const bld_vnum CELESTIAL_FORGE = 5195;
+	const mob_vnum OLD_ARTISAN = 212;
+	const mob_vnum NEW_ARTISAN = 12800;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+			if (!GET_BUILDING(ter->room) || GET_BLD_VNUM(GET_BUILDING(ter->room)) != CELESTIAL_FORGE) {
+				continue;	// not a celestial forge
+			}
+			
+			found_new = FALSE;
+			
+			// detect npcs
+			LL_FOREACH_SAFE(ter->npcs, npc, next_npc) {
+				if (npc->vnum == OLD_ARTISAN) {
+					// delete old artisan
+					delete_territory_npc(ter, npc);
+				}
+				else if (npc->vnum == NEW_ARTISAN) {
+					found_new = TRUE;
+				}
+			}
+			
+			// populate a new one if needed?
+			if (!found_new) {
+				populate_npc(ter->room, NULL, TRUE);
+			}
+		}
+	}
+}
+
+
+// b5.202 despawn Celestial Forge to force a fresh instance
+void b5_202_celestial_forge(void) {
+	bool found = FALSE;
+	int num_rules, tries, dir = NO_DIR;
+	adv_data *adv;
+	room_data *loc;
+	struct adventure_link_rule *rule, *rule_iter;
+	struct instance_data *inst, *next_inst;
+	
+	const any_vnum CFORGE_ADV = 12800;
+	
+	if (!(adv = adventure_proto(CFORGE_ADV))) {
+		// adventure doesn't exist? fail silently
+		return;
+	}
+	
+	// delete it
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (INST_ADVENTURE(inst) == adv) {
+			delete_instance(inst, TRUE);
+		}
+	}
+	
+	// attempt to add a fresh one
+	if (can_instance(adv)) {
+		// randomly choose one rule to attempt
+		for (tries = 0; tries < 5 && !found; ++tries) {
+			num_rules = 0;
+			rule = NULL;
+			for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
+				if (adventure_link_is_location_rule[rule_iter->type]) {
+					// choose one at random
+					if (!number(0, num_rules++) || !rule) {
+						rule = rule_iter;
+					}
+				}
+			}
+	
+			if (rule) {
+				if ((loc = find_location_for_rule(adv, rule, &dir))) {
+					// make it so!
+					if (build_instance_loc(adv, rule, loc, dir)) {
+						found = TRUE;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+// b5.203 just respawns adventures that added difficulty selectors
+void b5_203_adventure_update(void) {
+	adv_vnum list[] = {
+		127,	// [  127] Wandering Dragon
+		128,	// [  128] Colossal Red Dragon
+		10105,	// [10105] Ruins: Three Bandits
+		10300,	// [10300] Flame Dragon
+		10950,	// [10950] Viscous Muck Dragon
+		10965,	// [10965] Giant!
+		NOTHING
+	};
+	
+	update_replace_instances(list);
+}
+
+
+// b5.204 adds a celestial forge -- this is ALSO used for b5.205, b5.208
+void b5_204_celestial_forge(void) {
+	adv_vnum list[] = {
+		12800,	// [12800] Celestial Forge
+		NOTHING
+	};
+	
+	update_replace_instances(list);
+}
+
+
+// b5.206 has some QOL improvements on goblin mines
+void b5_206_goblin_mines(void) {
+	adv_vnum list[] = {
+		181,	// [  181] Goblin Mines
+		NOTHING
+	};
+	
+	update_replace_instances(list);
+}
+
+
+// b5.208: add dismantle trigger to portals
+void b5_208_portal_triggers(void) {
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	// some vnums
+	any_vnum PORTAL_BUILDING = 5185;
+	
+	any_vnum PORTAL_TRIG_1 = 5185;
+	
+	if (!real_trigger(PORTAL_TRIG_1)) {
+		log("- portal update skipped because trig %d doesn't exist", PORTAL_TRIG_1);
+		return;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		if (GET_BLD_VNUM(GET_BUILDING(room)) == PORTAL_BUILDING && (!SCRIPT(room) || !has_trigger(SCRIPT(room), PORTAL_TRIG_1))) {
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = PORTAL_TRIG_1;
+			LL_APPEND(room->proto_script, tpl);
+			
+			assign_triggers(room, WLD_TRIGGER);
+			++count;
+		}
+	}
+	
+	log("- updated %d portals", count);
+}
+
+
+// b5.210: add new triggers to some companions
+void b5_210_companion_update(void) {
+	const any_vnum BODYGUARD_VNUM = 205;
+	const any_vnum HABERDASHER_VNUM = 15922;
+	
+	const any_vnum NEW_COMPANION_TRIG = 9809;
+
+	refresh_companions_trigger = NEW_COMPANION_TRIG;
+	
+	// bodyguard
+	refresh_companions_mob = BODYGUARD_VNUM;
+	update_all_players(NULL, refresh_companions_player);
+	
+	// haperdasher
+	refresh_companions_mob = HABERDASHER_VNUM;
+	update_all_players(NULL, refresh_companions_player);
+}
+
+
+// b5.212: terrain repair for foothills that were converted to plains by adventures (and usually evolved from there)
+void b5_212_foothills_fix(void) {
+	int iter;
+	int changed_sect = 0, changed_base = 0;
+	sector_vnum to_sect, to_base;
+	crop_data *keep_crop;
+	room_data *room;
+	struct map_data *map;
+	
+	// checking for this natural sector
+	const sector_vnum FOOTHILLS_SECT = 58;
+	
+	// converts from-vnum -> to-vnum
+	sector_vnum foothills_conversion[][2] = {
+		{ 15, 13 },	// Jungle Field -> Seeded Field
+		{ 0, 58 },	// Plains -> Foothills
+		{ 1, 58 },	// Light Forest -> Foothills
+		{ 2, 58 },	// Forest -> Foothills
+		{ 3, 58 },	// Shady Forest -> Foothills
+		{ 4, 58 },	// Overgrown Forest -> Foothills
+		{ 7, 99 },	// Crop -> Foothills Crop
+		{ 13, 98 },	// Seeded Field -> Seeded Foothills
+		{ 17, 58 },	// Trench -> Foothills
+		{ 19, 58 },	// Canal -> Foothills
+		{ 36, 58 },	// Stumps -> Foothills
+		{ 37, 58 },	// Small Copse -> Foothills
+		{ 38, 58 },	// Copse -> Foothills
+		{ 39, 58 },	// Forest Edge -> Foothills
+		{ 40, 58 },	// Riverbank -> Foothills
+		{ 41, 58 },	// Floodplains -> Foothills
+		{ 42, 58 },	// Flooded Woods -> Foothills
+		{ 43, 58 },	// Flooded Forest -> Foothills
+		{ 44, 58 },	// Light Riverbank Forest -> Foothills
+		{ 45, 58 },	// Forested Riverbank -> Foothills
+		{ 46, 58 },	// Stumped Riverbank -> Foothills
+		{ 47, 58 },	// Riverside Copse -> Foothills
+		{ 50, 58 },	// Shore -> Foothills
+		{ 51, 58 },	// Beach -> Foothills
+		{ 53, 58 },	// Estuary -> Foothills
+		{ 54, 58 },	// Shoreside Tree -> Foothills
+		{ 55, 58 },	// Old Seaside Jungle -> Foothills
+		{ 56, 58 },	// Estuary Shore -> Foothills
+		{ 57, 58 },	// Shallow Sea -> Foothills
+		{ 59, 58 },	// Seaside Stumps -> Foothills
+		{ 90, 58 },	// Old-Growth Forest -> Foothills
+		{ 242, 58 },	// Flooded Riverbank -> Foothills
+		{ 245, 58 },	// Flooded Lake -> Foothills
+		{ 18451, 58 },	// Flooded Plains -> Foothills
+		{ 18452, 58 },	// Flooded Woods -> Foothills
+		{ 18453, 58 },	// Flooded Desert -> Foothills
+		{ 18454, 58 },	// Flooded Desert -> Foothills
+		{ 18455, 58 },	// Flooded Desert -> Foothills
+		{ 18456, 58 },	// Flooded Desert -> Foothills
+		{ 18457, 58 },	// Flooded Desert -> Foothills
+		{ 18458, 58 },	// Flooded Grassland -> Foothills
+		{ 10300, 10308 },	// Scorched Woods -> Scorched Foothills
+		{ 10301, 10308 },	// Scorched Grove -> Scorched Foothills
+		{ 10302, 10308 },	// Scorched Plains -> Scorched Foothills
+		{ 10303, 10308 },	// Scorched Crop -> Scorched Foothills
+		{ 10304, 10308 },	// Scorched Desert Crop -> Scorched Foothills
+		{ 10305, 10308 },	// Scorched Desert -> Scorched Foothills
+		{ 10306, 10308 },	// Scorched Oasis -> Scorched Foothills
+		{ 10307, 10308 },	// Scorched Spruce -> Scorched Foothills
+		{ 10309, 10308 },	// Scorched Tropical Crop -> Scorched Foothills
+		{ 10310, 10308 },	// Scorched Jungle -> Scorched Foothills
+		{ 10311, 10308 },	// Scorched Grassland -> Scorched Foothills
+		{ 10550, 58 },	// Frozen River -> Foothills
+		{ 10551, 58 },	// Frozen Estuary -> Foothills
+		{ 10552, 58 },	// Frozen Canal -> Foothills
+		{ 10553, 58 },	// Frozen Lake -> Foothills
+		{ 10554, 58 },	// Frozen Irrigation Canal -> Foothills
+		{ 10555, 58 },	// Frozen Canal -> Foothills
+		{ 10556, 58 },	// Frozen Canal -> Foothills
+		{ 10562, 58 },	// Thin Evergreen Forest -> Foothills
+		{ 10563, 58 },	// Evergreen Forest -> Foothills
+		{ 10564, 58 },	// Overgrown Evergreen Forest -> Foothills
+		{ 10565, 58 },	// Thick Evergreen Forest -> Foothills
+		{ 10566, 58 },	// Stumps -> Foothills
+		{ 12350, 12367 },	// Frozen Desert -> Frozen Hills
+		{ 12351, 12367 },	// Frozen Grove -> Frozen Hills
+		{ 12352, 12367 },	// Frozen Oasis -> Frozen Hills
+		{ 12353, 12367 },	// Frozen Beach -> Frozen Hills
+		{ 12354, 12367 },	// Frozen Shallows -> Frozen Hills
+		{ 12355, 12367 },	// Frozen Field -> Frozen Hills
+		{ 12356, 12367 },	// Frozen Forest -> Frozen Hills
+		{ 12357, 12367 },	// Frozen Jungle -> Frozen Hills
+		{ 12358, 12367 },	// Frozen Oasis -> Frozen Hills
+		{ 12359, 12367 },	// Frozen Irrigation Canal -> Frozen Hills
+		{ 12360, 12367 },	// Frozen Canal -> Frozen Hills
+		{ 12361, 12367 },	// Frozen Canal -> Frozen Hills
+		{ 12362, 12367 },	// Frozen Oasis -> Frozen Hills
+		{ 12363, 12367 },	// Frozen River -> Frozen Hills
+		{ 12364, 12367 },	// Frozen Estuary -> Frozen Hills
+		{ 12365, 12367 },	// Frozen Forest -> Frozen Hills
+		{ 12366, 12367 },	// Frozen Plains -> Frozen Hills
+		{ 12368, 12367 },	// Frozen Lake -> Frozen Hills
+		
+		{ -1, -1 }	// last
+	};
+	
+	LL_FOREACH(land_map, map) {
+		to_sect = to_base = NOTHING;
+		
+		// QUALIFY
+		if (map->shared == &ocean_shared_data) {
+			continue;	// just skip ocean
+		}
+		if (!map->natural_sector || GET_SECT_VNUM(map->natural_sector) != FOOTHILLS_SECT) {
+			continue;	// skip if natural sect wasn't foothills
+		}
+		
+		// DETERMINE: sectors to change
+		for (iter = 0; foothills_conversion[iter][0] != -1; ++iter) {
+			if (GET_SECT_VNUM(map->sector_type) == foothills_conversion[iter][0]) {
+				to_sect = foothills_conversion[iter][1];
+			}
+			if (GET_SECT_VNUM(map->base_sector) == foothills_conversion[iter][0]) {
+				to_base = foothills_conversion[iter][1];
+			}
+		}
+		
+		// LAST: do the work
+		if ((to_sect != NOTHING || to_base != NOTHING)) {
+			// log
+			log("- repairing (%d, %d) [%d] %s, base: [%d] %s", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), GET_SECT_VNUM(map->sector_type), GET_SECT_NAME(map->sector_type), GET_SECT_VNUM(map->base_sector), GET_SECT_NAME(map->base_sector));
+			
+			if (to_sect != NOTHING) {
+				keep_crop = map->crop_type;
+				perform_change_sect(NULL, map, sector_proto(to_sect));
+				++changed_sect;
+				
+				// restore crop?
+				if (map->crop_type && keep_crop && map->crop_type != keep_crop && (room = real_room(map->vnum))) {
+					set_crop_type(room, keep_crop);
+				}
+			}
+			if (to_base != NOTHING) {
+				perform_change_base_sect(NULL, map, sector_proto(to_base));
+				++changed_base;
+			}
+		}
+	}
+	
+	log("- total: %d sector%s, %d base sector%s", changed_sect, PLURAL(changed_sect), changed_base, PLURAL(changed_base));
+}
+
+
+// b5.212a: Removing learned recipe for Stables; this now just requires the Build ability instead of a progress goal
+void b5_212a_stables_update(void) {
+	struct player_craft_data *pcd;
+	empire_data *emp, *next_emp;
+	
+	// will remove this from empires' learned lists
+	const any_vnum STABLE_CRAFT_VNUM = 5111;
+		
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// find
+		HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &STABLE_CRAFT_VNUM, pcd);
+		
+		// and delete
+		if (pcd) {
+			HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+			free(pcd);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+// b5.212b: player informative updates
+PLAYER_UPDATE_FUNC(b5_212_update_player_informative) {
+	check_delayed_load(ch);
+	if (INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC)) {
+		SET_BIT(GET_INFORMATIVE_FLAGS(ch), INFORMATIVE_PRIVATE);
+	}
+}
+
+
+// b5.213 adds new admin flag to immortal empires
+void b5_213_immortal_empire_update(void) {
+	empire_data *emp, *next_emp;
+	
+	// normally this is computed AFTER this step
+	reread_empire_tech(NULL);
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp) && EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES | EADM_NO_DECAY)) {
+			log("- Set ALLOW-NEWBIE-ISLE admin flag on immortal empire [%d] %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+			SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_ALLOW_NEWBIE_ISLE);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+// b5.216: Purchased goals no longer count toward points.
+void b5_216_progress_points_update(void) {
+	empire_data *emp, *next_emp;
+	progress_data *prg;
+	struct empire_completed_goal *goal, *next_goal;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
+			if ((prg = real_progress(goal->vnum))) {
+				if (PRG_COST(prg)) {
+					SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), -PRG_COST(prg), INT_MIN, INT_MAX, FALSE);
+					EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				}
+			}
+		}
+	}
+}
+
+
+// b5.219: Apply new NO-COLUMNS toggle
+PLAYER_UPDATE_FUNC(b5_219_preference_update) {
+	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		SET_BIT(PRF_FLAGS(ch), PRF_NO_COLUMNS);
+	}
+	else {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_NO_COLUMNS);
+	}
+}
+
+
+// b5.219: apply new empire toggles
+void b5_219_empire_toggles(void) {
+	empire_data *emp, *next_emp;
+	
+	// normally this is computed AFTER this step
+	reread_empire_tech(NULL);
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
+			SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_HIDDEN_PROGRESS);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4523,6 +5211,25 @@ const struct {
 	{ "b5.183", b5_183_trigger_update, b5_183_trigger_update_plr, "Applying new triggers to water bottles and molten essence" },
 	{ "b5.183a", b5_183_molten_fiend_update, NULL, "Updating Molten Fiend adventure from 281 to 18000" },
 	{ "b5.189", b5_189_molds_update, b5_189_molds_update_plr, "Updating old molds to use trigger 12144" },
+	{ "b5.194", b5_194_tropical_terrain_overhaul, NULL, "Updating tropical tiles to new terrain vnums 200-260" },
+	{ "b5.196", b5_196_mine_data, NULL, "Updating mines with fullness data" },
+	{ "b5.196a", b5_196_mountain_eng, NULL, "Updating empires with Mountain Engineering" },
+	{ "b5.201", b5_201_starsmith, NULL, "Updating Celestial Forges with new artisan" },
+	{ "b5.202", b5_202_celestial_forge, NULL, "De-spawning and re-spawning the Celestial Forge to add new content" },
+	{ "b5.203", b5_203_adventure_update, NULL, "De-spawning and re-spawning updated adventures" },
+	{ "b5.204", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
+	{ "b5.205", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
+	{ "b5.206", b5_206_goblin_mines, NULL, "Re-spawning Goblin Mines" },
+	{ "b5.208", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
+	{ "b5.208a", b5_208_portal_triggers, NULL, "Adding missing portal triggers" },
+	{ "b5.210", b5_210_companion_update, NULL, "Updating companions with new triggers" },
+	{ "b5.212", b5_212_foothills_fix, NULL, "Repairing foothills that were converted to plains by adventures" },
+	{ "b5.212a", b5_212a_stables_update, NULL, "Removing learned recipe for Stables; this now just requires the Build ability" },
+	{ "b5.212b", NULL, b5_212_update_player_informative, "Updating players with new private informative flag" },
+	{ "b5.213", b5_213_immortal_empire_update, NULL, "Adding new admin flag to immortal empires" },
+	{ "b5.216", b5_216_progress_points_update, NULL, "Updating progress points because purchases no longer add points" },
+	{ "b5.219", NULL, b5_219_preference_update, "Applying new no-columns toggle to players" },
+	{ "b5.219a", b5_219_empire_toggles, NULL, "Applying new toggles to empires" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
@@ -4642,12 +5349,87 @@ void check_version(void) {
 	
 	// ensure everything is saved
 	if (any) {
+		// b5.214: must check goals here, otherwise ships/buildings may be double-counted and trigger goals early in run_delayed_refresh()
+		need_progress_refresh = TRUE;
+		check_progress_refresh();
+		
 		save_island_table();
 		save_trading_post();
 		run_delayed_refresh();
 		free_loaded_players();
 		save_all_empires();
 		save_world_after_startup = TRUE;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPER FUNCTIONS ////////////////////////////////////////////////////////
+
+/**
+* De-spawns all instances from a list of adventures, then attempts to spawn
+* fresh ones right away.
+*
+* A vnum list should look like:
+* adv_vnum list[] = { 123, 124, 125, NOTHING };
+*
+* @param const adv_vnum *vnum_list An array of adventure vnums of any length, terminated by a NOTHING entry.
+*/
+void update_replace_instances(const adv_vnum *vnum_list) {
+	bool found;
+	int count, dir, iter, num_rules;
+	adv_data *adv;
+	room_data *loc;
+	struct adventure_link_rule *rule, *rule_iter;
+	struct instance_data *inst, *next_inst;
+	
+	// will need this first
+	update_instance_world_size();
+	
+	// delete instances from the list
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (!INST_ADVENTURE(inst)) {
+			// safety first
+			delete_instance(inst, TRUE);
+			continue;
+		}
+		
+		found = FALSE;
+		for (iter = 0; vnum_list[iter] != NOTHING && !found; ++iter) {
+			if (GET_ADV_VNUM(INST_ADVENTURE(inst)) == vnum_list[iter]) {
+				found = TRUE;
+			}
+		}
+		
+		if (found) {
+			delete_instance(inst, TRUE);
+		}
+	}
+	
+	// now attempt to spawn them
+	for (iter = 0; vnum_list[iter] != NOTHING; ++iter) {
+		if ((adv = adventure_proto(vnum_list[iter]))) {
+			for (count = 0; count < adjusted_instance_limit(adv) && can_instance(adv); ++count) {
+				// randomly choose one rule to attempt
+				num_rules = 0;
+				rule = NULL;
+				for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
+					if (adventure_link_is_location_rule[rule_iter->type]) {
+						// choose one at random
+						if (!number(0, num_rules++) || !rule) {
+							rule = rule_iter;
+						}
+					}
+				}
+				
+				// did we find one?
+				if (rule && (loc = find_location_for_rule(adv, rule, &dir))) {
+					if (build_instance_loc(adv, rule, loc, dir)) {
+						// result doesn't matter
+					}
+				}
+			}
+		}
 	}
 }
 

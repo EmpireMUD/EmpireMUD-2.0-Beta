@@ -1,0 +1,434 @@
+#12200
+blood pit walls~
+all the blood~
+A tremendous amount of blood is spattered across the pit.~
+   Blood in two different colors paint a grim scene across the earthen walls
+and woodchip floor of the pit. In the low light, it forms a grim artwork of
+verdigris and vermillion. Something great died here.
+~
+3 B 0 0 0 5
+0 0 0
+12 72
+M
+18
+The blood soaks in and dries up.~
+T 12203
+S
+#12201
+pit~
+the pit~
+There's a pit in the middle of the forest.~
+   The forest floor ends at the mouth of a wide pit, scoured clean by something
+vast and relentless. The walls of the pit are lined with gouges and slashes
+where the soil has been scraped raw in a spiraling pattern, leaving roots
+dangling with frayed ends.
+~
+8 0 0 0 0 3
+-1 0 0
+1 0
+M
+30
+You grab onto some roots and carefully descend into the pit...~
+M
+31
+$n carefully descends into the pit.~
+T 12201
+S
+#12203
+dung serragon twisted pile great~
+a pile of twisted serragon dung~
+A great pile of twisted serragon dung is steaming a little too close to you.~
+   The massive pile of dung is still warm and, certainly, quite pungent.
+Hidden amongst small bones and rocks are a few remnants of twigs and,
+surprisingly frilled seeds still whole and intact.
+   You could try planting the dung somewhere.
+   Ribbon serragons are known to swallow anything that will fit between its
+jaws. Their trails are scraped raw, leaving no plant, beast, or rock behind.
+The inedible parts churn and roil to break up the rest.
+~
+3 be a 0 0 13
+0 12221 0
+0 0
+C
+1 1
+S
+#12204
+whistle earthworm worm giant mount~
+a giant earthworm mount whistle~
+A giant earthworm mount whistle is lying on the ground.~
+   The whistle is crafted from a hollow acorn shell fitted with a smooth sliver
+of oak, bound with threads of dried moss. Tiny grooves spiral down its sides
+like the tunnels of a burrowing worm. A faint earthy smell lingers on the
+whistle. When blown, it gives a low, humming note.
+   You can 'use' this whistle to summon a giant earthworm, a new mount.
+   Hunters whisper that the vermilion ribbon is always the more aggressive of
+the pair with its jagged crest reputed to be a sign that it's ready for a
+fight. The redder serragon is said to burn brightly to defend its mate.
+~
+3 p a 0 0 11
+12204 0 0
+0 0
+C
+1 1
+T 9910
+S
+#12205
+whistle caterpillar giant mount~
+a giant caterpillar mount whistle~
+A giant caterpillar mount whistle is lying here.~
+   The whistle is fashioned from a curled oak leaf, dried and lacquered until
+it holds its shape, with tiny veins etched in silver along its surface. A bit
+of willow twig forms the mouthpiece, and when blown it releases a soft,
+rustling tone.
+   You can 'use' this whistle to summon a giant caterpillar, a new mount.
+   Travelers say the viridian ribbon serragon is always the calmer of the two.
+Old poachers call it 'the brooding coil,' for it lingers near the nest and
+circles patiently, waiting for its mate's strike before it joins the fray.
+~
+3 p a 0 0 12
+12205 0 0
+0 0
+C
+1 1
+T 9910
+S
+#12206
+whistle minipet mossy sproutling~
+a mossy sproutling minipet whistle~
+A mossy sproutling minipet whistle is growing here.~
+   The whistle is carved from a hollow twig of elderwood. Its surface is still
+wrapped in a thin layer of living moss. Tiny shoots sprout from cracks along
+its length, giving it the look of something half-grown rather than crafted.
+   You can 'use' the whistle to gain  mossy sproutling as a minipet!
+   Ribbon serragons are always found entwined, winding their bodies together so
+closely that most who see them believe they are a single beast. Hunters say the
+pair mates for life, fighting and feeding as one, grinding bark to powder as
+they coil and carving long scars through the forest floor.
+~
+19 p a 0 0 12
+12206 0 0
+0 0
+C
+1 1
+S
+#12207
+scales pair matched serrated serragon gemlike~
+a pair of gemlike serragon scales~
+A matched pair of serrated scales glimmer on the ground like cut jewels.~
+   These two scales, shed from a ribbon serragon, gleam with a natural
+brilliance. One is a deep ruby shot through with golden veins, the other a rich
+emerald laced with hints of silver. Both are hard as stone and razor-edged
+along their jagged margins. They look like they're from two different colored
+beasts, but they interlock as if they were made together.
+   Ribbon serragon scales are so rare and fragile that it is said lords have
+sent armies to claim them.
+~
+15 e a 0 0 9
+6 2 0
+12 0
+C
+100 100
+R
+4 5611 a
+S
+#12208
+coilstone stone coiling smooth serragon~
+a serragon coilstone~
+A smooth, coiling stone has rolled to a stop on the ground.~
+   The coilstone is a polished nodule formed deep within the bowel of a ribbon
+serragon, where grit and minerals were churned together for years. It gleams
+just below the surface like a pearl, with iridescent bands of vermilion and
+viridian that twist into a natural spiral.
+   Woodsmen say the forest itself stirs when a serragon is ready to give birth
+as the creature uncoils to release a nest of wriggling young.
+~
+15 e a 0 0 10
+12 2 0
+12 0
+C
+100 100
+R
+4 5611 a
+S
+#12209
+skull serragon frilled~
+a frilled serragon skull~
+The frilled skull of a serragon looms here.~
+   This enormous skull once crowned a ribbon serragon, and finding one unbroken
+is a prize beyond measure. Its long, narrow form is crowned with a frilled
+crest of spines that splay outward like a jagged fan, sharp as broken obsidian.
+Rows upon rows of teeth still jut from the gaping jaws; lifeless now after
+taking so many lives themselves.
+   Woodsmen tell grim stories of whole timber camps erased overnight -- men
+return to find splinters and woodchips, with no sign of their comrades except
+the scent of blood that leads back to the nest of the ribbon serragon.
+~
+15 e a 0 0 9
+18 2 0
+14 0
+C
+100 100
+R
+4 5611 a
+S
+#12212
+corpse body half-digested halfdigested digested large bear~
+the half-digested corpse of a large bear~
+The half-digested corpse of a large bear is lying on the ground.~
+   Most of the fur from the corpse has been eaten away by the foul-smelling
+stomach acid or beaten away by the churning rocks in whatever stomach this bear
+found itself in. The upper torso is riddled with needle-like puncture marks and
+most of the claws are missing. You turn away before the smell overtakes you.
+~
+10 gk a 0 0 8
+12212 4 0
+7 36
+M
+0
+You bury $p.~
+M
+1
+$n buries $p.~
+S
+#12213
+body adventurer half-digested halfdigested digested corpse hapless~
+the body of a hapless adventurer~
+The body of a hapless adventurer is lying here, half-digested.~
+   What remains of this poor adventurer -- and it isn't much -- doesn't look
+good. Little remains of his clothing; littler still remains of his skin. You
+can't make out who this was. Unfortunately, it looks a little late for a
+resurrection spell, too.
+~
+10 gk a 0 0 11
+12213 4 0
+7 360
+M
+0
+You bury $p.~
+M
+1
+$n buries $p.~
+S
+#12214
+tooth serragon ribbon intact~
+an intact ribbon serragon tooth~
+An intact ribbon serragon tooth is staked into the ground.~
+   The needle-like fang, knocked loose in a great struggle, is nearly flawless.
+It's also nearly the length of your forearm. Its surface is glassy and faintly
+striated, translucent when it catches the light.
+   Those skilled in jewelry can sew a needle tooth cloak with this fang as its
+clasp.
+   Hunters prize such fangs as rare ornaments, since few survive intact when
+the beast is slain. They're known to adorn their clothes with these fangs to
+show off their greatness in battle.
+~
+3 e a 0 0 6
+0 0 0
+14 0
+C
+100 100
+R
+4 5193 0
+S
+#12215
+cloak clasped needle tooth serragon~
+a cloak clasped with the needle tooth of a serragon~
+A cloak clasped with a tooth is lying here.~
+   Though the cloak is elegant enough on its own, it is the large clasp at the
+cloak's throat that truly makes it unique. The clasp is made from the polished
+needle fang of a ribbon serragon, translucent nd gleaming faintly in the light.
+   Hunters say such clasps mark those who have braved the coils and lived; that
+the fang a sign that the forest's deadliest predator could not defeat them.
+~
+2 mo ak 0 0 4
+0 0 0
+7 0
+A
+5 1 0
+A
+11 1 3
+A
+16 1 3
+A
+15 1 3
+C
+50 150
+S
+#12216
+lung lobed many-lobed manylobed massive serragon~
+a many-lobed serragon lung~
+A massive, many-lobed lung lies flattened on the ground.~
+   The enormous lung stretches longer than a man is tall. Its rubbery flesh
+branches into a maze of small lobes and chambers. Though heavy, the lung is
+surprisingly elastic, and when pressed it releases faint wheezes from its
+countless pockets.
+   With this lung, you can sew lunghide trousers, provided you have the
+Leatherworking ability.
+   Hunters sometimes complain of ribbon serragon flesh being tough and stringy,
+though it's rich with fat and keeps for weeks if dried, so desperate camps have
+lived on it after a lucky kill.
+~
+3 e a 0 0 8
+0 0 0
+7 0
+C
+100 100
+R
+4 5193 0
+S
+#12217
+pants lunghide hide pair~
+a pair of lunghide pants~
+A pair of lunghide pants is folded up on the ground.~
+   These trousers are fashioned from the elastic hide of a ribbon serragon's
+enormous lung. The many branching lobes are cleverly stitched into place as
+natural pouches, resulting in dozens of tiny pockets hidden across the surface.
+   The rasp of ribbon serragon scales is often mistaken for saws in the
+distance. All the more tragic for the lost woodsman thinking he's heading back
+to a warm campfire.
+~
+2 emo af 0 0 5
+0 0 0
+7 0
+A
+5 1 3
+A
+19 3 0
+A
+11 1 0
+C
+50 150
+S
+#12218
+corpse tremendous vermilion serragon ribbon~
+the tremendous corpse of the vermilion serragon~
+The vermilion ribbon serragon sprawls around you, dim and lifeless.~
+   The vermilion serragon's length sprawls across the ground in broken coils,
+its fiery red scales darkened with cracks and streaks of dust. The once-proud
+jaws now lie twisted and limp. Its eyes, once sharp and unblinking rubies, are
+glazed with a black, lifeless sheen. The rows of hooked teeth glint faintly, as
+if waiting for a breath that will never come.
+~
+10 m 0 0 0 8
+12201 6 0
+7 72
+S
+#12219
+corpse twisted veridian serragon ribbon scales~
+the twisted corpse of the veridian serragon~
+The viridian ribbon serragon lies in a twisted heap atop fallen scales.~
+   The viridian serragon's body lies slack in a loose coil, like a flattened
+worm collapsed into the earth. The once-glossy scales now look like they're
+covered in verdigris, dull, chipped, and cracked where blows struck deep. The
+creature's wide, leaflike crest sags against the soil, torn in places and
+drained of its shimmer. Its needled teeth are mostly broken, piled below the
+slackened jaw and glassy, absent gaze.
+~
+10 m 0 0 0 9
+12202 6 0
+7 72
+S
+#12220
+heart coiled heliacal helical ribbon serragon~
+the heliacal heart of a ribbon serragon~
+A great, coiled heart glows faintly in a puddle of blood.~
+   Its shape is twisted in radiant whorls, still warm to the touch and heavy
+with sloshing blood. The surface of the heart gleams faintly, as if lit from
+within by the last rays of sunlight caught in its chambers.
+   The blood from this heart could be used to build a ribbon serragon shrine
+in awe or in fear of the vicious creature.
+   Some villages once gathered in the spring at shrines to the ribbon serragon,
+weaving long bands of red and green cloth through the trees.
+~
+3 e a 0 0 2
+0 0 0
+7 0
+C
+100 100
+S
+#12221
+gourds snake coiled long bundle~
+a bundle of coiled snake gourds~
+A bundle of long, coiled snake gourds lies on the ground.~
+   The fresh gourds twist in loose coils, some nearly forming knots in their
+length. The skins are smooth and cool to the touch, mottled with green stripes.
+When you split one open, the flesh within is pale and moist, with a sweet
+scent. A strip of vine bundles the gourds together.
+~
+6 gC a 0 0 16
+12 0 0
+7 120
+C
+1 1
+I 15 12222 100.00 4  # SEPARATE: fresh snake gourd
+I 25 12223 50.00 1 s  # SEED: handful of snake gourd seeds
+I 25 12223 50.00 2 s  # SEED: handful of snake gourd seeds
+O+ 1 6152
+R
+4 5215 0
+S
+#12222
+gourd snake curling fresh small~
+a fresh snake gourd~
+A small, curling snake gourd pokes up from the ground.~
+   This young snake gourd is only a few hands long. Its coil is still tight,
+but its skin is soft enough to bite right through. The skin is white, not the
+mottled green of the mature fruit. Inside, it's pale and watery, with a
+freshness that makes it a favored snake for man and beast alike.
+~
+6 gC a 0 0 9
+2 0 0
+0 120
+I 14 12221 100.00 4 e  # COMBINE: bundle of coiled snake gourds
+O+ 1 6142
+R
+4 5619 0
+S
+#12223
+seeds handful snake gourd frilled~
+a handful of snake gourd seeds~
+A handful of frilled snake gourd seeds is scattered here.~
+   The seeds are flat and oval, beige or light tan in color, some of them
+striped. The edges are ringed with a delicate, frilled margin that gives them a
+scalloped look. They rattle softly when shaken in the palm.
+~
+3 bC a 0 0 11
+0 12221 0
+0 8760
+C
+1 1
+O+ 1 6180
+R
+4 5210 0
+S
+#12251
+elephants sorrow~
+the sorrow of the elephants~
+The sorrow of the elephants lingers in the air.~
+It seems all the elephants have been driven away from these stomping grounds.
+~
+3 0 0 0 0 2
+0 0 0
+0 24
+M
+18
+The sorrow doesn't linger any further.~
+T 9683
+S
+#12255
+bone elephant sanctified~
+a sanctified elephant bone~
+A sanctified elephant bone is lying here.~
+   This tremendous bone once belonged to a great and powerful elephant, leader
+of her herd, queen of her domain. Now, it can be used to build an elephant
+graveyard -- a sacred space where elephants return when they die.
+~
+3 e a 0 0 1
+0 0 0
+14 0
+C
+100 100
+R
+4 5193 0
+S
+$

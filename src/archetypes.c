@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -587,7 +588,7 @@ bool audit_archetype(archetype_data *arch, char_data *ch) {
 			}
 		}
 		
-		if (ispunct(*(GET_ARCH_LORE(arch) + strlen(GET_ARCH_LORE(arch)) - 1))) {
+		if (ends_in_punct(GET_ARCH_LORE(arch))) {
 			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Lore ends with punctuation");
 			problem = TRUE;
 		}
@@ -873,7 +874,7 @@ void olc_fullsearch_archetype(char_data *ch, char *argument) {
 		if (*find_rank && !multi_isname(find_rank, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_rank, GET_ARCH_FEMALE_RANK(arch))) {
 			continue;
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_ARCH_NAME(arch)) && !multi_isname(find_keywords, GET_ARCH_DESC(arch)) && !multi_isname(find_keywords, GET_ARCH_LORE(arch)) && !multi_isname(find_keywords, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_keywords, GET_ARCH_FEMALE_RANK(arch))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_ARCH_NAME(arch)) && !multi_isname(find_keywords, GET_ARCH_DESC(arch)) && !multi_isname(find_keywords, GET_ARCH_LORE(arch)) && !multi_isname(find_keywords, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_keywords, GET_ARCH_FEMALE_RANK(arch)) && (!GET_ARCH_NOTES(arch) || !multi_isname(find_keywords, GET_ARCH_NOTES(arch)))) {
 			continue;
 		}
 		
@@ -902,6 +903,7 @@ void olc_fullsearch_archetype(char_data *ch, char *argument) {
 void olc_search_archetype(char_data *ch, any_vnum vnum) {
 	archetype_data *arch = archetype_proto(vnum);
 	quest_data *qiter, *next_qiter;
+	trig_data *trig, *next_trig;
 	int found;
 	bool any;
 	
@@ -921,6 +923,14 @@ void olc_search_archetype(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_ARCHETYPE, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -1121,6 +1131,9 @@ void free_archetype(archetype_data *arch) {
 	if (GET_ARCH_FEMALE_RANK(arch) && (!proto || GET_ARCH_FEMALE_RANK(arch) != GET_ARCH_FEMALE_RANK(proto))) {
 		free(GET_ARCH_FEMALE_RANK(arch));
 	}
+	if (GET_ARCH_NOTES(arch) && (!proto || GET_ARCH_NOTES(arch) != GET_ARCH_NOTES(proto))) {
+		free(GET_ARCH_NOTES(arch));
+	}
 	
 	if (GET_ARCH_GEAR(arch) && (!proto || GET_ARCH_GEAR(arch) != GET_ARCH_GEAR(proto))) {
 		free_archetype_gear(GET_ARCH_GEAR(arch));
@@ -1254,6 +1267,11 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				GET_ARCH_NOTES(arch) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -1310,6 +1328,7 @@ void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list) {
 * @param archetype_data *arch The thing to save.
 */
 void write_archetype_to_file(FILE *fl, archetype_data *arch) {
+	char temp[MAX_STRING_LENGTH];
 	struct archetype_skill *sk;
 	int iter;
 	
@@ -1343,6 +1362,13 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	// K: skills
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		fprintf(fl, "K\n%d %d\n", sk->skill, sk->level);
+	}
+	
+	// '_'
+	if (GET_ARCH_NOTES(arch) && *GET_ARCH_NOTES(arch)) {
+		strcpy(temp, GET_ARCH_NOTES(arch));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1803,6 +1829,7 @@ void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 	archetype_data *arch;
 	descriptor_data *desc;
 	quest_data *qiter, *next_qiter;
+	trig_data *trig, *next_trig;
 	char name[256];
 	bool found;
 	
@@ -1828,6 +1855,16 @@ void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_ARCHETYPE, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to archetype [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// remove from active editors
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_QUEST(desc)) {
@@ -1837,6 +1874,12 @@ void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "An archetype rewarded by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_ARCHETYPE, vnum);
+			if (found) {
+				msg_to_desc(desc, "Archetype [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 	}
@@ -1880,6 +1923,9 @@ void save_olc_archetype(descriptor_data *desc) {
 	if (GET_ARCH_FEMALE_RANK(proto)) {
 		free(GET_ARCH_FEMALE_RANK(proto));
 	}
+	if (GET_ARCH_NOTES(proto)) {
+		free(GET_ARCH_NOTES(proto));
+	}
 	free_archetype_gear(GET_ARCH_GEAR(proto));
 	free_archetype_skills(GET_ARCH_SKILLS(proto));
 	
@@ -1907,6 +1953,10 @@ void save_olc_archetype(descriptor_data *desc) {
 			free(GET_ARCH_FEMALE_RANK(arch));
 		}
 		GET_ARCH_FEMALE_RANK(arch) = str_dup(default_archetype_rank);
+	}
+	if (GET_ARCH_NOTES(arch) && !*GET_ARCH_NOTES(arch)) {
+		free(GET_ARCH_NOTES(arch));
+		GET_ARCH_NOTES(arch) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -2029,6 +2079,10 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	build_page_display_str(ch, "Gear:");
 	show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	
+	if (GET_ARCH_NOTES(arch) && *GET_ARCH_NOTES(arch)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_ARCH_NOTES(arch));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -2113,6 +2167,8 @@ void olc_show_archetype(char_data *ch) {
 	if (GET_ARCH_GEAR(arch)) {
 		show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_ARCH_NOTES(arch)), NULLSAFE(GET_ARCH_NOTES(arch)));
 	
 	send_page_display(ch);
 }
@@ -2278,6 +2334,19 @@ OLC_MODULE(archedit_malerank) {
 OLC_MODULE(archedit_name) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_ARCH_NAME(arch));
+}
+
+
+OLC_MODULE(archedit_notes) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_ARCH_NAME(arch));
+		start_string_editor(ch->desc, buf, &GET_ARCH_NOTES(arch), MAX_NOTES, TRUE);
+	}
 }
 
 

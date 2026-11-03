@@ -1,0 +1,475 @@
+#9300
+bat fox flying spectacled~
+a spectacled flying fox~
+A spectacled flying fox swoops past.
+~
+65 90 djo cm 1
+0 0 2 9 -1 -1
+D
+   This curious creature has the face of a fox with the wings of a bat.
+Straw-colored fur around its eyes gives it the appearance that it's wearing a
+pair of spectacles. There's also light fur on its shoulders and part of its
+body, but the predominant color is black.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
+S
+#9301
+bird paradise majestic~
+a majestic bird of paradise~
+A majestic bird of paradise fans its colorful feathers.
+~
+65 90 djo m 1
+0 0 2 26 -1 -1
+D
+   A riot of color and grace, this bird seems almost unreal against the green
+backdrop. Long plumes spill from its tail in cascading shades of gold, scarlet,
+and deep indigo, catching the light every time it turns. When it dances, it
+moves with a deliberate, almost ritualistic precision.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
+S
+#9302
+beaver burly~
+a burly beaver~
+A burly beaver is dragging a log.
+~
+100 125 djo L 2
+0 0 0 9 -1 -1
+D
+   This stocky, powerful beaver is well-suited to both labor and defense in
+this rugged terrain. Its dense brown fur is slick with water and mud. Its
+broad, paddle-like tail leaves a wide groove in the soft earth as it moves.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+M
+15
+A burly beaver weaves through the water.~
+S
+#9303
+buffalo water wild~
+a wild water buffalo~
+A wild water buffalo stands here, chewing.
+~
+50 75 djo 0 4
+0 0 70 42 -1 -1
+D
+   It's a broad, powerful anmial with a thick, mud-colored hide that glistens
+faintly from recent wallowing. Heavy-lidded eyes watch you carefully. You might
+be able to tame the water buffalo, if you can earn its trust.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 24 9304 100.00 1  # TAME: water buffalo
+M
+0
+$n shakes its massive head.~
+M
+0
+$n lets out a deep, rumbling grunt.~
+M
+0
+$n lowers its head to graze.~
+M
+0
+$n flicks its tail sharply.~
+M
+0
+$n huffs a misty breath.~
+M
+0
+$n flaps $s ears.~
+T 9028
+T 9027
+T 9503
+S
+#9304
+buffalo water~
+a water buffalo~
+A water buffalo stands here, chewing.
+~
+50 75 defjo 0 4
+0 0 70 42 -1 -1
+D
+   The water buffalo is a thick creature with a dark hide. Its sweeping horns
+curve outward, with more than enough reach to ruin the day of anybody standing
+too close when it becomes alarmed.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 3 9305 100.00 1 x  # BARDE: armored water buffalo
+M
+0
+$n shakes its massive head.~
+M
+0
+$n lets out a deep, rumbling grunt.~
+M
+0
+$n lowers its head to graze.~
+M
+0
+$n flicks its tail sharply.~
+M
+0
+$n huffs a misty breath.~
+M
+0
+$n flaps $s ears.~
+M
+6
+A water buffalo stands here, chewing.~
+M
+6
+A water buffalo plods along slowly.~
+M
+6
+A water buffalo stands patiently nearby.~
+M
+6
+A water buffalo stands here, snorting at you.~
+M
+6
+A water buffalo swishes its tail lazily.~
+M
+6
+A water buffalo stands quietly.~
+M
+15
+A water buffalo is wallowing here.~
+T 9503
+S
+#9305
+buffalo water armored~
+an armored water buffalo~
+An armored water buffalo stands proudly nearby.
+~
+75 100 defjo 0 4
+0 0 70 42 -1 -1
+D
+   The broad water buffalo wears heavy plates of armor with no sign of slowing
+down. A stampeding water buffalo is hard to stop; an armored one is impossible.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+T 9503
+S
+#9306
+zebu wild~
+a wild zebu~
+A wild zebu trots by.
+~
+50 75 djo 0 4
+0 0 70 9021 -1 -1
+D
+   The zebu is a sleek bull with a pronounced hump rising proudly between its
+shoulders. Its horns curve elegantly above its head, giving it a regal, almost
+statuesque presence.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 24 9307 100.00 1  # TAME: hump-backed zebu
+M
+0
+$n flicks its long ears.~
+M
+0
+$n lowers its head to sniff at the ground.~
+M
+0
+$n shifts its weight and adjusts its stance.~
+M
+0
+$n shakes its coat, sending dust into the air.~
+M
+0
+$n lifts a hoof and shakes something off of it.~
+M
+0
+$n chews slowly.~
+T 9028
+T 9027
+T 9503
+S
+#9307
+zebu hump-backed humpbacked backed~
+a hump-backed zebu~
+A zebu stands here, staring at you.
+~
+50 75 dejo 0 4
+0 0 70 9021 -1 -1
+D
+   The mighty zebu is a silver-gray bull with tall, curving horns sprouting
+like a crown above its head. Just behind the horns, a large hump rises
+prominently over its shoulders.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 3 9308 100.00 1 x  # BARDE: mighty armored zebu
+M
+0
+$n flicks its long ears.~
+M
+0
+$n lowers its head to sniff at the ground.~
+M
+0
+$n shifts its weight and adjusts its stance.~
+M
+0
+$n shakes its coat, sending dust into the air.~
+M
+0
+$n lifts a hoof and shakes something off of it.~
+M
+0
+$n chews slowly.~
+M
+6
+A zebu stands here, staring at you.~
+M
+6
+A zebu lowers its head and sniffs at the ground.~
+M
+6
+A zebu raises its head and sniffs at the air.~
+M
+6
+A zebu ambles along nearby.~
+M
+6
+A zebu stands calmly, chewing.~
+M
+6
+A zebu is standing here.~
+T 9503
+S
+#9308
+zebu armored mighty~
+a mighty armored zebu~
+A mighty armored zebu stands tall.
+~
+75 100 dejo 0 4
+0 0 70 9021 -1 -1
+D
+   The hefty zebu is all the heavier for the armor it has been dressed in.
+Even its signature shoulder hump is plated for protection in battle.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+T 9503
+S
+#9309
+kangaroo ornery~
+an ornery kangaroo~
+An ornery kangaroo searches for someone to fight.
+~
+100 150 cdjoz 0 4
+0 0 15 11 -1 -1
+D
+   This odd creature has the head of a deer, the ears of a rabbit, and the legs
+of a kick-boxer. It stands upright with its tail braced like a tripod, watching
+you closely and giving the ground an impatient thump.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+M
+0
+$n holds up $s hands in a fighting stance.~
+M
+0
+$n braces $s tail against the ground and squares up.~
+M
+0
+$n gives the ground a sharp warning thump.~
+M
+0
+$n snorts and flexes $s claws.~
+S
+#9310
+peahen demure hen bird~
+a demure peahen~
+A demure peahen searches through the grass.
+~
+65 90 djo 0 3
+0 0 0 26 -1 -1
+D
+   You see a brownish peahen foraging nearby. It is a large, sturdy bird, but
+its plumage is mostly a subdued, earth-toned mix of grey and brown. Its only
+significant ornament is a small, spiky Crest atop its head. Unlike the male, it
+has a short, manageable tail and moves with a quiet, cautious grace.
+~
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 1 9025 100.00 1  # SKIN: bird feathers
+M
+0
+$n listens for a nearby peacock's call.~
+M
+0
+$n looks for a flash of color in the distance.~
+M
+0
+$n tilts $s head, listening intently.~
+M
+0
+$n gives a soft, questioning call.~
+M
+0
+$n smooths a few feathers with careful nips.~
+S
+#9311
+peacock fancy-looking fancylooking cock bird~
+a fancy peacock~
+A fancy-looking peacock struts its stuff.
+~
+65 90 djo 0 2
+0 0 87 26 -1 -1
+D
+   A blue peacock is present, displaying its iridescent sapphire plumage. Its
+extended train consists of green feathers adorned with numerous black and blue
+eye-shaped patterns. The bird shakes its feathers and emits a distinct, loud
+call.
+~
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 1 9025 100.00 1  # SKIN: bird feathers
+M
+0
+$n fans out $s colorful tail feathers.~
+M
+0
+$n lets out a rather annoying call.~
+M
+0
+$n struts a slow circle, head held high.~
+M
+0
+$n angles for attention.~
+M
+0
+$n shakes $s tail in a brief shimmer of color.~
+M
+0
+$n flares $s wings dramatically as it hops a short distance.~
+M
+0
+$n preens meticulously, never breaking $s regal posture.~
+S
+#9312
+toucan juggles fruit bird~
+a toucan~
+A toucan juggles a piece of fruit with its beak.
+~
+65 90 abdjo 0 3
+0 0 2 9 -1 -1
+D
+   A vibrant toucan sits high on a branch, its glossy black body set off by a
+white throat and colorful markings around its face. Its large, curved rainbow
+beak-yellow, orange, and green-stands out.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 1 9025 100.00 1  # SKIN: bird feathers
+S
+#9313
+hornbill golden-crested goldencrested crested~
+a golden-crested hornbill~
+A golden-crested hornbill lets out a cackling call.
+~
+65 90 dj m 3
+0 0 2 26 -1 -1
+D
+   You spot a golden-crested hornbill, a large black-and-white bird with a
+massive beak and a helmet-like structure marked in yellow and red. Its sharp
+red eyes are ringed by thick lashes, and it calls out with a loud echoing
+cackle every few seconds. Powerful wings allow it to glide easily through the
+tropical air.
+~
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 1 9025 50.00 1  # SKIN: bird feathers
+M
+0
+$n forages through the trees for fruit.~
+M
+0
+$n shows off $s brightly colored crest.~
+M
+0
+$n lets out a loud, cackling call.~
+S
+#9314
+yak stubborn shaggy~
+a stubborn yak~
+A stubborn yak is grazing here.
+~
+20 30 bdfjkoy 0 4
+0 0 0 42 -1 -1
+D
+   The yak's shaggy, dark brown fur is warm to the touch. Aside from the
+overgrown fringe, it looks rather like an ox.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 2 9234 5.00 4 s  # SHEAR: sack of yak wool
+I 2 9234 45.00 3 s  # SHEAR: sack of yak wool
+I 2 9234 50.00 2 s  # SHEAR: sack of yak wool
+M
+0
+$n chews some grass.~
+M
+6
+A shaggy yak stands nearby, chewing.~
+M
+6
+A yak watches you from nearby.~
+M
+6
+A yak snorts as it watches you.~
+M
+6
+A yak flicks its ear as it watches you.~
+M
+6
+A yak is grazing nearby.~
+M
+6
+A stubborn yak chews as it watches you.~
+S
+#9315
+llama woolly curious~
+a woolly llama~
+A woolly llama is grazing.
+~
+10 20 bdfjko 0 4
+0 0 0 9 -1 -1
+D
+The shaggy llama munches a mouthful of grass as it contemplates you.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+I 2 1361 100.00 1  # SHEAR: bag of soft llama wool
+I 2 1361 50.00 1  # SHEAR: bag of soft llama wool
+I 2 1361 5.00 1  # SHEAR: bag of soft llama wool
+M
+6
+A curious llama watches you.~
+M
+6
+A woolly llama chews on a mouthful of grass.~
+M
+6
+A woolly llama stands nearby.~
+M
+6
+A curious llama trots past.~
+M
+6
+A llama chews silently.~
+M
+6
+A llama chews loudly.~
+S
+$

@@ -84,9 +84,11 @@ how:
 ~
 You seem to have mastered the scrape command.
 ~
-4 h 0 15 -1
+5 h 0 15 -1
 A
 2 120
+A
+2 147
 R
 0 0 1
 R
@@ -107,15 +109,27 @@ lumber. Here's what to do:
 ~
 Lumber can be used for all kinds of buildings and crafts.
 ~
-1 h 0 15 -1
+2 h 0 15 -1
 A
 2 120
+A
+2 128
+A
+2 137
+A
+2 149
+A
+2 150
 R
 0 0 1
 W
 2 125 0 1 -
+W
+2 130 0 1 -
 Z
 2 125
+Z
+2 130
 S
 #126
 Rough Wood Tutorial~
@@ -171,7 +185,7 @@ S
 #128
 Pole Tutorial~
    You've found a sapling -- a narrow, straight tree. You can scrape the
-sapling to make a pole, which can then be used to make buildings or crafts. 
+sapling to make a pole, which can then be used to make buildings or crafts.
 Here's how:
  1. 'Use' a knife tool (such as a handaxe).
  2. Type 'scrape sapling' (or 'scrape shoot', if you have that instead).
@@ -179,7 +193,7 @@ Here's how:
 ~
 You've mastered scraping saplings to make poles.
 ~
-6 h 0 15 -1
+7 h 0 15 -1
 A
 2 131
 A
@@ -188,6 +202,8 @@ A
 2 135
 A
 2 136
+A
+2 148
 R
 0 0 1
 W

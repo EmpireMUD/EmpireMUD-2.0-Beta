@@ -199,10 +199,10 @@ A sack of ironflour is sitting on the ground.~
 can be baked (though perhaps forged would be a better term) into long-lasting
 iron rations.
 
-Bake (no skill required): ironbread
+Bake (Gourmet Chef required): ironbread
   2x sack of ironflour
 ~
-3 0 a 0 0 8
+3 0 a 0 0 9
 0 0 0
 2 0
 R
@@ -260,9 +260,9 @@ magical crystal. It can also be planted to grow more gemfruit. Some gemfruits
 will fail to produce gems, and you must be holding them in your inventory when
 they decay to get any gems at all.
 ~
-6 b a 0 0 15
+6 b a 0 0 16
 48 10504 0
-12 240
+12 120
 T 10514
 S
 #10515
@@ -293,9 +293,9 @@ growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
 ~
-6 bC a 0 0 14
+6 bC a 0 0 15
 12 10505 0
-7 72
+7 168
 B
 u
 I 15 10515 100.00 4 x  # SEPARATE: magic mushroom
@@ -345,9 +345,9 @@ from the manaweavers of the Magiterranean.
 Cook: figgy pudding
  2x basket of pudding figs
 ~
-6 bC a 0 0 5
+6 bC a 0 0 6
 24 10506 0
-7 120
+7 168
 R
 4 5114 0
 S
@@ -647,9 +647,9 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 bgC a 0 0 9
+6 bgC a 0 0 10
 12 10551 0
-7 72
+7 168
 O+ 1 6132
 R
 4 5215 0
@@ -886,9 +886,9 @@ is small, if you 'use charm', it will summon a flying mount.
 T 9910
 S
 #10567
-whistle polar cub~
-a polar cub whistle~
-A polar cub whistle is lying here.~
+whistle polar cub minipet~
+a polar cub minipet whistle~
+A polar cub minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~

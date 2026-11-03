@@ -406,6 +406,7 @@ void sire_char(char_data *ch, char_data *victim) {
 void start_drinking_blood(char_data *ch, char_data *victim) {
 	struct char_event_data *data;
 	struct dg_event *ev;
+	struct over_time_effect_type *dot, *next_dot;
 	
 	// safety first
 	if (GET_FEEDING_FROM(ch)) {
@@ -420,6 +421,13 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 
 	stop_fighting(ch);
 	stop_fighting(victim);
+	
+	// cancel physical DoTs on bite (prevent bleed effects from killing the target)
+	LL_FOREACH_SAFE(victim->over_time_effects, dot, next_dot) {
+		if (dot->damage_type == DAM_PHYSICAL) {
+			dot_remove(victim, dot);
+		}
+	}
 	
 	// ensure no existing event
 	cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
@@ -1060,7 +1068,7 @@ ACMD(do_bite) {
 				set_blood(victim, MAX(1, GET_BLOOD(victim) - 2));
 			}
 			
-			if (can_gain_exp_from(ch, victim)) {
+			if (can_gain_exp_from(ch, victim, NULL)) {
 				gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 10);
 				if (melee) {
 					gain_player_tech_exp(ch, PTECH_BITE_MELEE_UPGRADE, 10);
@@ -1131,7 +1139,7 @@ ACMD(do_boost) {
 		msg_to_char(ch, "Which attribute do you wish to boost? Or type 'boost end' to cancel boosts.\r\nAttributes:");
 		any = FALSE;
 		for (iter = 0; *boost_data[iter].name != '\n'; ++iter) {
-			if (boost_data[iter].role == ROLE_NONE || boost_data[iter].role == GET_CLASS_ROLE(ch)) {
+			if (boost_data[iter].role == ROLE_NONE || boost_data[iter].role == GET_CLASS_ROLE(ch) || (GET_CLASS_ROLE(ch) == ROLE_SOLO && check_solo_role(ch))) {
 				msg_to_char(ch, "%s%s", (any ? ", " : " "), boost_data[iter].name);
 				any = TRUE;
 			}
@@ -1160,6 +1168,10 @@ ACMD(do_boost) {
 	}
 	if (pos == NOTHING) {	// no valid choice
 		msg_to_char(ch, "You don't know how to boost '%s'.\r\n", arg);
+		return;
+	}
+	if (boost_data[pos].role != ROLE_NONE && GET_CLASS_ROLE(ch) != boost_data[pos].role && (GET_CLASS_ROLE(ch) != ROLE_SOLO || !check_solo_role(ch))) {
+		msg_to_char(ch, "You need to be in the %s%s\t0 role to boost that.\r\n", class_role_color[boost_data[pos].role], class_role[boost_data[pos].role]);
 		return;
 	}
 	
@@ -1252,7 +1264,7 @@ ACMD(do_command) {
 			strcpy(argument, buf);
 		do_say(ch, argument, 0, 0);
 		
-		if (can_gain_exp_from(ch, victim)) {
+		if (can_gain_exp_from(ch, victim, ability_proto(ABIL_VAMP_COMMAND))) {
 			gain_ability_exp(ch, ABIL_VAMP_COMMAND, 33.4);
 		}
 

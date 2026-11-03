@@ -1,6 +1,7 @@
 #121
 Start Handle Tutorial~
-2 u 0
+2 u 0 1
+L t 100
 ~
 * start flint tutorial
 if !%actor.completed_quest(100)% && !%actor.on_quest(100)%
@@ -9,7 +10,8 @@ end
 ~
 #130
 Water Tutorial: Detect fill~
-1 c 2
+1 c 2 1
+L t 130
 fill~
 return 0
 set prev %self.val1%

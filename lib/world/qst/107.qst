@@ -10,9 +10,10 @@ that citizens live) to finish this quest.
 collect. By time you've turned around, the cookies are gone and a left-over
 gift has replaced them.
 ~
-18 dej 0 0 -1
+19 dej 0 0 -1
 A
 1 10702
+D 10700
 P
 36 10700 0 1 -
 R
@@ -26,6 +27,37 @@ W
 36 10700 0 1 a
 Z
 2 10716
+S
+#10701
+Winter Wonderland: A Proper Roasting~
+   The cheerful little elves are preparing for one of their favorite winter
+activities: They're having a roast! The elves will be taking turns making jokes
+about Santa as some sort of twisted polar team-building activity. They just
+need their favorite snack. Bake 20 bowls of roast chestnuts and leave them in
+any home where the elves will collect them while delivering presents.
+(If you don't have chestnuts, try opening more gifts.)
+~
+   You leave the freshly roasted chestnuts in a pile of neatly-stacked bowls on
+the table for the elves to collect. By the time you turn around, they're gone!
+There's a stocking in their place, and it has your name on it.
+~
+21 dej 0 0 -1
+A
+1 10702
+D 10700
+P
+36 10700 0 1 -
+R
+9 10700 10
+R
+2 16678 1
+T 10700
+W
+2 10722 0 20 a
+W
+36 10700 0 1 a
+Z
+2 10722
 S
 #10730
 Hey Diddle Diddle~
@@ -84,9 +116,11 @@ items like the fiddle, pail, candlestick, and more whenever you kill a low-
 level mob anywhere in the world. When you find one, use 'start all' and look at
 the item for information on how to get it back to its rightful owner.
 ~
-2 0 0 100 -1
+3 0 0 100 -1
 A
 3 10850
+A
+1 10862
 P
 0 10851 0 1 -
 P
@@ -404,9 +438,11 @@ also more to explore inside. Get a torch and head into the mine to see what's
 inside. Maybe it will be interesting. Type 'adventure' inside the mine for more
 information.
 ~
-2 0 0 100 -1
+3 0 0 100 -1
 A
 3 10850
+A
+1 10862
 P
 0 10851 0 1 -
 P

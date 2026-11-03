@@ -37,7 +37,7 @@ Bone is a component type used in many crafts. Sub-types of bone include:
 
 See also: COMPONENT
 #
-"BLOCK COMPONENT" "STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
+"BLOCK COMPONENT" "STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS" "LARGE BLOCK" "HUGE STONE BLOCK" "PILE OF BRICKS"
 
 Block (component)
 
@@ -97,10 +97,10 @@ CANOE RAFT
 Canoe (vehicle)
 Raft (vehicle)
 
-Required ability:  Basic Crafts
+Required ability:  Primitive Crafts
 
 A good canoe or raft will allow you to cross rivers as well as oceans. And
-unlike swimming, you won't be bothered by sharks. To use a one of these
+unlike swimming, you won't be bothered by sharks. To use one of these
 vehicles, drag it to the shore and then sit in/on it. After that, use "sail"
 to move it.
 
@@ -155,7 +155,8 @@ CONVEYANCE "TRINKET OF CONVEYANCE"
 
 A trinket of conveyance can be used to teleport you back to a starting location
 (such as a Tower of Souls) from anywhere in the world. This item is single-use,
-so be sure to craft a few of them.
+so be sure to craft a few of them. However, if you happen to use it while
+you're already on a newbie island, you can re-use the trinket.
 
 You can't teleport out of certain locations, such as hostile territory or
 certain adventures. If you find yourself in one of these places, find a way
@@ -264,7 +265,7 @@ Stored at:  Chicken Coops, Larder
 
 Eggs are a quick, easy food source.
 #
-FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER" FEATHERS
+FIBERS FIBRES "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER" FEATHERS
 
 Fibers (component)
 
@@ -320,6 +321,21 @@ from wheat) along with similar ingredients such as cornmeal.
 
 See also: COMPONENT, MILL, CROPS
 #
+FLOWER FLOWERS "SMALL FLOWER"
+
+Flower crops:
+ &Yo&A:&Yo&A:&0  Temperate
+ &OlL&ClL  Arid
+ &A^&G|&V`&G|&0  Tropical
+
+You can grow flowers to beautify your city and to craft bouquets and wreaths.
+You can also use flowers as plant fiber, such as the stuffing for training
+dummies.
+
+Note: The 'small flower' item found while picking cannot be used for crafting.
+
+See also: CROPS, PICK, SEED, WOODWORKING
+#
 FRUITS "FRUIT COMPONENT" "SMALL FRUITS" "LARGE FRUITS"
 
 Fruit (component)
@@ -346,7 +362,7 @@ Furniture is cosmetic and provides no particular game function.
 
 See also: DRAG, WOODWORKING
 #
-FURS "FUR COMPONENT"
+FURS "FUR COMPONENT" "SMALL FURS" "LARGE FURS" "MYTHIC FURS"
 
 Fur (component)
 
@@ -355,7 +371,8 @@ Used for:  sewing
 Fur is a component type primarily used for clothing and mage armor.
 
 small furs: fox, wolverine, bright red, spotted fur
-large:  big cat pelt, wolf, tiger, polar bear fur
+large furs:  big cat pelt, wolf, tiger, polar bear fur
+mythic furs:  explore to find strange and valuable furs
 
 See also: COMPONENT, SEW, SKIN COMMAND
 #
@@ -524,10 +541,13 @@ your inventory.
 can use this to avoid wasting more precious components when you have cheaper
 ones available.
 
+If you 'toggle hide-keep on', items with (keep) flags won't show up on your
+basic inventory command.
+
 Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
 be counted by the quest tracker. Unkeep it for it to appear.
 
-See also: COMPONENT, QUEST
+See also: COMPONENT, QUEST, TOGGLE HIDE-KEEP
 #
 KNIFE KNIVES
 
@@ -722,6 +742,18 @@ you mix it with copper.
 
 See also: FORGE, METALS, MINE, SEW, SMELT
 #
+OBSIDIAN
+
+Obsidian (counts as rock)
+
+Used for:  crafting
+Stored at:  Gravel Pit
+
+Obsidian is a black volcanic glass sometimes found while digging in the
+mountains. It can also be used as a regular rock.
+
+See also: ROCK
+#
 OIL OILS "OIL COMPONENT" "SEED OILS" "VEGETABLE OILS"
 
 Oil (component)
@@ -789,12 +821,12 @@ the ground.
 
 See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
 #
-ROCKS "ROCK COMPONENT" OBSIDIAN
+ROCKS "ROCK COMPONENT"
 
 Rock (component)
 
 Used for:  basic crafting, basic building
-Stored at:  Gravel Pit, Quarry, Sand Pit
+Commonly stored at:  Gravel Pit, Quarry, Sand Pit
 
 You can find rocks by digging in the ground. They can be used as a primitive
 hammer for chipping flint, for laying roads, and as filler for many building.
@@ -896,16 +928,22 @@ See also: BAKE, COOK, GOURMET CHEF, HARVEST, FORAGE, PICK, PROCESS, SPICERY
 SPLIT
 
 Usage:  split <amount> <type> coins
+        split
 
 You can split coins you've found with members of your group using this command.
 Only group members who are present with you will receive a split. The amount is
 rounded down if there isn't an even amount to split, and you will keep the
 difference.
 
+If you type 'split' with no amount or type, it will split the last amount of
+coins you received (if you've gained coins since joining the group). Only coins
+you pick up from the ground or from objects are included in this; coins from
+quests or other sources aren't tracked for this.
+
 Example:
 > split 10 misc coins
 
-See also: COINS
+See also: COINS, GROUP
 #
 "STICKS AND LEAVES" "THORNY BRANCHES" "TANGLED VINES" VINES
 
@@ -1036,6 +1074,10 @@ Masterwork abilities (usually):
   Pottery - Master Craftsman
   Smelt - Master Craftsman or Master Blacksmith
   Woodworking - Master Craftsman
+
+Some abilities also have a bigger effect when you also know their mastery
+ability, such as Ready Fireball, which produces superior fireballs if you also
+know the Wilderblaze ability.
 
 See also: SCALABLE CRAFTS, ITEM-QUALITY
 #

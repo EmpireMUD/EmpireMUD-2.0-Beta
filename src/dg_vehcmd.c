@@ -770,6 +770,7 @@ VCMD(do_vslay) {
 	char_data *vict;
 	
 	argument = one_argument(argument, name);
+	skip_spaces(&argument);
 
 	if (!*name) {
 		veh_log(veh, "vslay: no target");
@@ -844,8 +845,8 @@ VCMD(do_vteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_triggers(ch, NO_DIR, "script", FALSE);
-			greet_triggers(ch, NO_DIR, "script", FALSE);
+			enter_triggers(ch, NO_DIR, "script", FALSE, orm);
+			greet_triggers(ch, NO_DIR, "script", FALSE, orm);
 			qt_visit_room(ch, IN_ROOM(ch));
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
@@ -875,8 +876,8 @@ VCMD(do_vteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_triggers(ch, NO_DIR, "script", FALSE);
-						greet_triggers(ch, NO_DIR, "script", FALSE);
+						enter_triggers(ch, NO_DIR, "script", FALSE, orm);
+						greet_triggers(ch, NO_DIR, "script", FALSE, orm);
 						qt_visit_room(ch, IN_ROOM(ch));
 						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);	// once we're sure we're staying
@@ -895,8 +896,8 @@ VCMD(do_vteleport) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_triggers(ch, NO_DIR, "script", FALSE);
-				greet_triggers(ch, NO_DIR, "script", FALSE);
+				enter_triggers(ch, NO_DIR, "script", FALSE, orm);
+				greet_triggers(ch, NO_DIR, "script", FALSE, orm);
 				qt_visit_room(ch, IN_ROOM(ch));
 				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);	// once we're sure we're staying
@@ -1064,7 +1065,7 @@ VCMD(do_vload) {
 	room_data *room, *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
-	vehicle_data *vehicle;
+	vehicle_data *vehicle, *cnt_veh;
 	char *target;
 	struct empire_storage_data *store;
 
@@ -1148,7 +1149,7 @@ VCMD(do_vload) {
 			}
 			
 			// ok: charge it
-			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), number, 1, TRUE);
+			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), number, 1, STORAGE_TIMERS_OLDEST);
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			// and load it
@@ -1225,6 +1226,12 @@ VCMD(do_vload) {
 		cnt = get_obj_near_vehicle(veh, arg1);
 		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
+			load_otrigger(object);
+			return;
+		}
+		cnt_veh = get_vehicle_near_vehicle(veh, arg1);
+		if (cnt_veh && VEH_FLAGGED(cnt_veh, VEH_CONTAINER)) {
+			obj_to_vehicle(object, cnt_veh);
 			load_otrigger(object);
 			return;
 		}

@@ -62,6 +62,7 @@ void check_for_new_map();
 void check_learned_empire_crafts();
 void check_newbie_islands();
 void check_nowhere_einv_all();
+void check_old_flag_names_in_triggers();
 void check_for_player_wipe();
 void check_sector_times(any_vnum only_sect);
 void check_skills();
@@ -101,7 +102,6 @@ void schedule_map_unloads();
 void setup_island_levels();
 void sort_commands();
 void startup_room_reset();
-void update_instance_world_size();
 void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
@@ -670,6 +670,7 @@ void boot_world(void) {
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
+	check_old_flag_names_in_triggers();
 	compute_generic_relations();
 	
 	log("Sorting data.");
@@ -986,7 +987,7 @@ void verify_sectors(void) {
 			if (!room) {
 				room = real_room(map->vnum);	// load it into memory
 			}
-			new_crop = get_potential_crop_for_location(room, NOTHING);
+			new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 	}
@@ -1195,14 +1196,6 @@ int file_to_string(const char *name, char *buf) {
  */
 int file_to_string_alloc(const char *name, char **buf) {
 	char temp[MAX_STRING_LENGTH];
-	descriptor_data *in_use;
-	
-	LL_FOREACH(descriptor_list, in_use) {
-		if (in_use->showstr_vector && *in_use->showstr_vector == *buf) {
-			syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open paginator", name);
-			return (-1);
-		}
-	}
 
 	/* Lets not free() what used to be there unless we succeeded. */
 	if (file_to_string(name, temp) < 0) {
@@ -1307,22 +1300,55 @@ void init_text_file_strings(void) {
 /**
 * Reloads 1 text file, by type.
 *
+* @param char_data *ch Optional: Character who caused the reload and will receive error messages (may be NULL).
 * @param int type Any TEXT_FILE_ type.
 * @return int The return code from file_to_string_alloc (-1 is error, 0 is success).
 */
-int reload_text_string(int type) {
+int reload_text_string(char_data *ch, int type) {
+	descriptor_data *in_use;
+	
 	if (type < 0 || type >= NUM_TEXT_FILE_STRINGS) {
 		log("SYSERR: reload_text_string called with invalid type %d", type);
+		if (ch) {
+			msg_to_char(ch, "Error trying to reload text.\r\n");
+		}
 	}
 	else if (!text_file_data[type].filename || !*text_file_data[type].filename) {
 		log("SYSERR: reload_text_string called on type %d with no filename set", type);
+		if (ch) {
+			msg_to_char(ch, "Error trying to reload text.\r\n");
+		}
 	}
 	else {
-		// ok:
-		if (text_file_strings[type]) {
-			free(text_file_strings[type]);
-			text_file_strings[type] = NULL;
+		// lastly, check open paginators and editors
+		LL_FOREACH(descriptor_list, in_use) {
+			if (in_use->showstr_vector && *in_use->showstr_vector == text_file_strings[type]) {
+				if (ch && in_use->character && GET_INVIS_LEV(in_use->character) <= GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "Unable to reload '%s' due to open paginator for %s.\r\n", text_file_data[type].filename, GET_NAME(in_use->character));
+				}
+				else if (ch) {
+					msg_to_char(ch, "Unable to reload '%s' due to open paginator.\r\n", text_file_data[type].filename);
+				}
+				else {
+					syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open paginator", text_file_data[type].filename);
+				}
+				return (-1);
+			}
+			else if (in_use->str && *in_use->str == text_file_strings[type]) {
+				if (ch && in_use->character && GET_INVIS_LEV(in_use->character) <= GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "Unable to reload '%s' due to open editor for %s.\r\n", text_file_data[type].filename, GET_NAME(in_use->character));
+				}
+				else if (ch) {
+					msg_to_char(ch, "Unable to reload '%s' due to open editor.\r\n", text_file_data[type].filename);
+				}
+				else {
+					syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open editor", text_file_data[type].filename);
+				}
+				return (-1);
+			}
 		}
+		
+		// ok:
 		return file_to_string_alloc(text_file_data[type].filename, &text_file_strings[type]);
 	}
 	
@@ -1607,7 +1633,7 @@ void check_newbie_islands(void) {
 		}
 		
 		// ensure ownership and that the empire is "not new"
-		if (!(emp = ROOM_OWNER(room)) || (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) > time(0)) {
+		if (!(emp = ROOM_OWNER(room)) || EMPIRE_ADMIN_FLAGGED(emp, EADM_ALLOW_NEWBIE_ISLE) || (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) > time(0)) {
 			continue;
 		}
 		
@@ -1847,7 +1873,6 @@ void clear_char(char_data *ch) {
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
 	SET_SIZE(ch) = SIZE_NORMAL;
-	MOB_CUSTOM_CORPSE(ch) = NOTHING;
 	MOB_INSTANCE_ID(ch) = NOTHING;
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
@@ -1856,6 +1881,21 @@ void clear_char(char_data *ch) {
 	GET_ROPE_VNUM(ch) = NOTHING;
 	
 	ch->customized = FALSE;
+}
+
+
+/**
+* Initializes mob's proto_data.
+*
+* @param char_data *ch The mob (also works on players as this data should be present but unused).
+*/
+void clear_mob_proto_data(char_data *ch) {
+	if (!ch->proto_data) {
+		CREATE(ch->proto_data, struct mob_proto_data, 1);
+	}
+	
+	// mob_proto_data inits
+	SET_CUSTOM_CORPSE(ch, NOTHING);
 }
 
 
@@ -1871,6 +1911,11 @@ void init_player_specials(char_data *ch) {
 	if (IS_NPC(ch)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: init_player_specials called on an NPC");
 		return;
+	}
+	
+	// ensure they have dummy mob proto data
+	if (!ch->proto_data) {
+		clear_mob_proto_data(ch);
 	}
 	
 	// ensures they have unique player_specials
@@ -2084,6 +2129,42 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
 
+/**
+* Runs at startup to alert to any triggers that are using old versions of
+* affect flag names.
+*/
+void check_old_flag_names_in_triggers(void) {
+	int iter;
+	trig_data *trig, *next_trig;
+	struct cmdlist_element *cmd;
+	
+	const char *old_flag_names[] = {
+		"HIDE",
+		"ENTANGLED",
+		"!WHERE",	// b5.203
+		"!DISARM",	// b5.203
+		"!DRINK-BLOOD",	// b5.203
+		"!MORPH",	// b5.203
+		"!SEE",	// b5.203
+		"!BLOOD",	// b5.203
+		"!STUN",	// b5.203
+		"!TARGET",	// b5.203
+		"SOULMASK",	// b5.203
+		"\n"
+	};
+	
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		LL_FOREACH(trig->cmdlist, cmd) {
+			for (iter = 0; *old_flag_names[iter] != '\n'; ++iter) {
+				if (strstr(cmd->cmd, old_flag_names[iter])) {
+					log("SCRIPT ERR: Trigger [%d] %s is using old affect flag name %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), old_flag_names[iter]);
+				}
+			}
+		}
+	}
+}
+
+
 /* reset the time in the game from file */
 void reset_time(void) {
 	long beginning_of_time = data_get_long(DATA_WORLD_START);
@@ -2210,7 +2291,7 @@ void load_intro_screens(void) {
 		fscanf(index, "%s\n", lbuf2);
 	}
 	
-	log("Loaded %d intro screens.", num_intro_screens);
+	log("Loaded %d intro screen%s.", num_intro_screens, PLURAL(num_intro_screens));
 	fclose(index);
 }
 

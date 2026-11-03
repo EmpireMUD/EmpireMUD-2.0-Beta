@@ -9,7 +9,7 @@ a desert grove. Instructions:
 ~
 You're well on your way to building an empire.
 ~
-6 h 0 15 -1
+7 h 0 15 -1
 A
 2 2100
 A
@@ -18,12 +18,22 @@ R
 0 0 1
 T 2100
 W
-2 120 0 1
+2 120 0 1 -
 W
-2 122 0 1
+2 122 0 1 -
 Z
 2 120
 Z
 2 122
+Z
+2 128
+Z
+2 137
+Z
+2 147
+Z
+2 149
+Z
+2 150
 S
 $

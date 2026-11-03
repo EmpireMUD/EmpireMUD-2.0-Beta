@@ -51,8 +51,10 @@ char **olc_material_list = NULL;	// used for olc
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_object(obj_data *obj, char_data *ch) {
+	bitvector_t bits;
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
+	int pos;
 	obj_data *obj_iter, *next_obj;
 	bool problem = FALSE, found;
 	attack_message_data *amd = NULL;
@@ -80,7 +82,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not set");
 		problem = TRUE;
 	}
-	if (!ispunct(GET_OBJ_LONG_DESC(obj)[strlen(GET_OBJ_LONG_DESC(obj)) - 1])) {
+	if (!ends_in_punct(GET_OBJ_LONG_DESC(obj))) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc missing punctuation");
 		problem = TRUE;
 	}
@@ -97,7 +99,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(GET_OBJ_SHORT_DESC(obj)[strlen(GET_OBJ_SHORT_DESC(obj)) - 1])) {
+	if (ends_in_punct(GET_OBJ_SHORT_DESC(obj))) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc has punctuation");
 		problem = TRUE;
 	}
@@ -139,7 +141,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "LONG-TIMER-IN-STORAGE set with NO-DECAY-IN-STORAGE");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
+	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0 && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT flag)");
 		problem = TRUE;
 	}
@@ -186,6 +188,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	if (GET_OBJ_COMPONENT(obj) != NOTHING && !find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Invalid component vnum %d does not match a generic component", GET_OBJ_COMPONENT(obj));
 		problem = TRUE;
+	}
+	
+	// affects
+	for (bits = GET_OBJ_AFF_FLAGS(obj), pos = 0; bits; bits >>= 1, ++pos) {
+		if (IS_SET(bits, BIT(0)) && !allow_affect_flag_on_items[pos]) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Disallowed affect flag is set: %s", affected_bits[pos]);
+			problem = TRUE;
+		}
 	}
 	
 	// look for full keyword collisions
@@ -359,7 +369,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_LIGHT: {
-			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED && GET_OBJ_TIMER(obj) <= 0) {
+			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED && GET_OBJ_TIMER(obj) <= 0 && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT item type)");
 				problem = TRUE;
 			}
@@ -495,6 +505,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	char_data *mob, *next_mob, *chiter;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
+	trig_data *trig, *next_trig;
 	descriptor_data *desc;
 	char name[256];
 	bool found, any_trades = FALSE;
@@ -766,12 +777,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		// interactions
-		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
+		found = delete_from_interaction_list(&MOB_INTERACTIONS(mob), TYPE_OBJ, vnum);
 		
 		// corpse
 		if (MOB_CUSTOM_CORPSE(mob) == vnum) {
 			found |= TRUE;
-			MOB_CUSTOM_CORPSE(mob) = NOTHING;
+			SET_CUSTOM_CORPSE(mob, NOTHING);
 		}
 		
 		if (found) {
@@ -886,6 +897,16 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted object", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_OBJECT, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to object [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
 		}
 	}
 	
@@ -1008,12 +1029,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_MOBILE(desc)) {
 			// interactions
-			found = delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_OBJ, vnum);
+			found = delete_from_interaction_list(&MOB_INTERACTIONS(GET_OLC_MOBILE(desc)), TYPE_OBJ, vnum);
 			
 			// corpse
 			if (MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) == vnum) {
 				found |= TRUE;
-				MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) = NOTHING;
+				SET_CUSTOM_CORPSE(GET_OLC_MOBILE(desc), NOTHING);
 			}
 			
 			if (found) {
@@ -1102,6 +1123,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "An object required by the social you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_OBJECT, vnum);
+			if (found) {
+				msg_to_desc(desc, "Object [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -1350,7 +1377,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && !search_custom_messages(find_keywords, GET_OBJ_CUSTOM_MSGS(obj)) && !search_extra_descs(find_keywords, GET_OBJ_EX_DESCS(obj))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && (!GET_OBJ_NOTES(obj) || !multi_isname(find_keywords, GET_OBJ_NOTES(obj))) && !search_custom_messages(find_keywords, GET_OBJ_CUSTOM_MSGS(obj)) && !search_extra_descs(find_keywords, GET_OBJ_EX_DESCS(obj))) {
 			continue;
 		}
 		
@@ -1401,6 +1428,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *proto, *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	struct resource_data *res;
 	int found;
 	bool any;
@@ -1576,7 +1604,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 		
 		// interactions
-		for (inter = mob->interactions; inter && !any; inter = inter->next) {
+		for (inter = MOB_INTERACTIONS(mob); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1693,6 +1721,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_OBJECT, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -1851,6 +1887,12 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	free_obj_proto_data(proto->proto_data);
 	
+	// sanity
+	if (GET_OBJ_NOTES(obj) && !*GET_OBJ_NOTES(obj)) {
+		free(obj->proto_data->notes);
+		obj->proto_data->notes = NULL;
+	}
+	
 	// old applies
 	free_obj_apply_list(GET_OBJ_APPLIES(proto));
 	GET_OBJ_APPLIES(proto) = NULL;
@@ -1980,6 +2022,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		new->proto_data->custom_msgs = copy_custom_messages(input->proto_data->custom_msgs);
 		new->proto_data->interactions = copy_interaction_list(input->proto_data->interactions);
 		new->proto_data->storage = copy_storage(input->proto_data->storage);
+		new->proto_data->notes = GET_OBJ_NOTES(input) ? str_dup(GET_OBJ_NOTES(input)) : NULL;
 		// don't keep quest_lookups or shop_lookups
 		new->proto_data->quest_lookups = NULL;
 		new->proto_data->shop_lookups = NULL;
@@ -2490,6 +2533,8 @@ void olc_show_object(char_data *ch) {
 		show_script_display(ch, GET_OBJ_SCRIPTS(obj), FALSE);
 	}
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_OBJ_NOTES(obj)), NULLSAFE(GET_OBJ_NOTES(obj)));
+	
 	send_page_display(ch);
 }
 
@@ -2511,8 +2556,21 @@ OLC_MODULE(oedit_action_desc) {
 
 
 OLC_MODULE(oedit_affects) {
+	bitvector_t bits, old_bits;
+	int pos;
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	old_bits = GET_OBJ_AFF_FLAGS(obj);
+	
 	GET_OBJ_AFF_FLAGS(obj) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, GET_OBJ_AFF_FLAGS(obj));
+	
+	// verify no illegal affects
+	for (bits = GET_OBJ_AFF_FLAGS(obj), pos = 0; bits; bits >>= 1, ++pos) {
+		if (IS_SET(bits, BIT(0)) && !IS_SET(old_bits, BIT(pos)) && !allow_affect_flag_on_items[pos]) {
+			msg_to_char(ch, "Removing disallowed affect flag %s.\r\n", affected_bits[pos]);
+			REMOVE_BIT(GET_OBJ_AFF_FLAGS(obj), BIT(pos));
+		}
+	}
 }
 
 
@@ -3180,6 +3238,19 @@ OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	obj->proto_data->min_scale_level = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
+}
+
+
+OLC_MODULE(oedit_notes) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_OBJ_SHORT_DESC(obj));
+		start_string_editor(ch->desc, buf, &(obj->proto_data->notes), MAX_NOTES, TRUE);
+	}
 }
 
 

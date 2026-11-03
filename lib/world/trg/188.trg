@@ -1,6 +1,7 @@
 #18800
 Summon ghost with candy~
-1 c 2
+1 c 2 1
+L b 18800
 sacrifice~
 * This is no longer used as of Oct 2020
 return 0
@@ -39,7 +40,9 @@ end
 ~
 #18801
 Summon Headless Centaur~
-1 c 2
+1 c 2 2
+L b 18801
+L c 18800
 use~
 if !%arg%
   return 0
@@ -149,7 +152,9 @@ nop %mob.unscale_and_reset%
 ~
 #18802
 Offer Jammy Dodger~
-0 j 100
+0 j 100 2
+L c 18802
+L c 18826
 ~
 if %object.vnum% == 18802
   return 0
@@ -171,7 +176,10 @@ end
 ~
 #18803
 Headless Centaur: Prance~
-0 k 33
+0 k 33 3
+L w 18801
+L w 18802
+L w 18803
 ~
 if %self.cooldown(18801)%
   halt
@@ -238,7 +246,10 @@ scfight clear dodge
 ~
 #18804
 Headless Centaur: Neck Chop~
-0 k 50
+0 k 50 3
+L w 18801
+L w 18802
+L w 18804
 ~
 if %self.cooldown(18801)%
   halt
@@ -297,7 +308,9 @@ scfight clear dodge
 ~
 #18805
 Headless Centaur: Attack-O-Lantern~
-0 k 100
+0 k 100 2
+L b 18805
+L w 18801
 ~
 if %self.cooldown(18801)%
   halt
@@ -325,7 +338,10 @@ end
 ~
 #18806
 Headless Centaur death~
-0 f 100
+0 f 100 3
+L b 18805
+L t 18801
+L y 18800
 ~
 set person %self.room.people%
 set loot 0
@@ -349,7 +365,9 @@ end
 ~
 #18807
 attack-o-lantern aoe~
-0 k 100
+0 k 100 2
+L w 18802
+L w 18805
 ~
 if %self.cooldown(18805)%
   halt
@@ -384,7 +402,19 @@ scfight clear interrupt
 ~
 #18808
 put candy in pillowcase~
-1 c 2
+1 c 2 12
+L c 18802
+L c 18803
+L c 18804
+L c 18805
+L c 18806
+L c 18807
+L c 18808
+L c 18809
+L c 18810
+L c 18811
+L t 18808
+L z 18800
 look examine put~
 set Needs 31
 if %actor.aff_flagged(blind)%
@@ -412,7 +442,7 @@ set Candy18810 %self.Candy18810%
 set Candy18811 %self.Candy18811%
 * only looking at it?
 if %cmd% == look || %cmd% == examine
-  if %actor.obj_target(%arg.argument1%)% != %self%
+  if %actor.obj_target(%arg.argument1%)% != %self% && %actor.obj_target(%arg.argument2%)% != %self%
     return 0
     halt
   end
@@ -549,7 +579,17 @@ end
 ~
 #18809
 set variables on the pillowcase~
-1 n 100
+1 n 100 10
+L c 18802
+L c 18803
+L c 18804
+L c 18805
+L c 18806
+L c 18807
+L c 18808
+L c 18809
+L c 18810
+L c 18811
 ~
 set Candy18802 0
 set Candy18803 0
@@ -575,7 +615,9 @@ remote Candy18811 %target%
 ~
 #18810
 randomly trash the candy pillowcase if event isn't running~
-1 b 20
+1 b 20 2
+L t 18808
+L z 18800
 ~
 if %event.running(18800)%
   halt
@@ -588,7 +630,9 @@ end
 ~
 #18811
 risen guard combat~
-0 k 75
+0 k 75 2
+L w 18811
+L w 18812
 ~
 if %self.cooldown(18812)%
   halt
@@ -656,7 +700,8 @@ nop %self.set_cooldown(18812, 25)%
 ~
 #18812
 corpse wagon is destroyed~
-5 f 100
+5 f 100 1
+L r 18859
 ~
 %load% veh 18859 %self.level%
 if %self.empire%
@@ -670,7 +715,13 @@ return 0
 ~
 #18818
 Learn Halloween Costumes~
-1 c 2
+1 c 2 6
+L a 18812
+L a 18813
+L a 18814
+L a 18815
+L a 18816
+L a 18817
 learn~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -690,7 +741,15 @@ done
 ~
 #18819
 apply costume to citizens~
-1 c 2
+1 c 2 8
+L s 18812
+L s 18813
+L s 18814
+L s 18815
+L s 18816
+L s 18817
+L t 18819
+L w 18819
 costume~
 if %self.val0% == 0
   %send% %actor% You are out of costumes.
@@ -752,7 +811,53 @@ end
 ~
 #18820
 Halloween event quest items~
-2 u 0
+2 u 0 46
+L c 18801
+L c 18820
+L c 18821
+L c 18823
+L c 18824
+L c 18827
+L c 18828
+L c 18848
+L c 18850
+L c 18851
+L c 18852
+L c 18853
+L c 18854
+L c 18856
+L c 18857
+L c 18860
+L c 18861
+L c 18864
+L c 18866
+L c 18869
+L c 18870
+L c 18873
+L c 18880
+L t 18801
+L t 18808
+L t 18819
+L t 18821
+L t 18823
+L t 18824
+L t 18827
+L t 18828
+L t 18829
+L t 18830
+L t 18831
+L t 18832
+L t 18840
+L t 18854
+L t 18856
+L t 18857
+L t 18860
+L t 18861
+L t 18866
+L t 18869
+L t 18870
+L t 18873
+L t 18880
 ~
 switch %questvnum%
   case 18819
@@ -837,7 +942,12 @@ done
 ~
 #18821
 toad citizen~
-1 c 2
+1 c 2 5
+L b 202
+L b 203
+L s 18821
+L t 18821
+L w 18821
 polymorph~
 if %self.val0% == 0
   %send% %actor% @%self% is out of charges.
@@ -888,7 +998,8 @@ end
 ~
 #18822
 spawn ghosts~
-1 b 25
+1 b 25 1
+L b 18822
 ~
 set room %self.room%
 * room population check
@@ -913,7 +1024,10 @@ end
 ~
 #18823
 Ritual of Spirits~
-1 c 2
+1 c 2 3
+L c 18822
+L e 5009
+L t 18823
 ritual rite~
 if !(spirits /= %arg%)
   return 0
@@ -974,7 +1088,12 @@ done
 ~
 #18824
 toiletpaper houses~
-1 c 2
+1 c 2 5
+L b 18824
+L c 18825
+L q 4
+L t 18824
+L w 18824
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -1018,7 +1137,7 @@ if %actor.room% != %room%
   halt
 end
 * Skill check
-set chance %random.100%
+set chance %random.75%
 if %chance% > %actor.skill(Stealth)%
   * Fail
   %send% %actor% You hear someone approaching!
@@ -1026,7 +1145,7 @@ if %chance% > %actor.skill(Stealth)%
   %at% %room% %echo% A guard arrives!
   %at% %room% %load% mob 18824 %actor.level%
   set guard %room.people%
-  if %guard.vnum% == 18824
+  if %guard.vnum% == 18824 && %guard.room% == %actor.room% && %guard.can_see(%actor%)%
     %force% %guard% mhunt %actor%
   end
 else
@@ -1048,7 +1167,16 @@ end
 ~
 #18827
 Scare citizens as Dracula~
-1 c 2
+1 c 2 9
+L b 200
+L b 201
+L b 202
+L b 203
+L b 237
+L b 251
+L s 18827
+L t 18827
+L w 18827
 scare~
 if %actor.morph% != 18827
   * Only in Dracula morph
@@ -1112,7 +1240,9 @@ end
 ~
 #18828
 Unearthly Manor Interior~
-2 o 100
+2 o 100 2
+L e 18829
+L e 18830
 ~
 eval greatrm %%room.%room.enter_dir%(room)%%
 * Add great room
@@ -1132,7 +1262,23 @@ detach 18828 %self.id%
 ~
 #18829
 Halloween: Open goody bag~
-1 c 2
+1 c 2 16
+L c 600
+L c 18839
+L c 18840
+L c 18841
+L c 18844
+L c 18846
+L c 18847
+L c 18859
+L c 18863
+L c 18879
+L c 18885
+L c 18886
+L c 18887
+L c 18888
+L c 18889
+L z 18800
 open~
 * clear actor's event currency-- this is no longer used
 set tokens %actor.currency(18800)%
@@ -1211,7 +1357,11 @@ return 1
 ~
 #18838
 Halloween: Ectoplasm upgrades items~
-1 c 2
+1 c 2 4
+L c 18836
+L c 18847
+L c 18883
+L c 18884
 upgrade~
 set max_level 400
 if !%arg%
@@ -1251,7 +1401,25 @@ nop %target.flag(SUPERIOR)%
 ~
 #18840
 Macabre Menagerie: Bind animal~
-1 c 2
+1 c 2 18
+L b 222
+L b 223
+L b 9004
+L b 9009
+L b 9010
+L b 9011
+L b 9022
+L b 9024
+L b 9026
+L b 9033
+L b 9034
+L b 9035
+L b 9036
+L b 9037
+L b 9038
+L b 9039
+L b 9153
+L b 9154
 bind~
 set ban_list 222 223 9004 9010 9009 9011 9022 9024 9153 9154 9026 9033 9034 9035 9036 9037 9038 9039
 return 1
@@ -1311,12 +1479,15 @@ end
 ~
 #18841
 Macabre Menagerie: Unleash animal~
-1 c 2
+1 c 2 3
+L f 18842
+L f 18847
+L t 18840
 unleash~
 return 1
 * word list for adjectives
 set adj_list horrifying monstrous terrifying gargantuan dreadful nightmarish eldritch spectral otherworldly ghastly unearthly macabre sinister diabolical phantom hulking beastly grim cursed accursed demonic infernal
-set adj_size 23
+set adj_size 22
 * basics
 if !%arg%
   %send% %actor% Unleash what?
@@ -1424,7 +1595,7 @@ end
 ~
 #18842
 Macabre Menagerie: Despawn creature later~
-0 ab 10
+0 ab 10 0
 ~
 * allows a despawn after 3 days
 if %timestamp% - %self.var(spawn_time,0)% > 259200
@@ -1435,7 +1606,91 @@ end
 ~
 #18847
 Halloween: Citizens fear me~
-0 bw 20
+0 bw 20 84
+L b 200
+L b 201
+L b 202
+L b 203
+L b 204
+L b 206
+L b 207
+L b 208
+L b 209
+L b 210
+L b 211
+L b 212
+L b 213
+L b 214
+L b 215
+L b 216
+L b 217
+L b 218
+L b 219
+L b 220
+L b 221
+L b 222
+L b 223
+L b 224
+L b 225
+L b 226
+L b 227
+L b 228
+L b 229
+L b 230
+L b 231
+L b 232
+L b 233
+L b 234
+L b 235
+L b 236
+L b 237
+L b 238
+L b 239
+L b 240
+L b 241
+L b 242
+L b 243
+L b 244
+L b 245
+L b 246
+L b 247
+L b 248
+L b 249
+L b 250
+L b 251
+L b 252
+L b 253
+L b 254
+L b 255
+L b 256
+L b 257
+L b 258
+L b 259
+L b 260
+L b 262
+L b 263
+L b 264
+L b 265
+L b 266
+L b 267
+L b 268
+L b 269
+L b 270
+L b 271
+L b 272
+L b 273
+L b 274
+L b 275
+L b 276
+L b 277
+L b 278
+L b 279
+L b 280
+L b 281
+L b 282
+L b 283
+L b 284
+L b 285
 ~
 * vnum lists
 set flee_list 200 201 202 203 204 228 230 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 255 264 265
@@ -1498,7 +1753,20 @@ done
 ~
 #18848
 make offering to the spirits~
-1 c 2
+1 c 2 13
+L c 18849
+L c 18850
+L c 18851
+L c 18852
+L c 18853
+L t 18829
+L t 18830
+L t 18831
+L t 18832
+L w 6050
+L w 6075
+L w 6420
+L w 6720
 offer~
 * Value0 tracks sacrifices remaining
 switch %self.vnum%
@@ -1567,7 +1835,94 @@ end
 ~
 #18849
 Halloween: Bylda Bear behavior~
-0 bw 10
+0 bw 10 87
+L b 200
+L b 201
+L b 202
+L b 203
+L b 204
+L b 206
+L b 207
+L b 208
+L b 209
+L b 210
+L b 211
+L b 212
+L b 213
+L b 214
+L b 215
+L b 216
+L b 217
+L b 218
+L b 219
+L b 220
+L b 221
+L b 222
+L b 223
+L b 224
+L b 225
+L b 226
+L b 227
+L b 228
+L b 229
+L b 230
+L b 231
+L b 232
+L b 233
+L b 234
+L b 235
+L b 236
+L b 237
+L b 238
+L b 239
+L b 240
+L b 241
+L b 242
+L b 243
+L b 244
+L b 245
+L b 246
+L b 247
+L b 248
+L b 249
+L b 250
+L b 251
+L b 252
+L b 253
+L b 254
+L b 255
+L b 256
+L b 257
+L b 258
+L b 259
+L b 260
+L b 262
+L b 263
+L b 264
+L b 265
+L b 266
+L b 267
+L b 268
+L b 269
+L b 270
+L b 271
+L b 272
+L b 273
+L b 274
+L b 275
+L b 276
+L b 277
+L b 278
+L b 279
+L b 280
+L b 281
+L b 282
+L b 283
+L b 284
+L b 285
+L b 18841
+L b 18861
+L b 18885
 ~
 if %self.fighting% || %self.disabled%
   halt
@@ -1609,7 +1964,9 @@ done
 ~
 #18850
 Halloween: Bylda Bear finish~
-5 o 100
+5 o 100 2
+L b 18860
+L t 18860
 ~
 wait 1
 %echo% The Bylda lets out a powerful roar as it comes to life and smashes out of its frame!
@@ -1632,7 +1989,7 @@ end
 ~
 #18851
 Halloween: Purge Bylda at the end of the day~
-0 ab 10
+0 ab 10 0
 ~
 if %self.var(day,%dailycycle%)% != %dailycycle%
   %echo% ~%self% lets out one last roar and then disolves into wisps of glittering dust!
@@ -1641,7 +1998,14 @@ end
 ~
 #18852
 demons are scared off~
-0 g 33
+0 g 33 7
+L s 18812
+L s 18813
+L s 18814
+L s 18815
+L s 18816
+L s 18817
+L s 18827
 ~
 set banish 0
 if %actor.morph% == 18827
@@ -1662,7 +2026,7 @@ end
 ~
 #18853
 dressing up the small demons~
-0 n 100
+0 n 100 0
 ~
 * switch and random set:
 switch %random.2%
@@ -1771,7 +2135,12 @@ end
 ~
 #18854
 pick or treat action~
-1 c 2
+1 c 2 5
+L c 18855
+L o 142
+L q 4
+L t 18854
+L w 18854
 pickpocket~
 if !%actor.on_quest(18854)%
   return 0
@@ -1837,7 +2206,7 @@ end
 ~
 #18855
 nether portal closes~
-5 ab 30
+5 ab 30 0
 ~
 if %self.varexists(spawn_time)%
   eval check_time %timestamp% - %self.spawn_time%
@@ -1850,7 +2219,8 @@ end
 ~
 #18856
 look in magic mirror~
-1 c 2
+1 c 2 1
+L t 18856
 look examine~
 if !%actor.on_quest(18856)%
   %send% %actor% @%self%? What about @%self%?
@@ -1958,7 +2328,8 @@ end
 ~
 #18857
 apple bobbing challenge~
-1 c 4
+1 c 4 1
+L t 18857
 challenge accept~
 if %cmd% == challenge
   set owner %self.owner%
@@ -2042,7 +2413,8 @@ end
 ~
 #18858
 apple bobbing bob~
-1 c 4
+1 c 4 1
+L c 18857
 bob~
 set otarg %actor.obj_target(%arg%)%
 if !%otarg% || %otarg.vnum% != 18857
@@ -2065,7 +2437,7 @@ if %self.varexists(same_round)%
   return 1
   halt
 end
-%send% %actor% You dip your head into the water of the bucket and start looking for an apple.
+%send% %actor% You dip your head into the water of the bucket and start looking for an apple. Type 'stand' when you're ready to grab one and complete your turn.
 %echoaround% %actor% ~%actor% sticks ^%actor% head into the bucket and starts looking for an apple.
 set start_bob %timestamp%
 remote start_bob %self.id%
@@ -2073,11 +2445,14 @@ set timer_running 1
 remote timer_running %self.id%
 set same_round 1
 remote same_round %self.id%
-wait 10 s
-if %self.varexists(timer_running)%
-  %send% %actor% You can't hold your breath much longer! You need to 'stand' soon!
-end
-wait 4 s
+set count 14
+while %count% > 0 && %self.varexists(same_round)%
+  wait 1 s
+  if %count% == 5 && %self.varexists(timer_running)%
+    %send% %actor% You can't hold your breath much longer! You need to 'stand' soon!
+  end
+  eval count %count% - 1
+done
 if %self.varexists(timer_running)%
   set turn %self.turn%
   %send% %turn% You can't hold your breath any longer and pull your head out of the water.
@@ -2089,7 +2464,8 @@ rdelete same_round %self.id%
 ~
 #18859
 apple bobbing bucket was left behind~
-1 b 100
+1 b 100 1
+L t 18857
 ~
 if %self.carried_by%
   set actor %self.carried_by%
@@ -2112,7 +2488,8 @@ done
 ~
 #18860
 bobbing please stand up~
-1 c 4
+1 c 4 1
+L t 18857
 bob stand~
 if %cmd% == bob
   if !(%actor.obj_target(%arg%)% == %self%)
@@ -2142,10 +2519,12 @@ if %cmd% == stand
   end
   return 1
   rdelete timer_running %self.id%
+  rdelete same_round %self.id%
   eval time %timestamp% - %self.start_bob%
   if %time% == 0
     %send% %actor% You stand back up immediately, with no apple.
     %echoaround% %actor% ~%actor% stands back up immediately with no apple in ^%actor% mouth.
+    %send% %actor% Type 'bob bucket' to try again.
     return 1
     halt
   end
@@ -2202,6 +2581,10 @@ if %cmd% == stand
       set apple_val 1
       set apple_size bitty
     break
+    default
+      set apple_size 1
+      set apple_size eensy
+    break
   done
   %send% %actor% You managed to get a %apple_size% apple from the bucket!
   %echoaround% %actor% ~%actor% straightens up with a %apple_size% apple in ^%actor% mouth!
@@ -2210,6 +2593,7 @@ if %cmd% == stand
     remote ch_apple %self.id%
     set turn %self.owner%
     remote turn %self.id%
+    %send% %self.owner% It's your turn next. Type 'bob bucket' to start.
   elseif %actor% == %self.owner%
     set ow_apple %apple_val%
     set ch_apple %self.ch_apple%
@@ -2220,7 +2604,8 @@ if %cmd% == stand
       %purge% %self%
     elseif %ow_apple% < %ch_apple%
       %send% %actor% You've lost this time.
-      %echoaround% %actor% ~%self.challenged% wins!
+      %send% %self.challenged% You win!
+      %echoaround% %self.challenged% ~%self.challenged% wins!
     else
       %echo% It's a tie!
     end
@@ -2232,7 +2617,9 @@ end
 ~
 #18861
 Set up Nether Portal~
-2 g 100
+2 g 100 2
+L b 18862
+L e 18862
 ~
 set rn %room.north(room)%
 * Add north first
@@ -2266,7 +2653,12 @@ detach 18861 %room.id%
 ~
 #18862
 ritual of demon summoning~
-1 c 2
+1 c 2 5
+L b 18861
+L r 18861
+L t 18861
+L w 6200
+L w 18862
 ritual rite~
 set room %actor.room%
 if !%arg%
@@ -2372,7 +2764,7 @@ end
 ~
 #18863
 nether damage inside portal~
-2 bw 100
+2 bw 100 0
 ~
 set person %self.people%
 while %person%
@@ -2386,7 +2778,7 @@ done
 ~
 #18864
 Nether portal - Block further entry~
-2 q 100
+2 q 100 0
 ~
 if %actor.nohassle% || %direction% == none
   return 1
@@ -2397,7 +2789,8 @@ return 0
 ~
 #18865
 small demons come from the nether~
-5 b 30
+5 b 30 1
+L b 18861
 ~
 set how_many %random.3%
 switch %how_many%
@@ -2441,7 +2834,8 @@ done
 ~
 #18866
 track the blood feeding~
-1 c 2
+1 c 2 1
+L t 18866
 bite stop~
 * make sure action is feeding
 if %actor.action% != feeding
@@ -2486,7 +2880,7 @@ end
 ~
 #18867
 did the vampire kill them~
-1 z 100
+1 z 100 0
 ~
 if !%killer.action(feeding)%
   halt
@@ -2509,7 +2903,8 @@ remote BiteList %self.id%
 ~
 #18869
 play them off johny~
-1 c 2
+1 c 2 1
+L f 18870
 play~
 return 0
 set music_score 0
@@ -2520,7 +2915,11 @@ end
 ~
 #18870
 are they still playing~
-1 b 100
+1 b 100 4
+L b 18801
+L b 18871
+L t 18869
+L t 18870
 ~
 set questid %self.vnum%
 set actor %self.carried_by%
@@ -2602,7 +3001,7 @@ end
 ~
 #18871
 ghostly citizen spawns~
-0 n 100
+0 n 100 0
 ~
 set who %random.1000%
 if %who% == 1000
@@ -2687,7 +3086,8 @@ remote day_count %self.id%
 ~
 #18872
 ghost can't stick around forever~
-0 ab 10
+0 ab 10 1
+L b 18881
 ~
 if %self.varexists(day_count)%
   if %dailycycle% <= %self.day_count%
@@ -2703,7 +3103,8 @@ end
 ~
 #18873
 play the victim to death~
-0 bw 100
+0 bw 100 1
+L t 18873
 ~
 set person %self.room.people%
 while %person%
@@ -2741,7 +3142,7 @@ switch %count_up%
   break
 done
 set tent %self.room.in_vehicle%
-dg_affect %self% !see on -1
+dg_affect %self% NO-SEE-IN-ROOM on -1
 mgoto %tent.room%
 nop %tent.dump%
 %echo% Healers sadly dismantle %tent.shortdesc%.
@@ -2753,7 +3154,8 @@ end
 ~
 #18874
 reject those not on quest~
-5 c 0
+5 c 0 1
+L t 18873
 enter~
 if !%actor.veh_target(%arg%)%
   return 0
@@ -2781,7 +3183,8 @@ return 1
 ~
 #18875
 load the victim~
-5 o 100
+5 o 100 1
+L b 18873
 ~
 %at% %self.interior% %load% mob 18873
 set victim %self.interior.people.id%
@@ -2792,7 +3195,7 @@ remote spawn_time %victim%
 ~
 #18876
 tent should not persist~
-0 ab 10
+0 ab 10 0
 ~
 if %self.varexists(spawn_time)%
   set spawn_time %self.spawn_time%
@@ -2802,7 +3205,7 @@ if %self.varexists(spawn_time)%
   end
 end
 set tent %self.room.in_vehicle%
-dg_affect %self% !see on -1
+dg_affect %self% NO-SEE-IN-ROOM on -1
 mgoto %tent.room%
 nop %tent.dump%
 %echo% %self% Healers sadly dismantle %tent.shortdesc%.
@@ -2811,7 +3214,11 @@ nop %tent.dump%
 ~
 #18878
 Halloween: Magi-genic Ooze mount upgrader~
-1 c 2
+1 c 2 4
+L b 18838
+L b 18839
+L b 18878
+L b 18879
 use~
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -2868,7 +3275,10 @@ end
 ~
 #18880
 Ancestor's Offering: Invoke/Paint Ancestor~
-1 c 2
+1 c 2 3
+L b 18880
+L b 18881
+L c 18881
 invoke paint~
 if %self.vnum% == 18880
   set room %actor.room%
@@ -2918,7 +3328,7 @@ if invoke /= %cmd%
     %mod% %mob% keywords spirit faded grandmother ancestor %halloween_grandma%
     %force% %mob% mfollow %actor%
     %send% %actor% You drip some blood on the ground and invoke the name of your ancestor, %halloween_grandma%!
-    %echoaround% %actor% ~%actor% drips some blood on the name and shouts, 'Grandmother %halloween_grandma%, I invoke you!'
+    %echoaround% %actor% ~%actor% drips some blood on the ground and shouts, 'Grandmother %halloween_grandma%, I invoke you!'
     %echo% ~%mob% rises from the grave.
   else
     %send% %actor% Something went wrong.
@@ -2964,7 +3374,11 @@ end
 ~
 #18881
 Ancestor's Offering: Place Portrait~
-1 c 2
+1 c 2 4
+L b 18880
+L b 18881
+L c 18882
+L t 18880
 place~
 * usage: place <portrait>
 if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
@@ -3029,7 +3443,8 @@ end
 ~
 #18884
 Plague Doctor Mask: Coughers abound~
-1 b 3
+1 b 3 1
+L c 18884
 ~
 * Randomly makes other humans in the room cough, in your own territory
 set ch %self.worn_by%
@@ -3074,7 +3489,11 @@ done
 ~
 #18887
 Halloween: Dropped flower buff~
-1 h 100
+1 h 100 4
+L c 18887
+L c 18888
+L c 18889
+L w 18887
 ~
 set room %actor.room%
 %send% %actor% You drop @%self%, which crumbles to dust as it falls.
@@ -3098,7 +3517,7 @@ return 0
 ~
 #18890
 Great Pumpkin wrong-month despawn~
-0 n 100
+0 n 100 0
 ~
 * Despawns if it's not October in-game
 set room %self.room%
@@ -3109,7 +3528,9 @@ end
 ~
 #18898
 Flying pumpkin coach spell~
-1 c 2
+1 c 2 2
+L r 18897
+L r 18898
 enchant~
 * targeting
 set coach %actor.veh_target(%arg.argument1%)%
@@ -3168,7 +3589,12 @@ end
 ~
 #18899
 Haunted Mansion interior~
-2 o 100
+2 o 100 5
+L e 18892
+L e 18893
+L e 18894
+L e 18895
+L e 18896
 ~
 * Add gallery west
 if !%room.west(room)%

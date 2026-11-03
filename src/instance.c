@@ -162,6 +162,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	INST_FAKE_LOC(inst) = loc;	// by default
 	INST_LEVEL(inst) = 0;	// unscaled
 	INST_CREATED(inst) = time(0);
+	INST_AGE_TIMESTAMP(inst) = time(0);
 	INST_LAST_RESET(inst) = 0;	// will update this on 1st reset
 	INST_START(inst) = NULL;
 	INST_SIZE(inst) = 0;
@@ -618,6 +619,28 @@ bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map
 				
 				break;
 			}
+			case ADV_LINK_REQUIRE_CLIMATE: {
+				if (loc && (get_climate(loc) & rule->bld_on) != rule->bld_on) {
+					// missing at least 1 required climate
+					return FALSE;
+				}
+				else if (!loc && map && (get_climate_map(map) & rule->bld_on) != rule->bld_on) {
+					// missing at least 1 required climate
+					return FALSE;
+				}
+				break;
+			}
+			case ADV_LINK_FORBID_CLIMATE: {
+				if (loc && IS_SET(get_climate(loc), rule->bld_on)) {
+					// has forbidden climate
+					return FALSE;
+				}
+				else if (!loc && map && IS_SET(get_climate_map(map), rule->bld_on)) {
+					// has forbidden climate
+					return FALSE;
+				}
+				break;
+			}
 			// other types don't have secondary linking limits
 		}
 	}
@@ -641,7 +664,7 @@ bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map
 */
 bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, struct map_data *map) {
 	room_data *home;
-	struct island_info *isle = NULL;
+	struct island_info *isle;
 	empire_data *emp;
 	char_data *ch;
 	bool junk;
@@ -670,12 +693,15 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!home || !ROOM_OWNER(home))) {
 		return FALSE;
 	}
-		
+	
+	// no-adventure island?
+	isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
+	if (isle && IS_SET(isle->flags, ISLE_NO_ADVENTURES)) {
+		return FALSE;
+	}
+	
 	// continental or incontinental?
 	if (LINK_FLAGGED(rule, ADV_LINKF_CONTINENT_ONLY | ADV_LINKF_NO_CONTINENT)) {
-		if (!isle) {
-			isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
-		}
 		if (isle && LINK_FLAGGED(rule, ADV_LINKF_CONTINENT_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT)) {
 			return FALSE;
 		}
@@ -722,9 +748,6 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	}
 	
 	// newbie island checks
-	if (!isle) {
-		isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
-	}
 	if (isle && isle->id != NO_ISLAND) {
 		if (!ADVENTURE_FLAGGED(adv, ADV_IGNORE_ISLAND_LEVELS | ADV_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT) && !config_get_bool("ignore_island_levels")) {	// not continent: check levels
 			if (GET_ADV_MIN_LEVEL(adv) > 0 && (!isle->max_level || isle->max_level + 50 < GET_ADV_MIN_LEVEL(adv))) {
@@ -947,6 +970,7 @@ void generate_adventure_instances(void) {
 	struct adventure_link_rule *rule, *rule_iter;
 	adv_data *iter, *next_iter;
 	room_data *loc;
+	bool done_any = FALSE;
 	int try, num_rules, dir = NO_DIR;
 	adv_vnum start_vnum;
 	
@@ -964,6 +988,11 @@ void generate_adventure_instances(void) {
 			}
 			// skip past the last adventure we instanced
 			if (GET_ADV_VNUM(iter) <= last_adv_vnum) {
+				continue;
+			}
+			
+			// check if this adventure lets us bypass the 1-per-cycle limit
+			if (done_any && !ADVENTURE_FLAGGED(iter, ADV_FASTER_INSTANCING)) {
 				continue;
 			}
 			
@@ -985,9 +1014,12 @@ void generate_adventure_instances(void) {
 					if ((loc = find_location_for_rule(iter, rule, &dir))) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
-							last_adv_vnum = GET_ADV_VNUM(iter);
-							// only 1 instance per cycle
-							return;
+							// store last_adv_vnum ONLY if this was the first one
+							if (!done_any) {
+								last_adv_vnum = GET_ADV_VNUM(iter);
+							}
+							// only 1 regular instance per cycle
+							done_any = TRUE;
 						}
 					}
 				}
@@ -1211,14 +1243,14 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				char_from_room(ch);
 				char_to_room(ch, to_room);
 				GET_LAST_DIR(ch) = NO_DIR;
-				pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "system");	// cannot pre-greet for this
-				enter_triggers(ch, NO_DIR, "system", FALSE);
+				pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "system", NULL);	// cannot pre-greet for this
+				enter_triggers(ch, NO_DIR, "system", FALSE, NULL);
 				look_at_room(ch);
 				
 				// and announce
 				act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
 				
-				greet_triggers(ch, NO_DIR, "system", FALSE);
+				greet_triggers(ch, NO_DIR, "system", FALSE, NULL);
 			}
 		}
 	}
@@ -1416,7 +1448,7 @@ void prune_instances(void) {
 		delayed = IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? TRUE : FALSE;
 		
 		// look for completed or orphaned instances
-		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
+		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_AGE_TIMESTAMP(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst)) && check_outside_vehicles(inst)) {
 				delete_instance(inst, TRUE);
@@ -2411,7 +2443,7 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 	struct instance_data *inst;
 	char line[256], str_in[256];
 	int i_in[4];
-	long l_in[2];
+	long l_in[3];
 
 	CREATE(inst, struct instance_data, 1);
 	INST_ID(inst) = idnum;
@@ -2437,15 +2469,26 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 	INST_FLAGS(inst) = asciiflag_conv(str_in);
 	INST_FAKE_LOC(inst) = real_room(i_in[3]);
 
-	// line 2: level, created, last-reset
-	if (!get_line(fl, line) || sscanf(line, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]) != 3) {
-		log("SYSERR: Format error in line 2 of instance %d", idnum);
+	// line 2: level, created, age, last-reset
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 2 of instance %d", idnum);
 		exit(1);
+	}
+	if (sscanf(line, "%d %ld %ld %ld", &i_in[0], &l_in[0], &l_in[1], &l_in[2]) != 4) {
+		if (sscanf(line, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[2]) == 3) {
+			// backwards-compatible pre-b5.213
+			l_in[1] = time(0) - l_in[0];	// assume full age
+		}
+		else {
+			log("SYSERR: Format error in line 2 of instance %d", idnum);
+			exit(1);
+		}
 	}
 	
 	INST_LEVEL(inst) = i_in[0];
 	INST_CREATED(inst) = l_in[0];
-	INST_LAST_RESET(inst) = l_in[1];
+	INST_AGE_TIMESTAMP(inst) = time(0) - l_in[1];	// convert age in seconds to seconds-ago
+	INST_LAST_RESET(inst) = l_in[2];
 	
 	inst->room = NULL;
 	INST_SIZE(inst) = 0;
@@ -2647,7 +2690,7 @@ void save_instances(void) {
 	DL_FOREACH(instance_list, inst) {
 		fprintf(fl, "#%d\n", INST_ID(inst));
 		fprintf(fl, "%d %d %d %lld %d\n", GET_ADV_VNUM(INST_ADVENTURE(inst)), INST_LOCATION(inst) ? GET_ROOM_VNUM(INST_LOCATION(inst)) : NOWHERE, INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE, INST_FLAGS(inst), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE);
-		fprintf(fl, "%d %ld %ld\n", INST_LEVEL(inst), INST_CREATED(inst), INST_LAST_RESET(inst));
+		fprintf(fl, "%d %ld %ld %ld\n", INST_LEVEL(inst), INST_CREATED(inst), (time(0) - INST_AGE_TIMESTAMP(inst)), INST_LAST_RESET(inst));
 		
 		// 'D' direction data
 		if (INST_DIR(inst) || INST_ROTATION(inst)) {

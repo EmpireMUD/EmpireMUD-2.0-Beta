@@ -77,7 +77,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(GET_SHORT_DESC(mob)[strlen(GET_SHORT_DESC(mob)) - 1])) {
+	if (ends_in_punct(GET_SHORT_DESC(mob))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc has punctuation");
 		problem = TRUE;
 	}
@@ -99,7 +99,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not set");
 		problem = TRUE;
 	}
-	if (!ispunct(GET_LONG_DESC(mob)[strlen(GET_LONG_DESC(mob)) - 3])) {
+	if (!ends_in_punct(GET_LONG_DESC(mob))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc missing punctuation");
 		problem = TRUE;
 	}
@@ -129,11 +129,11 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "NO-CORPSE and custom corpse are both set");
 		problem = TRUE;
 	}
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(MOB_INTERACTIONS(mob), INTERACT_SKIN)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal has no skin");
 		problem = TRUE;
 	}
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_BUTCHER)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(MOB_INTERACTIONS(mob), INTERACT_BUTCHER)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal can't be butchered");
 		problem = TRUE;
 	}
@@ -153,10 +153,39 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		}
 	}
 	
-	problem |= audit_interactions(GET_MOB_VNUM(mob), mob->interactions, TYPE_MOB, ch);
+	problem |= audit_interactions(GET_MOB_VNUM(mob), MOB_INTERACTIONS(mob), TYPE_MOB, ch);
 	
 	return problem;
 }
+
+
+/**
+* Duplicates mob_proto_data for OLC editing. Does not copy quest or shop
+* lookups, which are reference data and not editable.
+*
+* @param struct mob_proto_data *input The incoming data.
+* @return struct mob_proto_data* The copied version.
+*/
+struct mob_proto_data *copy_mob_proto_data(struct mob_proto_data *input) {
+	struct mob_proto_data *mpd;
+	
+	CREATE(mpd, struct mob_proto_data, 1);
+	*mpd = *input;
+	
+	// lookups are not copied
+	mpd->quest_lookups = NULL;
+	mpd->shop_lookups = NULL;
+	
+	// copy pointers
+	mpd->custom_msgs = copy_custom_messages(input->custom_msgs);
+	mpd->interactions = copy_interaction_list(input->interactions);
+	mpd->notes = input->notes ? str_dup(input->notes) : NULL;
+	
+	// input->faction is ok to just copy as a pointer to live data, not stored internally here
+	
+	return mpd;
+}
+
 
 /**
 * Creates a new mob entry.
@@ -175,6 +204,7 @@ char_data *create_mob_table_entry(mob_vnum vnum) {
 	
 	CREATE(mob, char_data, 1);
 	clear_char(mob);
+	clear_mob_proto_data(mob);
 	mob->vnum = vnum;
 	SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);	// need this for some macroes
 	add_mobile_to_table(mob);
@@ -326,6 +356,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	shop_data *shop, *next_shop;
 	empire_data *emp, *next_emp;
 	social_data *soc, *next_soc;
+	trig_data *trig, *next_trig;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
 	char name[256];
@@ -456,7 +487,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update mob interactions
 	HASH_ITER(hh, mobile_table, mob_iter, next_mob) {
-		if (delete_from_interaction_list(&mob_iter->interactions, TYPE_MOB, vnum)) {
+		if (delete_from_interaction_list(&MOB_INTERACTIONS(mob_iter), TYPE_MOB, vnum)) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted related mob", GET_MOB_VNUM(mob_iter), GET_SHORT_DESC(mob_iter));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob_iter->vnum);
 		}
@@ -473,7 +504,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
+		// REQ_x: delete from prog
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
@@ -485,10 +519,18 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
+		// QG_x, QR_x, REQ_x: delete from quest
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
+		found |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_COMPANION, vnum);
+		found |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_REMOVE_COMPANION, vnum);
+		found |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_MINIPET, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_NOT_HAVE_COMPANION, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -530,12 +572,25 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
+		// REQ_x: delete from social
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted mobile", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_MOBILE, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to mobile [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
 		}
 	}
 	
@@ -588,7 +643,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_MOBILE(desc)) {
-			if (delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_MOB, vnum)) {
+			if (delete_from_interaction_list(&MOB_INTERACTIONS(GET_OLC_MOBILE(desc)), TYPE_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the mob you're editing was deleted.\r\n");
 			}
 		}
@@ -599,7 +654,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
+			// REQ_x: delete from progress editor
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
@@ -607,10 +665,18 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
+			// QG_x, QR_x, REQ_x: delete from quest editor
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_COMPANION, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_REMOVE_COMPANION, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_MINIPET, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 			
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -642,11 +708,20 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
+			// REQ_x: delete from social editor
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 			
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A mobile required by the social you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_MOBILE, vnum);
+			if (found) {
+				msg_to_desc(desc, "Mobile [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -675,7 +750,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 void olc_fullsearch_mob(char_data *ch, char *argument) {
 	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
-	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS, not_aff = NOBITS;
+	bool only_custom_corpse = FALSE;
 	int only_move = NOTHING, only_nameset = NOTHING;
 	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	faction_data *only_fct = NULL;
@@ -702,6 +778,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_FUNC("faction", only_fct, find_faction(val_arg))
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
 		FULLSEARCH_FUNC("attack", only_attack, find_attack_message_by_name_or_vnum(val_arg, FALSE))
+		FULLSEARCH_BOOL("corpse", only_custom_corpse)
 		FULLSEARCH_FLAGS("custom", find_custom, mob_custom_types)
 		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
@@ -712,6 +789,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("sex", only_sex, genders)
 		FULLSEARCH_LIST("gender", only_sex, genders)
 		FULLSEARCH_LIST("size", only_size, size_types)
+		FULLSEARCH_FLAGS("unaffected", not_aff, affected_bits)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, action_bits)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
@@ -740,6 +818,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				continue;
 			}
 		}
+		if (only_custom_corpse && MOB_CUSTOM_CORPSE(mob) == NOTHING) {
+			continue;
+		}
 		if (only_sex != NOTHING && GET_SEX(mob) != only_sex) {
 			continue;
 		}
@@ -747,6 +828,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_affs != NOBITS && (AFF_FLAGS(mob) & only_affs) != only_affs) {
+			continue;
+		}
+		if (not_aff != NOBITS && (AFF_FLAGS(mob) & not_aff)) {
 			continue;
 		}
 		if (only_flags != NOBITS && (MOB_FLAGS(mob) & only_flags) != only_flags) {
@@ -779,14 +863,14 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;
-			LL_FOREACH(mob->interactions, inter) {
+			LL_FOREACH(MOB_INTERACTIONS(mob), inter) {
 				found_interacts |= BIT(inter->type);
 			}
 			if ((find_interacts & found_interacts) != find_interacts) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && (!GET_LOOK_DESC(mob) || !multi_isname(find_keywords, GET_LOOK_DESC(mob))) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && (!GET_LOOK_DESC(mob) || !multi_isname(find_keywords, GET_LOOK_DESC(mob))) && (!MOB_NOTES(mob) || !multi_isname(find_keywords, MOB_NOTES(mob))) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
 			continue;
 		}
 		
@@ -829,6 +913,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
+	trig_data *trig, *next_trig;
 	int found;
 	bool any;
 	
@@ -925,7 +1010,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	// mob interactions
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		any = FALSE;
-		for (inter = mob->interactions; inter && !any; inter = inter->next) {
+		for (inter = MOB_INTERACTIONS(mob); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -946,6 +1031,8 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (any) {
 			++found;
@@ -955,7 +1042,19 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum)) {
+		// QG_x, QR_x, REQ_x: quest search
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_COMPANION, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_REMOVE_COMPANION, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_MINIPET, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_NOT_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_NOT_HAVE_COMPANION, vnum);
+		if (any) {
 			++found;
 			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
@@ -1009,9 +1108,22 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum)) {
+		// REQ_x: social search
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_HAVE_COMPANION, vnum);
+		
+		if (any) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_MOBILE, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -1055,25 +1167,41 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 void save_olc_mobile(descriptor_data *desc) {
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
-	struct quest_lookup *ql;
-	struct shop_lookup *sl;
 	UT_hash_handle hh;
-	bool changed, is_mini;
+	bool changed, is_mini, level_change;
 	
 	// have a place to save it?
 	if (!(proto = mob_proto(vnum))) {
 		proto = create_mob_table_entry(vnum);
 	}
+
+	// migrate lookup tables
+	MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
+	MOB_QUEST_LOOKUPS(proto) = NULL;
+	MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);
+	MOB_SHOP_LOOKUPS(proto) = NULL;
 	
 	// slight sanity checking
 	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
-		GET_MAX_SCALE_LEVEL(mob) = GET_MIN_SCALE_LEVEL(mob);
+		SET_MAX_SCALE_LEVEL(mob, GET_MIN_SCALE_LEVEL(mob));
 	}
+	if (MOB_NOTES(mob) && !*MOB_NOTES(mob)) {
+		free(MOB_NOTES(mob));
+		MOB_NOTES(mob) = NULL;
+	}
+	
+	// notes
+	level_change = (GET_MIN_SCALE_LEVEL(mob) != GET_MIN_SCALE_LEVEL(proto) || GET_MAX_SCALE_LEVEL(mob) != GET_MAX_SCALE_LEVEL(proto));
 	
 	// update the strings and pointers on live mobs
 	DL_FOREACH(character_list, mob_iter) {
 		if (IS_NPC(mob_iter) && GET_MOB_VNUM(mob_iter) == vnum) {
 			is_mini = (GET_LEADER(mob_iter) && IS_MINIPET_OF(mob_iter, GET_LEADER(mob_iter)));
+			
+			// proto data
+			if (mob_iter->proto_data == proto->proto_data) {
+				mob_iter->proto_data = mob->proto_data;
+			}
 			
 			// update strings
 			if (GET_PC_NAME(mob_iter) == GET_PC_NAME(proto)) {
@@ -1090,25 +1218,17 @@ void save_olc_mobile(descriptor_data *desc) {
 			}
 
 			// update pointers
-			if (mob_iter->interactions == proto->interactions) {
-				mob_iter->interactions = mob->interactions;
-			}
-			if (MOB_CUSTOM_MSGS(mob_iter) == MOB_CUSTOM_MSGS(proto)) {
-				MOB_CUSTOM_MSGS(mob_iter) = MOB_CUSTOM_MSGS(mob);
-			}
 			MOB_FACTION(mob_iter) = MOB_FACTION(mob);
 			
 			// check for changes to level, flags, or damage
-			changed = (GET_MIN_SCALE_LEVEL(mob_iter) != GET_MIN_SCALE_LEVEL(mob)) || (GET_MAX_SCALE_LEVEL(mob_iter) != GET_MAX_SCALE_LEVEL(mob)) || (MOB_ATTACK_TYPE(mob_iter) != MOB_ATTACK_TYPE(mob)) || (MOB_FLAGS(mob_iter) != MOB_FLAGS(mob));
+			changed = (MOB_ATTACK_TYPE(mob_iter) != MOB_ATTACK_TYPE(mob)) || (MOB_FLAGS(mob_iter) != MOB_FLAGS(mob));
 			
 			// update stats
-			GET_MIN_SCALE_LEVEL(mob_iter) = GET_MIN_SCALE_LEVEL(mob);
-			GET_MAX_SCALE_LEVEL(mob_iter) = GET_MAX_SCALE_LEVEL(mob);
 			MOB_ATTACK_TYPE(mob_iter) = MOB_ATTACK_TYPE(mob);
 			MOB_FLAGS(mob_iter) = MOB_FLAGS(mob);
 			
 			// re-scale
-			if (changed && GET_CURRENT_SCALE_LEVEL(mob_iter) > 0) {
+			if ((changed || level_change) && GET_CURRENT_SCALE_LEVEL(mob_iter) > 0) {
 				scale_mob_to_level(mob_iter, GET_CURRENT_SCALE_LEVEL(mob_iter));
 			}
 
@@ -1146,9 +1266,8 @@ void save_olc_mobile(descriptor_data *desc) {
 	if (GET_LOOK_DESC(proto)) {
 		free(GET_LOOK_DESC(proto));
 	}
-
-	free_interactions(&proto->interactions);
-	free_custom_messages(MOB_CUSTOM_MSGS(proto));
+	
+	free_mob_proto_data(proto->proto_data);
 	
 	if (proto->proto_script) {
 		free_proto_scripts(&proto->proto_script);
@@ -1156,15 +1275,10 @@ void save_olc_mobile(descriptor_data *desc) {
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
-	ql = proto->quest_lookups;	// save lookups
-	sl = proto->shop_lookups;
 	
 	*proto = *mob;
 	proto->vnum = vnum;	// ensure correct vnum
-	
 	proto->hh = hh;	// restore hash handle
-	proto->quest_lookups = ql;	// restore lookups
-	proto->shop_lookups = sl;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_MOB, vnum);
@@ -1192,26 +1306,22 @@ char_data *setup_olc_mobile(char_data *input) {
 		GET_SHORT_DESC(new) = GET_SHORT_DESC(input) ? str_dup(GET_SHORT_DESC(input)) : NULL;
 		GET_LONG_DESC(new) = GET_LONG_DESC(input) ? str_dup(GET_LONG_DESC(input)) : NULL;
 		GET_LOOK_DESC(new) = GET_LOOK_DESC(input) ? str_dup(GET_LOOK_DESC(input)) : NULL;
+		new->proto_data = copy_mob_proto_data(input->proto_data);
 
 		// copy scripts
 		SCRIPT(new) = NULL;
 		new->proto_script = copy_trig_protos(input->proto_script);
-		
-		// copy interactions
-		new->interactions = copy_interaction_list(input->interactions);
-		
-		// copy custom msgs
-		MOB_CUSTOM_MSGS(new) = copy_custom_messages(MOB_CUSTOM_MSGS(input));
 	}
 	else {
 		new->player_specials = &dummy_mob;
+		clear_mob_proto_data(new);
 		
 		// brand new
 		GET_PC_NAME(new) = str_dup(default_mob_keywords);
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
 		GET_LONG_DESC(new) = str_dup(default_mob_long);
 		MOB_FLAGS(new) = MOB_ISNPC;
-
+		
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
 	}
@@ -1428,7 +1538,7 @@ void olc_show_mobile(char_data *ch) {
 	}
 	
 	build_page_display(ch, "<%sattack\t0> %d %s", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
-	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[MOB_MOVE_TYPE(mob)]);
 	
 	// size/custom corpse line
 	line = build_page_display(ch, "<%ssize\t0> %s, ", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
@@ -1442,9 +1552,9 @@ void olc_show_mobile(char_data *ch) {
 	build_page_display(ch, "<%snameset\t0> %s, <%slanguage\t0> %d - %s", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
 	build_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
-	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(mob->interactions));
-	if (mob->interactions) {
-		show_interaction_display(ch, mob->interactions, FALSE);
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(MOB_INTERACTIONS(mob)));
+	if (MOB_INTERACTIONS(mob)) {
+		show_interaction_display(ch, MOB_INTERACTIONS(mob), FALSE);
 	}
 	
 	// custom messages
@@ -1458,6 +1568,8 @@ void olc_show_mobile(char_data *ch) {
 	if (mob->proto_script) {
 		show_script_display(ch, mob->proto_script, FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(MOB_NOTES(mob)), NULLSAFE(MOB_NOTES(mob)));
 	
 	send_page_display(ch);
 }
@@ -1521,7 +1633,7 @@ OLC_MODULE(medit_corpse) {
 		msg_to_char(ch, "Set the custom corpse to what object vnum (or 'default')?\r\n");
 	}
 	else if (is_abbrev(argument, "default") || is_abbrev(argument, "none")) {
-		MOB_CUSTOM_CORPSE(mob) = NOTHING;
+		SET_CUSTOM_CORPSE(mob, NOTHING);
 		msg_to_char(ch, "You remove the custom corpse%s.\r\n", MOB_FLAGGED(mob, MOB_NO_CORPSE) ? "" : "; it will now use the default corpse");
 	}
 	else if (!isdigit(*argument) || !(proto = obj_proto(atoi(argument)))) {
@@ -1531,7 +1643,7 @@ OLC_MODULE(medit_corpse) {
 		msg_to_char(ch, "That object is not a corpse.\r\n");
 	}
 	else {
-		MOB_CUSTOM_CORPSE(mob) = GET_OBJ_VNUM(proto);
+		SET_CUSTOM_CORPSE(mob, GET_OBJ_VNUM(proto));
 		msg_to_char(ch, "You set its custom corpse to object %d: %s\r\n", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto));
 	}
 }
@@ -1554,7 +1666,7 @@ OLC_MODULE(medit_flags) {
 
 OLC_MODULE(medit_interaction) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	olc_process_interactions(ch, argument, &mob->interactions, TYPE_MOB);
+	olc_process_interactions(ch, argument, &MOB_INTERACTIONS(mob), TYPE_MOB);
 }
 
 
@@ -1616,25 +1728,38 @@ OLC_MODULE(medit_lookdescription) {
 
 OLC_MODULE(medit_maxlevel) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);	
-	GET_MAX_SCALE_LEVEL(mob) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_MAX_SCALE_LEVEL(mob));
+	SET_MAX_SCALE_LEVEL(mob, olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_MAX_SCALE_LEVEL(mob)));
 }
 
 
 OLC_MODULE(medit_minlevel) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);	
-	GET_MIN_SCALE_LEVEL(mob) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_MIN_SCALE_LEVEL(mob));
+	SET_MIN_SCALE_LEVEL(mob, olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_MIN_SCALE_LEVEL(mob)));
 }
 
 
 OLC_MODULE(medit_movetype) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	MOB_MOVE_TYPE(mob) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, MOB_MOVE_TYPE(mob));
+	SET_MOVE_TYPE(mob, olc_process_type(ch, argument, "move type", "movetype", mob_move_types, MOB_MOVE_TYPE(mob)));
 }
 
 
 OLC_MODULE(medit_nameset) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	MOB_NAME_SET(mob) = olc_process_type(ch, argument, "name set", "nameset", name_sets, MOB_NAME_SET(mob));
+	SET_NAME_SET(mob, olc_process_type(ch, argument, "name set", "nameset", name_sets, MOB_NAME_SET(mob)));
+}
+
+
+OLC_MODULE(medit_notes) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_SHORT_DESC(mob));
+		start_string_editor(ch->desc, buf, &MOB_NOTES(mob), MAX_NOTES, TRUE);
+	}
 }
 
 

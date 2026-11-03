@@ -1,6 +1,7 @@
 #33
 Time Lion death 2.0~
-0 f 100
+0 f 100 1
+L b 33
 ~
 %echo% Oh no! You've messed with the time lion and now you no longer exist!
 set person %self.room.people%

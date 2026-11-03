@@ -1,0 +1,2164 @@
+#200
+Grassland~
+A Lush Grassland~
+',' 12 lr 3 al bp
+C
+gather, pick, burn grassland~
+D0
+,`,`~
+&G~
+D0
+`,`,~
+&G~
+D0
+,,,,~
+&G~
+E
+2 53 5.00 234
+E
+2 32 10.00 243
+E
+2 57 10.00 230
+E
+2 5 10.00 240
+E
+3 200 0.10 210
+E
+5 0 100.00 201
+E
+9 0 33.33 210
+E
+16 0 100.00 204
+E
+17 231 2.50 230
+E
+17 244 2.50 243
+E
+17 241 2.50 240
+E
+17 204 2.50 200
+I 6 3080 20.00 25 f  # FORAGE: lizard tail
+I 6 3081 20.00 25 f  # FORAGE: colorful bird egg
+I 6 3087 35.00 25 f  # FORAGE: crisp wild leaves
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1201 87.00 125 p  # PICK: sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 140 100.00 50  # GATHER: bundle of long grass
+U
+0
+Grass pops up all over, quickly growing to chest height!~
+U
+1
+The grassland burns away, fertilizing the rich soil underneath!~
+X
+grassland plains field ground around~
+   You stand in a sea of tall grass. Some if it comes up to your chest; some is
+taller and makes it hard to see. Even the lightest breeze pushes through the
+field in waves, rustling in your ears.
+~
+S
+#201
+Marshy Trench~
+A Marshy Trench~
+',' 24 hl 4 t 0
+C
+dig, excavate, fillin, pour~
+D0
+&t\__/~
+&G~
+E
+6 0 100.00 260
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3083 100.00 25 f  # FORAGE: river snail
+X
+trench canal moat ground around marshy~
+   You're deep in a trench that has been dug, scoop by scoop, to form the start
+of a waterway. Moisture already covers the dark soil, presaging the canal that
+will someday flow here.
+~
+S
+#202
+Seeded Soil~
+A Seeded Soil Field~
+',' 37 l 3 j kp
+D0
+,,,,~
+&t~
+E
+1 0 100.00 203
+E
+9 0 20.00 203
+E
+16 0 100.00 204
+E
+18 0 100.00 204
+I 6 3087 100.00 25 f  # FORAGE: crisp wild leaves
+U
+1
+The germinating crops are burnt away, fertilizing the rich soil!~
+X
+field seeded seeds plants crop around soil~
+   The field around you has been meticulously plowed into rows and seeded with
+baby plants that have just started to emergy. The soil is black and rich,
+perfect for growing all manner of crops -- so long as they thrive in this hot
+environment.
+~
+S
+#203
+Tropical Crop~
+A Tropical Crop~
+',' 37 l 3 djkE kp
+D0
+????~
+&G~
+E
+16 0 100.00 204
+E
+18 0 100.00 200
+U
+0
+The crops grow all around you with phenomenal speed!~
+U
+1
+The crops burn away to ash, which rains down and fertilizes the dark soil!~
+S
+#204
+Fertile Soil~
+A Patch of Fertile Soil~
+'.' 37 l 2 l bp
+D0
+....~
+&t~
+E
+2 53 5.00 234
+E
+2 57 10.00 231
+E
+2 32 10.00 244
+E
+2 5 10.00 241
+E
+4 0 5.00 200
+E
+5 0 100.00 201
+E
+8 0 100.00 202
+E
+9 0 100.00 200
+I 6 3082 100.00 25  # FORAGE: succulent root
+X
+soil fertile ground plains field around grass~
+   The soil here is black with rich nutrients. The land has been cleared,
+either by fire or by water, and now everything has begun to grow again. It's
+the perfect spot to plant a crop.
+~
+S
+#210
+Savanna~
+A Vast Savanna~
+',' 12 lqr 3 adl np
+C
+chop, gather, pick~
+D0
+,,&T|&?^~
+&G~
+D0
+,&T|&?^,~
+&G~
+D0
+&T|&?^,,~
+&G~
+D0
+,,^&T|~
+&G~
+D0
+,^&T|&?,~
+&G~
+D0
+^&T|&?,,~
+&G~
+D0
+^&T|&?^,~
+&G~
+D0
+,^&T|&?^~
+&G~
+E
+0 0 33.33 210
+E
+0 1 100.00 211
+E
+2 53 5.00 234
+E
+2 32 10.00 243
+E
+2 57 10.00 232
+E
+2 5 10.00 240
+E
+3 210 0.05 220
+E
+9 0 50.00 220
+E
+17 200 0.60 210
+E
+17 231 2.50 230
+E
+17 244 2.50 243
+E
+17 241 2.50 240
+E
+17 204 2.50 200
+I 6 3080 10.00 25 f  # FORAGE: lizard tail
+I 6 3081 15.00 25 f  # FORAGE: colorful bird egg
+I 6 3087 25.00 25 f  # FORAGE: crisp wild leaves
+I 6 3069 25.00 25 f  # FORAGE: honeycomb
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1201 87.00 125 p  # PICK: sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 121 44.00 50 g  # GATHER: sticks and leaves
+I 9 148 12.00 50 g  # GATHER: thorny shoot
+I 9 132 44.00 50 g  # GATHER: thorny branches
+I 20 147 100.00 1  # CHOP: thorny tree
+U
+0
+A tree springs from the ground and shoots green leaves up into the air!~
+X
+savannah grassland plains field ground around trees~
+   The vast, low grasslands are interrupted here and there by a single tree or
+bush blowing in the gentle breeze.
+~
+S
+#211
+Grassland Stump~
+A Stump in the Grassland~
+',' 12 lr 3 adl bp
+C
+gather, burn stump~
+D0
+`,&Tn&?,~
+&G~
+D0
+,&Tn&?,`~
+&G~
+D0
+&Tn&?,`,~
+&G~
+D0
+,`,&Tn~
+&G~
+D0
+`,&Tn&?,~
+&G~
+D0
+`&Tn&?,,~
+&G~
+D0
+`&Tn&?,`~
+&G~
+D0
+`,&Tn&?`~
+&G~
+E
+2 53 5.00 234
+E
+2 32 10.00 243
+E
+2 5 10.00 240
+E
+2 57 10.00 233
+E
+4 0 2.50 212
+E
+9 0 50.00 212
+E
+16 0 100.00 204
+E
+17 231 2.50 230
+E
+17 241 2.50 240
+E
+17 204 2.50 200
+E
+17 244 2.50 243
+E
+23 0 100.00 204
+I 6 3080 20.00 25 f  # FORAGE: lizard tail
+I 6 3081 20.00 25 f  # FORAGE: colorful bird egg
+I 6 3087 35.00 25 f  # FORAGE: crisp wild leaves
+I 9 148 33.33 50 g  # GATHER: thorny shoot
+I 9 140 66.67 50 g  # GATHER: bundle of long grass
+U
+1
+The stump burns away to ash, taking the grass with it as it fertilizes the rich soil!~
+X
+savannah grassland plains field ground around trees stumps~
+   The vast field of grass extends around this large tree stump, sweltering in
+the tropical heat.
+~
+S
+#212
+Savanna Copse~
+A Small Copse on the Savanna~
+',' 12 l 3 ad 0
+C
+chop~
+D0
+`,W,~
+&G~
+D0
+,W,`~
+&G~
+D0
+W,`,~
+&G~
+D0
+,`,W~
+&G~
+D0
+`,W,~
+&G~
+D0
+`W,,~
+&G~
+D0
+`W,`~
+&G~
+D0
+`,W`~
+&G~
+E
+0 1 50.00 211
+E
+0 0 100.00 212
+E
+2 5 10.00 240
+E
+2 32 10.00 243
+E
+2 53 10.00 234
+E
+2 57 10.00 232
+E
+4 0 0.80 210
+E
+9 0 50.00 210
+I 6 3080 10.00 25 f  # FORAGE: lizard tail
+I 6 3081 15.00 25 f  # FORAGE: colorful bird egg
+I 6 3087 20.00 25 f  # FORAGE: crisp wild leaves
+I 6 3069 20.00 25 f  # FORAGE: honeycomb
+I 20 134 100.00 1  # CHOP: thorny sapling
+U
+0
+New shoots spring forth from the stumps and begin to push out leaves!~
+X
+copse savannah grasslands trees forest stumps around field~
+   Old, woody stumps have regrown to form a copse of young trees which stretch
+tall toward the sky. Around them, short grass stretches into an endless field
+that blows ever so slightly in the wind.
+~
+S
+#220
+Jungle~
+The Jungle~
+'^' 4 lq 12 ad g
+C
+chop, gather~
+D0
+^^^%~
+&G~
+D0
+^^%^~
+&G~
+D0
+^%^^~
+&G~
+D0
+%^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+E
+0 1 50.00 221
+E
+0 1 100.00 220
+E
+2 32 2.00 252
+E
+2 57 10.00 232
+E
+7 5 2.00 250
+E
+17 70 0.80 72
+E
+17 240 0.30 224
+E
+17 241 1.00 224
+E
+17 243 0.30 224
+E
+17 244 1.00 224
+E
+17 231 1.00 232
+E
+17 230 0.30 232
+E
+17 210 0.60 224
+E
+17 204 1.00 224
+E
+17 200 0.30 224
+E
+17 0 0.60 39
+E
+20 20160 0.01 225
+I 6 3081 10.00 25 f  # FORAGE: colorful bird egg
+I 6 3086 5.00 25 f  # FORAGE: tree frog
+I 6 3017 20.00 25 f  # FORAGE: plump fig
+I 6 3069 20.00 25 f  # FORAGE: honeycomb
+I 6 3085 20.00 25 f  # FORAGE: fern tips
+I 9 133 90.00 50 g  # GATHER: tangle of vines
+I 9 121 10.00 50 g  # GATHER: sticks and leaves
+I 20 128 100.00 1 c  # CHOP: massive jungle tree
+U
+0
+More and more trees burst from the ground, twisting their way up to the sky and spreading a wide canopy!~
+X
+jungle trees forest around canopy~
+   You're standing in a jungle where both the canopy and the undergrowth are
+dense and nigh-impenetrable. The humid air is thick with the scent of plant
+life, protected by the layer of green above.
+~
+S
+#221
+Partial Jungle~
+The Jungle, Partially Cleared~
+'^' 4 lq 8 ad g
+C
+chop, gather~
+D0
+^^&t..~
+&G~
+D0
+^^&t..~
+&G~
+D0
+&t..&?^^~
+&G~
+D0
+&t..&?^^~
+&G~
+D0
+&t.&?^^&t.~
+&G~
+D0
+&t.&?^^&t.~
+&G~
+D0
+&t.&?^^^~
+&G~
+D0
+^^^&t.~
+&G~
+D0
+^&t.&?^^~
+&G~
+D0
+^^&t.&?^~
+&G~
+E
+0 1 50.00 222
+E
+0 1 100.00 221
+E
+2 32 2.00 252
+E
+2 57 10.00 232
+E
+4 0 0.80 220
+E
+7 5 2.00 250
+E
+9 0 50.00 220
+I 6 3081 10.00 25 f  # FORAGE: colorful bird egg
+I 6 3086 5.00 25 f  # FORAGE: tree frog
+I 6 3017 20.00 25 f  # FORAGE: plump fig
+I 6 3069 20.00 25 f  # FORAGE: honeycomb
+I 6 3085 20.00 25 f  # FORAGE: fern tips
+I 9 133 90.00 50 g  # GATHER: tangle of vines
+I 9 121 10.00 50 g  # GATHER: sticks and leaves
+I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+The trees around you grow and twist and branch until much of the sky is covered in green!~
+X
+jungle clearing cleared trees forest around canopy~
+   Many of the trees here have been cut to make way for small paths, but you
+still find yourself awash in the green vegetation. The ground forms a thick,
+moist layer of decaying leaves and organic material -- the base material from
+which the whole jungle grows.
+~
+S
+#222
+Wasteland~
+A Wasteland of Stumps and Vines~
+'.' 37 l 3 adl 0
+C
+burn stumps, gather~
+D0
+..&Tnn~
+&t~
+D0
+&Tnn&?..~
+&t~
+D0
+.&Tnn&?.~
+&t~
+D0
+..&Tnn~
+&t~
+D0
+&Tnn&?..~
+&t~
+D0
+.&Tnn&?.~
+&t~
+D0
+.&Tn&?.&Tn~
+&t~
+D0
+&Tn&?.&Tn&?.~
+&t~
+D0
+&Tn&?..&Tn~
+&t~
+D0
+.&G%&Tnn~
+&t~
+D0
+&Tnn&G%&?.~
+&t~
+D0
+.&Tnn&G%~
+&t~
+E
+2 32 2.00 252
+E
+2 57 10.00 233
+E
+4 0 2.50 223
+E
+7 5 2.00 250
+E
+9 0 50.00 223
+E
+16 0 100.00 204
+E
+23 0 100.00 204
+I 6 3080 10.00 25 f  # FORAGE: lizard tail
+I 6 3081 25.00 25 f  # FORAGE: colorful bird egg
+I 6 3082 20.00 25 f  # FORAGE: succulent root
+I 6 3085 20.00 25 f  # FORAGE: fern tips
+I 9 121 25.00 25 g  # GATHER: sticks and leaves
+I 9 133 75.00 25 g  # GATHER: tangle of vines
+U
+1
+The stumps and grass burn away, raining ash down on the fertile soil.~
+X
+wasteland stumps vines ground around land~
+   The remnants of a once-proud jungle litter the landscape around you. Jagged
+stumps are all that remain of tall trees. There isn't much growing here; you'd
+need to burn it to the ground to restore the fertile soil and begin anew.
+~
+S
+#223
+Jungle Copse~
+A Copse of Young Jungle Trees~
+'.' 4 l 6 ad 0
+C
+chop, gather~
+D0
+..&Gww~
+&t~
+D0
+&Gww&?..~
+&t~
+D0
+.&Gww&?.~
+&t~
+D0
+..&GWw~
+&t~
+D0
+&GWw&?..~
+&t~
+D0
+.&GWw&?.~
+&t~
+D0
+..&GwW~
+&t~
+D0
+&GwW&?..~
+&t~
+D0
+.&GwW&?.~
+&t~
+E
+0 1 50.00 222
+E
+0 0 100.00 223
+E
+2 57 2.00 232
+E
+2 32 2.00 252
+E
+4 0 0.80 221
+E
+7 5 2.00 250
+E
+9 0 50.00 221
+I 6 3081 10.00 25 f  # FORAGE: colorful bird egg
+I 6 3086 5.00 25 f  # FORAGE: tree frog
+I 6 3017 20.00 25 f  # FORAGE: plump fig
+I 6 3069 20.00 25 f  # FORAGE: honeycomb
+I 6 3085 20.00 25 f  # FORAGE: fern tips
+I 9 121 25.00 25 g  # GATHER: sticks and leaves
+I 9 133 75.00 25 g  # GATHER: tangle of vines
+I 20 135 100.00 1  # CHOP: reaching sapling
+U
+0
+Young trees spring up from the stumps to form a lush copse!~
+X
+copse young jungle trees forest stumps around~
+   All around, the stumps of once-proud jungle trees have bushed out into leafy
+copses. Saplings shoot straight up from the stumps to seek the light,
+struggling to capture whatever sun they can find. In the middle of the copse,
+the air is thick and humid, full of the scent of moist soil.
+~
+S
+#224
+Jungle Edge~
+The Edge of the Jungle~
+'.' 4 lq 5 ad 0
+C
+chop, gather~
+D0
+@w&?.&Gw@e~
+&t~
+D0
+@w&Gw&?.@e~
+&t~
+D0
+@w&Gww&?@e~
+&t~
+D0
+@w.&GW@e~
+&t~
+D0
+@w&Gw&?.@e~
+&t~
+D0
+@w&GWw@e~
+&t~
+D0
+@w.&Gw@e~
+&t~
+D0
+@w&GW&?.@e~
+&t~
+D0
+@w&GwW@e~
+&t~
+E
+0 1 75.00 222
+E
+0 0 100.00 224
+E
+2 32 2.00 252
+E
+2 57 5.00 232
+E
+4 0 0.50 220
+E
+7 5 2.00 250
+E
+9 0 50.00 220
+I 6 3081 10.00 25 f  # FORAGE: colorful bird egg
+I 6 3086 5.00 25 f  # FORAGE: tree frog
+I 6 3017 20.00 25 f  # FORAGE: plump fig
+I 6 3069 20.00 25 f  # FORAGE: honeycomb
+I 6 3085 20.00 25 f  # FORAGE: fern tips
+I 9 121 25.00 25 g  # GATHER: sticks and leaves
+I 9 133 75.00 25 g  # GATHER: tangle of vines
+I 20 135 100.00 1  # CHOP: reaching sapling
+U
+0
+Small trees pop up all over, soaking up water as they grow!~
+X
+jungle edge trees forest grassland plains around~
+   At the edge of the jungle, the air is cooler and more humid. The cacophany
+of sounds from the trees meets the chirps of insects that live in tall grass.
+In one direction, trees tower to the sky. In the other, you see tranquil, open
+space.
+~
+S
+#225
+Dense Jungle~
+A Dense Jungle~
+'^' 13 lq 16 ad g
+C
+chop, gather~
+D0
+^^^%~
+&G~
+D0
+^^%^~
+&G~
+D0
+^%^^~
+&G~
+D0
+%^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+D0
+^^^^~
+&G~
+E
+0 1 100.00 220
+E
+2 32 2.00 252
+E
+2 57 10.00 232
+E
+3 225 5.00 220
+E
+7 5 2.00 250
+E
+17 70 0.80 72
+E
+17 240 0.30 224
+E
+17 241 1.00 224
+E
+17 244 1.00 224
+E
+17 231 1.00 232
+E
+17 230 0.30 232
+E
+17 210 0.60 224
+E
+17 204 1.00 224
+E
+17 200 0.30 224
+E
+17 0 0.60 39
+E
+17 243 0.30 224
+I 6 3081 10.00 25 f  # FORAGE: colorful bird egg
+I 6 3086 5.00 25 f  # FORAGE: tree frog
+I 6 3017 20.00 25 f  # FORAGE: plump fig
+I 6 3069 20.00 25 f  # FORAGE: honeycomb
+I 6 3085 20.00 25 f  # FORAGE: fern tips
+I 9 133 90.00 50 g  # GATHER: tangle of vines
+I 9 121 10.00 50 g  # GATHER: sticks and leaves
+I 20 149 100.00 1 c  # CHOP: tremendous jungle tree
+U
+0
+More and more trees burst from the ground, twisting their way up to the sky and spreading a wide canopy!~
+X
+jungle trees forest around canopy~
+   You're standing in a jungle where both the canopy and the undergrowth are
+dense and nigh-impenetrable. The humid air is thick with the scent of plant
+life, protected by the layer of green above.
+~
+S
+#230
+Grassy Seaside~
+A Grassy Seaside~
+',' 12 lrs 3 al bpr
+C
+dig, gather, pick, burn grass~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?`,@e~
+&G~
+D0
+@w&?,`@e~
+&G~
+E
+5 0 100.00 201
+E
+9 0 100.00 232
+E
+10 57 5.00 200
+E
+16 0 100.00 231
+E
+17 204 2.50 200
+E
+17 241 2.50 240
+E
+17 244 2.50 243
+E
+17 231 2.50 230
+I 5 107 100.00 25 d  # DIG: bag of sand
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1200 87.00 125 p  # PICK: handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 140 100.00 50  # GATHER: bundle of long grass
+U
+0
+Tufts of grass squeak up out of the soil, turning black dirt to green paradise!~
+U
+1
+The grass burns away, fertilizing the soil beneath!~
+X
+seaside grassy ocean ground plains around~
+   Tall tropical grass rises almost to the very edge of the sea, where only a
+small sandy buffer separates it from the vastness of the ocean. The salt spray
+lingers in your nose as you look out, the caws of seabirds cutting across the
+serene silence.
+~
+S
+#231
+Fertile Seaside~
+Some Fertile Soil by the Seaside~
+'.' 37 ls 2 l bpr
+C
+dig~
+D0
+@w&?..@e~
+&t~
+E
+4 0 5.00 230
+E
+5 0 100.00 201
+E
+8 0 100.00 236
+E
+9 0 100.00 230
+E
+10 57 5.00 204
+I 5 107 100.00 25 d  # DIG: bag of sand
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
+X
+fertile soil seaside ground plains around ocean~
+   Here, the rich brown-black soil meets sand and sea as the land comes to an
+end. Salty sea spray seasons the air; it's strong in your nose than the earthy
+aroma of the soil.
+~
+S
+#232
+Mangrove Forest~
+A Mangrove Forest on the Seaside~
+'^' 13 lqs 5 d g
+C
+chop, gather, pick~
+D0
+@w&?^^@e~
+&L~
+D0
+@w&?^^@e~
+&L~
+D0
+@w&?^^@e~
+&L~
+D0
+@w&?^^@e~
+&L~
+D0
+@w&?^^@e~
+&L~
+D0
+@w&?^^@e~
+&L~
+D0
+@w&?^&Tw@e~
+&L~
+D0
+@w&Tw&?^@e~
+&L~
+E
+0 0 66.66 232
+E
+0 1 100.00 233
+E
+10 57 5.00 220
+E
+17 243 1.00 224
+E
+17 240 1.00 224
+E
+17 200 0.60 224
+E
+17 204 1.00 224
+E
+17 210 0.60 224
+E
+17 230 1.00 232
+E
+17 244 4.00 224
+E
+17 241 4.00 224
+E
+17 231 4.00 232
+I 6 3084 20.00 25 x  # FORAGE: brittlegill mushroom
+I 6 3051 30.00 25 x  # FORAGE: sea urchin
+I 6 3052 30.00 25 x  # FORAGE: clam
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1200 87.00 125 p  # PICK: handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 121 88.00 25 g  # GATHER: sticks and leaves
+I 9 135 12.00 25 g  # GATHER: reaching sapling
+I 10 9288 1.10 1  # ENCOUNTER: water monitor
+I 20 150 88.00 1 c  # CHOP: mangrove tree
+I 20 135 12.00 1 c  # CHOP: reaching sapling
+U
+0
+Trees burst from the wet soil and spread their leaves over the edge of the sea!~
+X
+mangrove forest seaside trees canopy jungle around ocean~
+   Woody roots stick up like straws across the salty floor of the mangrove
+forest, nestled on the very edge of the land where it meets the sea. Above, a
+leafy canopy provides shade from the harsh tropical sun.
+~
+S
+#233
+Seaside Wasteland~
+A Wasteland of Stumps on the Edge of the Sea~
+'.' 37 ls 3 adl pr
+C
+burn stumps, pick~
+D0
+@w&?.&Tn@e~
+&t~
+D0
+@w&Tn&?.@e~
+&t~
+D0
+@w&Tnn@e~
+&t~
+E
+4 0 1.00 232
+E
+9 0 50.00 232
+E
+10 57 5.00 222
+E
+16 0 100.00 231
+E
+23 0 100.00 231
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1200 87.00 125 p  # PICK: handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+U
+1
+The stumps and grass burn away, scattering ash along the fertile seaside.~
+X
+seaside wasteland land ocean stumps fores trees around ground~
+   The stumps of the mangrove forest rise between woody straw-like roots that
+stick up all over. Everything here has been cut down, leaving only devastation
+at the edge of the sea.
+~
+S
+#234
+Estuary Shore~
+The Shore of the Estuary~
+'.' 37 lrs 2 l bprs
+C
+dig, pick~
+D0
+@w&t..@e~
+&t~
+E
+5 0 100.00 201
+E
+8 0 100.00 238
+E
+10 53 5.00 204
+I 5 102 9.00 50 x  # DIG: flint stone
+I 5 107 9.00 50 x  # DIG: bag of sand
+I 5 101 82.00 50 x  # DIG: lump of clay
+I 6 3051 33.33 25 x  # FORAGE: sea urchin
+I 6 3052 33.34 25 x  # FORAGE: clam
+I 6 3083 33.33 25 x  # FORAGE: river snail
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1200 87.00 125 p  # PICK: handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+X
+shore estuary river water ocean sea around~
+   The shore is a mix of mud and sand, with the water slowly rising and
+falling. Small crabs scurry around, digging into the muck for food. The
+occasional bird swoops down to grab a meal as you listen to the sound of waves
+crashing.
+~
+S
+#236
+Seeded Seaside~
+A Seeded Field by the Seaside~
+',' 37 ls 3 j kp
+D0
+,,,,~
+&t~
+E
+1 0 100.00 237
+E
+9 0 20.00 237
+E
+16 0 100.00 231
+E
+18 0 100.00 231
+I 6 3052 33.33 25 f  # FORAGE: clam
+I 6 3087 33.34 25 f  # FORAGE: crisp wild leaves
+I 6 3051 33.33 25 f  # FORAGE: sea urchin
+U
+1
+The germinating crops are burnt away, fertilizing the rich soil!~
+X
+seeded seaside fertile soil ground field around ocean weeds crops~
+   Though someone has neatly planted crops in long rows along the seaside, the
+humidity and bountiful sunlight have already added a host of weeds and grasses
+to the mix. The crops have germinated already, and are growing quickly.
+~
+S
+#237
+Tropical Seaside Crop~
+A Tropical Crop by the Sea~
+',' 37 ls 3 djk kp
+D0
+????~
+&G~
+E
+16 0 100.00 231
+E
+18 0 100.00 230
+U
+0
+The crops grow all around you with phenomenal speed!~
+U
+1
+The crops burn away to ash, which rains down and fertilizes the dark soil!~
+S
+#238
+Seeded Estuary~
+A Seeded Field in the Estuary~
+',' 37 ls 3 j kp
+D0
+,,,,~
+&t~
+E
+1 0 100.00 239
+E
+9 0 20.00 239
+E
+16 0 100.00 234
+E
+18 0 100.00 234
+I 6 3052 33.33 25 f  # FORAGE: clam
+I 6 3087 33.34 25 f  # FORAGE: crisp wild leaves
+I 6 3051 33.33 25 f  # FORAGE: sea urchin
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+U
+1
+The germinating crops are burnt away, fertilizing the rich soil!~
+X
+shore estuary river water ocean sea around field seeded weeds crops~
+   Despite the brackish water and salty smell, a well-seeded field seems to be
+thriving. The germinating plants run in neat rows parallel to the shore,
+growing quickly in the sun.
+~
+S
+#239
+Tropical Estuary Crop~
+A Tropical Crop by the Estuary~
+',' 37 ls 3 djk kp
+D0
+????~
+&G~
+E
+16 0 100.00 234
+E
+18 0 100.00 234
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+U
+0
+The crops grow all around you with phenomenal speed!~
+U
+1
+The crops burn away to ash, which rains down and fertilizes the dark soil!~
+S
+#240
+Grassy Riverbank~
+A Grassland, Above the Riverbank~
+',' 12 lrv 3 al bps
+C
+gather, pick, burn grassland~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?`,@e~
+&G~
+D0
+@w&?,`@e~
+&G~
+D0
+@w&?,,`~
+&G~
+D0
+@w&?`,,~
+&G~
+D0
+@w&?,`,~
+&G~
+D0
+,,`@e~
+&G~
+D0
+`,,@e~
+&G~
+D0
+,`,@e~
+&G~
+E
+5 0 100.00 201
+E
+9 0 100.00 224
+E
+10 5 10.00 200
+E
+14 0 25.00 242
+E
+16 0 100.00 241
+E
+17 244 2.50 243
+E
+17 231 2.50 230
+E
+17 204 2.50 200
+E
+17 241 2.50 240
+I 6 3080 20.00 25 f  # FORAGE: lizard tail
+I 6 3087 35.00 25 f  # FORAGE: crisp wild leaves
+I 6 3083 20.00 25 f  # FORAGE: river snail
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1205 87.00 125 p  # PICK: bileberries
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 140 100.00 50  # GATHER: bundle of long grass
+U
+0
+Waves of grass spread across the riverbank!~
+U
+1
+The grass burns away, fertilizing the dark soil with ash.~
+X
+grassland grassy plains field ground around riverbank bank~
+   The tall grass almost disguises the riverbank, to the point that you nearly
+tumble down into the mud as you only see it at the last moment. Luckily, you
+can hear the flowing water before you see it.
+~
+_
+Floods to 242 seasonally.
+~
+S
+#241
+Fertile Riverbank~
+On a Fertile Riverbank~
+'.' 37 lv 2 al bps
+D0
+@w&?..@e~
+&t~
+D0
+@w&?..@e~
+&t~
+D0
+@w&?..@e~
+&t~
+D0
+@w&?..@e~
+&t~
+D0
+...@e~
+&t~
+D0
+@w&?...~
+&t~
+E
+4 0 5.00 240
+E
+5 0 100.00 201
+E
+8 0 100.00 246
+E
+9 0 100.00 240
+E
+10 5 10.00 204
+E
+14 0 25.00 242
+I 6 3082 75.00 25 f  # FORAGE: succulent root
+I 6 3083 25.00 25 f  # FORAGE: river snail
+X
+riverbank bank fertile ground plains around~
+   The rich, black soil sits above the riverbank, already germinating new
+plants. Soon it will be teeming with tall grass. Birds stride along, pecking
+tiny insects and stray crustaceans from the most soil, interrupted by the
+occasional croak.
+~
+_
+Floods to 242 seasonally.
+~
+S
+#242
+Flooded Riverbank~
+A Flooded Riverbank~
+'~' 17 lo 8 gi ps
+C
+fish, pick~
+D0
+~~~~~
+&c~
+E
+9 0 25.00 250
+E
+12 0 20.00 241
+E
+13 0 80.00 241
+E
+15 0 20.00 241
+I 6 3084 20.00 25 f  # FORAGE: brittlegill mushroom
+I 6 3310 55.00 25 f  # FORAGE: wood ear mushroom
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
+X
+riverbank bank flooded water around~
+   Heavy rainfall has raised the river up out of its bed and, surely, into the
+beds of every creature within a hundred paces. The water rages past, ripping
+out grass and plants from the submerged bank, churning almost loudly enough to
+drown out the chirping insects it evicted.
+~
+_
+Flooded version of 240/241 - reverts to 241.
+~
+S
+#243
+Grassy Lakeshore~
+A Grassy Lakeshore~
+',' 12 lrv 3 al bp
+C
+gather, pick, burn grass~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?,,@e~
+&G~
+D0
+@w&?`,@e~
+&G~
+D0
+@w&?,`@e~
+&G~
+D0
+@w&?,,`~
+&G~
+D0
+@w&?`,,~
+&G~
+D0
+@w&?,`,~
+&G~
+D0
+,,`@e~
+&G~
+D0
+`,,@e~
+&G~
+D0
+,`,@e~
+&G~
+E
+5 0 100.00 201
+E
+9 0 25.00 224
+E
+10 32 10.00 200
+E
+14 0 10.00 245
+E
+16 0 100.00 244
+E
+17 231 2.50 230
+E
+17 244 2.50 243
+E
+17 204 2.50 200
+E
+17 241 2.50 240
+I 6 3087 35.00 25 f  # FORAGE: crisp wild leaves
+I 6 3081 20.00 25 f  # FORAGE: colorful bird egg
+I 6 3080 20.00 25 f  # FORAGE: lizard tail
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1205 87.00 125 p  # PICK: bileberries
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 140 100.00 50  # GATHER: bundle of long grass
+U
+0
+Grass bursts up out of the ground and spreads across the shoreline!~
+U
+1
+The grass burns away, fertilizing the rich lakeshore with ash.~
+X
+grassland grassy plains field ground around lakeshore lake~
+   As you pry your way through the tall grass, you find yourself at the shore
+of a large lake. The water is so still you can't hear it at all; discovering it
+hiding in the grass is a welcome relief.
+~
+_
+Floods to 245 seasonally.
+~
+S
+#244
+Fertile Lakeshore~
+A Fertile Area Around the Lake~
+'.' 37 lv 2 al bp
+D0
+@w&?..@e~
+&t~
+D0
+@w&?..@e~
+&t~
+D0
+@w&?..@e~
+&t~
+D0
+@w&?..@e~
+&t~
+D0
+...@e~
+&t~
+D0
+@w&?...~
+&t~
+E
+4 0 5.00 243
+E
+5 0 100.00 201
+E
+8 0 100.00 248
+E
+9 0 100.00 243
+E
+10 32 10.00 204
+E
+14 0 10.00 245
+I 6 3082 100.00 25  # FORAGE: succulent root
+X
+lakeshore shore fertile area around ground plains~
+   Around the lake, black soil teems with sprouting life -- both in the green
+shoots of new plants, and the hungry larvae that munch on them. Chirping
+insects drown out the lake's serenity, but there's still the occasional wave of
+peace when a hungry bird flies in.
+~
+_
+Floods to 245 seasonally.
+~
+S
+#245
+Flooded Lake~
+An Overflowing Lake~
+'~' 17 lou 8 gi pu
+C
+fish~
+D0
+~~~~~
+&c~
+E
+9 0 25.00 252
+E
+12 0 40.00 244
+E
+13 0 80.00 244
+E
+15 0 40.00 244
+I 6 3084 50.00 25 f  # FORAGE: brittlegill mushroom
+I 6 3310 25.00 25 f  # FORAGE: wood ear mushroom
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
+X
+lake flooded overflowing water down around lakeshore shore~
+   Heavy rains have lifted the lake high above its usual water level. Near the
+old shore, grasses poke above the water level, but they seem to be wilting as
+they drown in the deluge.
+~
+_
+Flooded version of 243/244 - reverts to 244.
+~
+S
+#246
+Seeded Riverbank~
+A Seeded Field Above the Riverbank~
+',' 37 lv 3 j kp
+D0
+,,,,~
+&t~
+E
+1 0 100.00 247
+E
+9 0 20.00 247
+E
+16 0 100.00 241
+E
+18 0 100.00 241
+I 6 3087 33.34 25 f  # FORAGE: crisp wild leaves
+I 6 3083 33.33 25 f  # FORAGE: river snail
+I 6 3081 33.33 25 f  # FORAGE: colorful bird egg
+U
+1
+The germinating crops are burnt away, fertilizing the rich soil!~
+X
+riverbank bank seeded field fertile ground around crops~
+   Orderly rows of baby crops run parallel to the riverbank, providing ample
+water and sun to these thirsty plants. In the afternoons, you can almost hear
+them squeaking as they shoot up.
+~
+S
+#247
+Tropical Riverbank Crop~
+A Tropical Crop by the Riverbank~
+',' 37 lv 3 djk kp
+D0
+????~
+&G~
+E
+16 0 100.00 241
+E
+18 0 100.00 240
+U
+0
+The crops grow all around you with phenomenal speed!~
+U
+1
+The crops burn away to ash, which rains down and fertilizes the dark soil!~
+S
+#248
+Seeded Lakeshore~
+A Seeded Field Near the Lakeshore~
+',' 37 lv 3 j kp
+D0
+,,,,~
+&t~
+E
+1 0 100.00 249
+E
+9 0 20.00 249
+E
+16 0 100.00 244
+E
+18 0 100.00 244
+I 6 3087 100.00 25 f  # FORAGE: crisp wild leaves
+U
+1
+The germinating crops are burnt away, fertilizing the rich soil!~
+X
+lakeshore shore fertile seeded field crops ground around weeds~
+   Rows of well-planted crops grace the lakeshore -- not too close, but close
+enough that they never thirst for water. In this climate, everything grows
+quickly. Even weeds have started to grow already.
+~
+S
+#249
+Tropical Lakeshore Crop~
+A Tropical Crop Near the Lakeshore~
+',' 37 lv 3 djk kp
+D0
+????~
+&G~
+E
+16 0 100.00 244
+E
+18 0 100.00 243
+U
+0
+The crops grow all around you with phenomenal speed!~
+U
+1
+The crops burn away to ash, which rains down and fertilizes the dark soil!~
+S
+#250
+Swamp~
+A Murky Swamp~
+',' 13 lov 10 aw m
+D0
+,`,&0Y~
+&c~
+D0
+`,&0Y&?,~
+&c~
+D0
+,&0Y&?,`~
+&c~
+D0
+&0Y&?`,,~
+&c~
+D0
+`,,&wW~
+&c~
+D0
+,`&wW&?,~
+&c~
+D0
+,&wW&?`,~
+&c~
+D0
+&wW&?,`,~
+&c~
+D0
+,`,&G^~
+&c~
+D0
+`,&G^&?,~
+&c~
+D0
+,&G^&?,`~
+&c~
+D0
+&G^&?`,`~
+&c~
+E
+2 57 2.00 232
+E
+9 0 25.00 224
+E
+11 5 4.00 224
+E
+14 0 25.00 251
+E
+17 70 0.80 72
+E
+17 240 0.60 250
+E
+17 243 0.60 252
+E
+17 234 0.60 232
+E
+17 230 0.60 232
+E
+17 212 1.00 224
+E
+17 211 0.60 224
+E
+17 210 1.00 224
+E
+17 200 0.60 224
+E
+17 0 0.60 39
+E
+17 241 2.00 250
+E
+17 244 2.00 252
+E
+17 245 2.00 253
+E
+17 242 2.00 251
+E
+17 231 2.00 232
+E
+17 204 2.00 224
+I 6 3310 30.00 25 f  # FORAGE: wood ear mushroom
+I 6 3084 20.00 25 f  # FORAGE: brittlegill mushroom
+I 6 3083 25.00 25 f  # FORAGE: river snail
+I 6 3086 20.00 25 f  # FORAGE: tree frog
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
+M
+264 10.00 ace
+U
+0
+Green plants twist and writhe as they rise from the water!~
+X
+swamp murky river water trees forest jungle around~
+   The thick, moist air chokes your lungs as you survey the muddy swamp.
+Burbles emanate from the murk here and there, perhaps from the twisted roots
+and submerged logs that stick out here and there. The river flows lazily by,
+dotted here and there with lily pads and curious creatures.
+~
+_
+Non-flooded variant of 251
+~
+S
+#251
+Deep Swamp~
+A Deep, Murky Swamp~
+'~' 13 lo 10 ag m
+D0
+~~~&G^~
+&c~
+D0
+~~&G^&?~~
+&c~
+D0
+~&G^&?~~~
+&c~
+D0
+&G^&?~~~~
+&c~
+D0
+~~~&wW~
+&c~
+D0
+~~&wW&?~~
+&c~
+D0
+~&wW&?~~~
+&c~
+D0
+&wW&?~~~~
+&c~
+D0
+~~~&0Y~
+&c~
+D0
+~~&0Y&?~~
+&c~
+D0
+~&0Y&?~~~
+&c~
+D0
+&0Y&?~~~~
+&c~
+E
+2 57 2.00 232
+E
+9 0 25.00 224
+E
+11 5 4.00 224
+E
+12 0 5.00 250
+E
+13 0 80.00 250
+E
+15 0 5.00 250
+E
+17 70 0.80 72
+E
+17 240 0.60 250
+E
+17 243 0.60 252
+E
+17 234 0.60 232
+E
+17 230 0.60 232
+E
+17 212 1.00 224
+E
+17 211 0.60 224
+E
+17 210 1.00 224
+E
+17 200 0.60 224
+E
+17 0 0.60 39
+E
+17 241 2.00 250
+E
+17 244 2.00 252
+E
+17 245 2.00 253
+E
+17 242 2.00 251
+E
+17 231 2.00 232
+E
+17 204 2.00 224
+I 6 3310 30.00 25 f  # FORAGE: wood ear mushroom
+I 6 3084 20.00 25 f  # FORAGE: brittlegill mushroom
+I 6 3083 25.00 25 f  # FORAGE: river snail
+I 6 3086 25.00 25 f  # FORAGE: tree frog
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
+X
+swamp murky river water trees forest jungle around deep depths~
+   The murk and mud are hidden beneath the brown waters, which have risen high
+enough that shrubs and low-lying plants are completely submerged. The swamp has
+flooded from all the recent rains, leaving the air abuzz with flying insects
+and the water too deep to find footing.
+~
+_
+Flooded / deep version of 250
+~
+S
+#252
+Marsh~
+A Marshy Lakeshore~
+',' 13 louv 10 aw m
+D0
+,`,&0Y~
+&c~
+D0
+`,&0Y&?,~
+&c~
+D0
+,&0Y&?,`~
+&c~
+D0
+&0Y&?`,,~
+&c~
+D0
+`,,&wW~
+&c~
+D0
+,`&wW&?,~
+&c~
+D0
+,&wW&?`,~
+&c~
+D0
+&wW&?,`,~
+&c~
+D0
+,`,&G^~
+&c~
+D0
+`,&G^&?,~
+&c~
+D0
+,&G^&?,`~
+&c~
+D0
+&G^&?`,`~
+&c~
+E
+2 57 2.00 232
+E
+9 0 25.00 224
+E
+10 32 4.00 224
+E
+14 0 20.00 253
+E
+17 70 0.80 72
+E
+17 240 0.60 250
+E
+17 243 0.60 252
+E
+17 234 0.60 232
+E
+17 230 0.60 232
+E
+17 212 1.00 224
+E
+17 211 0.60 224
+E
+17 210 1.00 224
+E
+17 200 0.60 224
+E
+17 0 0.60 39
+E
+17 241 2.00 250
+E
+17 244 2.00 252
+E
+17 245 2.00 253
+E
+17 242 2.00 251
+E
+17 231 2.00 232
+E
+17 204 2.00 224
+I 6 3310 20.00 25 f  # FORAGE: wood ear mushroom
+I 6 3084 55.00 25 f  # FORAGE: brittlegill mushroom
+I 6 3086 20.00 25 f  # FORAGE: tree frog
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
+M
+264 10.00 ace
+U
+0
+Plants burst forth from the murky marsh and reach for the sky!~
+X
+marshy lakeshore shore swamp jungle forest trees water around~
+   The jungle around the lake has swollen with water, rendering it soft and
+marshy beneath your feet. All around you, creatures chirp and croak unseen.
+Flying insects take their fill of you; you are truly at the mercy of the marsh.
+~
+_
+Non-flooded variant of 253
+~
+S
+#253
+Marshy Lake~
+A Marshy Lake~
+'~' 13 lou 10 ag m
+D0
+~~~&G^~
+&c~
+D0
+~~&G^&?~~
+&c~
+D0
+~&G^&?~~~
+&c~
+D0
+&G^&?~~~~
+&c~
+D0
+~~~&wW~
+&c~
+D0
+~~&wW&?~~
+&c~
+D0
+~&wW&?~~~
+&c~
+D0
+&wW&?~~~~
+&c~
+D0
+~~~&0Y~
+&c~
+D0
+~~&0Y&?~~
+&c~
+D0
+~&0Y&?~~~
+&c~
+D0
+&0Y&?~~~~
+&c~
+E
+2 57 2.00 232
+E
+9 0 100.00 224
+E
+10 32 4.00 224
+E
+12 0 5.00 252
+E
+13 0 80.00 252
+E
+15 0 5.00 252
+E
+17 70 0.80 72
+E
+17 240 0.60 250
+E
+17 243 0.60 252
+E
+17 234 0.60 232
+E
+17 230 0.60 232
+E
+17 212 1.00 224
+E
+17 211 0.60 224
+E
+17 210 1.00 224
+E
+17 200 0.60 224
+E
+17 0 0.60 39
+E
+17 241 2.00 250
+E
+17 244 2.00 252
+E
+17 245 2.00 253
+E
+17 242 2.00 251
+E
+17 231 2.00 232
+E
+17 204 2.00 224
+I 6 3310 20.00 25 f  # FORAGE: wood ear mushroom
+I 6 3084 55.00 25 f  # FORAGE: brittlegill mushroom
+I 6 3086 25.00 25 f  # FORAGE: tree frog
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
+X
+marshy lakeshore shore swamp jungle forest trees water around~
+   The shoreline has moved inland as recent rains have raised the lake to the
+point that even trees struggle to hold their footing. Something stirs below the
+water, revealed only by the faintest ripple. You certainly can't see what lies
+beneath the murk.
+~
+_
+Flooded variant of 252
+~
+S
+#260
+Overgrown Canal~
+An Overgrown Canal~
+'~' 17 lo 8 giC af
+D0
+@w&?~~@e~
+&c~
+I 6 3081 10.00 25 f  # FORAGE: colorful bird egg
+I 6 3083 10.00 25 f  # FORAGE: river snail
+I 6 3082 15.00 25 f  # FORAGE: succulent root
+I 6 3087 15.00 25 f  # FORAGE: crisp wild leaves
+I 6 3017 25.00 25 f  # FORAGE: plump fig
+I 10 9279 0.90 1  # ENCOUNTER: spectacled caiman
+I+ 9 64  # Region: NORTH
+I+ 9 512  # Region: WEST
+I 10 9114 0.90 1  # ENCOUNTER: massive crocodile
+I+ 9 128  # Region: SOUTH
+I+ 9 512  # Region: WEST
+I 10 9298 0.90 1  # ENCOUNTER: armored alligator
+I+ 9 64  # Region: NORTH
+I+ 9 256  # Region: EAST
+I 10 9281 0.90 1  # ENCOUNTER: hungry hippopotamus
+I+ 9 128  # Region: SOUTH
+I+ 9 256  # Region: EAST
+U
+0
+The canal's waters begin to flow.~
+X
+canal water trench overgrown around~
+   You're standing in the tall grass next to a wide canal full of murky water
+and floating plants. Though the sides of the canal are reinforced, vegetation
+has completely overtaken them, making the canal hard to cross.
+~
+_
+Tropical version of canal
+~
+S
+$

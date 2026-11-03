@@ -372,6 +372,11 @@ ACMD(do_earthmeld) {
 		}
 	}
 	
+	if (AFF_FLAGGED(ch, AFF_FLYING)) {
+		msg_to_char(ch, "You can't earthmeld while flying. Land first.\r\n");
+		return;
+	}
+	
 	// TODO why isn't this using charge ability cost
 	set_mana(ch, GET_MANA(ch) - cost);
 	

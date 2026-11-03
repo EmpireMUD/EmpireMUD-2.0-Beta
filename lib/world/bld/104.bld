@@ -2,7 +2,7 @@
 Burning Hamlet~
 A Burning Hamlet~
 &R[^^]~
-128 0 bR 0
+128 0 bAR 0
 0 0 0 -1
 D
    You've come across a small hamlet, ablaze and beset by the undead. Most of
@@ -100,7 +100,7 @@ S
 Goblin Lab Tent~
 A Goblin Lab Tent~
 ..&0M&?.~
-24 0 R 0
+24 0 zR 0
 0 0 0 -1
 C
 brew, mix~
@@ -156,7 +156,7 @@ S
 Goblin Lab Tent~
 A Goblin Lab Tent~
 ..&0M&?.~
-24 0 aR 0
+24 0 azR 0
 0 0 0 -1
 C
 brew, mix~

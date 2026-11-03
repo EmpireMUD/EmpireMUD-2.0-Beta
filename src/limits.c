@@ -40,6 +40,7 @@
 
 // external vars
 extern int char_extractions_pending;
+extern int no_auto_deletes;
 
 // external funcs
 ACMD(do_dismount);
@@ -83,7 +84,7 @@ bool can_mount_in_room(char_data *ch, room_data *room) {
 		// has a waterwalking mount, in deep water, but is missing the riding upgrade
 		ok = FALSE;
 	}
-	else if (WATER_SECT(room) && !((has_player_tech(ch, PTECH_RIDING_UPGRADE) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC)) || (has_player_tech(ch, PTECH_RIDING_FLYING) && MOUNT_FLAGGED(ch, MOUNT_FLYING)))) {
+	else if (WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && !(has_player_tech(ch, PTECH_RIDING_FLYING) && MOUNT_FLAGGED(ch, MOUNT_FLYING))) {
 		ok = FALSE;
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
@@ -281,7 +282,7 @@ void check_idle_menu_users(void) {
 		++d->idle_tics;
 		
 		// determine how long they can stay
-		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 2 : 20;
+		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 4 : 20;
 		
 		if (d->idle_tics > allowed) {
 			if (STATE(d) == CON_PASSWORD) {
@@ -605,6 +606,17 @@ void real_update_player(char_data *ch) {
 	
 	// DEAD players: check for auto-respawn
 	if (IS_DEAD(ch) && ch->desc && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		// ensure fighting is over
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_in_room) {
+			if (!IS_NPC(room_ch) && FIGHTING(room_ch)) {
+				// someone still fighting here -- reset respawn timer
+				msg_to_char(ch, "Players are still in combat here -- resetting respawn cooldown.\r\n");
+				add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
+				return;
+			}
+		}
+		
+		// if we got here, no players remain in combat
 		do_respawn(ch, "", 0, 0);
 		return;
 	}
@@ -864,6 +876,31 @@ void real_update_player(char_data *ch) {
 		if (!point_update_player(ch)) {
 			return;
 		}
+	}
+}
+
+
+/**
+* @param char_data *ch Any player.
+* @return bool TRUE if they have reached the conditions for a bonus trait reset, FALSE if not.
+*/
+bool should_reset_bonus_traits(char_data *ch) {
+	int hours;
+	struct time_info_data passed;
+	
+	if (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_TRAITS_RESET) || !config_get_int("hours_to_bonus_trait_reset")) {
+		return FALSE; // shortcut
+	}
+	
+	// compute playtime
+	passed = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+	hours = passed.day * 24 + passed.hours;
+	
+	if (hours >= config_get_int("hours_to_bonus_trait_reset")) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
 	}
 }
 
@@ -1298,7 +1335,7 @@ bool should_delete_empire(empire_data *emp) {
 		return TRUE;
 	}
 	
-	if (EMPIRE_LAST_LOGON(emp) + (config_get_int("time_to_empire_delete") * SECS_PER_REAL_WEEK) < time(0)) {
+	if (!no_auto_deletes && EMPIRE_LAST_LOGON(emp) + (config_get_int("time_to_empire_delete") * SECS_PER_REAL_WEEK) < time(0)) {
 		return TRUE;
 	}
 	
@@ -1390,7 +1427,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	}
 	
 	if (vault) {
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 
@@ -1416,7 +1453,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	room_data *real_loc, *last_loc;
 	obj_data *top_obj;
 	bool store, unique, full, is_home, file;
-	int islid, home_idnum = NOBODY;
+	int islid, home_idnum = NOBODY, timer;
 	
 	// easy exclusions
 	top_obj = get_top_object(obj);
@@ -1433,6 +1470,11 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	if (obj->in_vehicle && !force) {
 		// contents of a vehicle only auto-store on a force: cancel if automatic
 		return FALSE;
+	}
+	
+	// override empire if stolen
+	if (IS_STOLEN(obj)) {
+		emp = real_empire(GET_STOLEN_FROM(obj));
 	}
 	
 	// ensure object is in a room, or in an object in a room
@@ -1540,7 +1582,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 		if (IS_COINS(obj)) {
 			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
 		}
-		else if (unique && is_home) {
+		else if (unique && is_home && check_douse_light_before_store(NULL, obj)) {
 			// home storage
 			if ((index = find_player_index_by_idnum(home_idnum)) && (loaded_ch = find_or_load_player(index->name, &file))) {
 				check_delayed_load(loaded_ch);
@@ -1551,7 +1593,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 			}
 			// failed to load owner: fall through to extract
 		}
-		else if (unique) {
+		else if (unique && check_douse_light_before_store(NULL, obj)) {
 			// this extracts it itself
 			store_unique_item(NULL, &EMPIRE_UNIQUE_STORAGE(emp), obj, emp, real_loc, &full);
 			return FALSE;
@@ -1564,7 +1606,10 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 			}
 			
 			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
-				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
+				// note drink containers don't store timers in basic storage because they'll come out with default values
+				timer = IS_DRINK_CONTAINER(obj) ? UNLIMITED : GET_OBJ_TIMER(obj);
+				
+				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1, timer);
 			}
 		}
 	}
@@ -1637,8 +1682,10 @@ void force_autostore(room_data *room) {
 				}
 			}
 		}
-	
-		read_vault(ROOM_OWNER(room));
+		
+		if (ROOM_OWNER(room)) {
+			TRIGGER_DELAYED_REFRESH(ROOM_OWNER(room), DELAY_REFRESH_VAULT);
+		}
 	}
 }
 
@@ -2242,6 +2289,7 @@ INTERACTION_FUNC(decay_in_storage_interact) {
 */
 void check_empire_storage_timers(void) {
 	bool counted;
+	int iter;
 	empire_data *emp, *next_emp;
 	obj_data *proto;
 	struct empire_island *isle, *next_isle;
@@ -2286,7 +2334,9 @@ void check_empire_storage_timers(void) {
 								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
 							}
 							else if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
-								run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+								for (iter = 0; iter < st->amount; ++iter) {
+									run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+								}
 							}
 						}
 						
@@ -2338,7 +2388,9 @@ void check_empire_storage_timers(void) {
 							counted = run_timer_triggers_on_decaying_warehouse(emp, eus, st->amount);
 						}
 						else if (has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
-							run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+							for (iter = 0; iter < st->amount; ++iter) {
+								run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+							}
 						}
 					}
 					
@@ -2405,6 +2457,7 @@ void check_empire_storage_timers(void) {
 */
 void check_home_storage_timers(char_data *ch) {
 	bool any, counted;
+	int iter;
 	room_data *home;
 	struct empire_unique_storage *eus, *next_eus;
 	struct storage_timer *st, *next_st;
@@ -2441,7 +2494,9 @@ void check_home_storage_timers(char_data *ch) {
 						counted = run_timer_triggers_on_decaying_home_storage(ch, home, eus, st->amount);
 					}
 					else if (home && has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
-						run_interactions(ch, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, home, NULL, NULL, NULL, decay_in_home_storage_interact);
+						for (iter = 0; iter < st->amount; ++iter) {
+							run_interactions(ch, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, home, NULL, NULL, NULL, decay_in_home_storage_interact);
+						}
 					}
 				}
 				

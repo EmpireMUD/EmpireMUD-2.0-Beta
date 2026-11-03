@@ -96,8 +96,8 @@ See also: QUEST
 #
 "QUEST FINISH"
 
-Usage:  quest finish <quest name | all>
-        finish <quest name | all>
+Usage:  quest finish [quest name | all]
+        finish [quest name | all]
 
 Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn
@@ -181,6 +181,8 @@ You can start all available quests with "quest start all". You can also use the
 
 There will be an indicator on any person, place, or thing that starts a quest.
 
+Immortals can start any quest by vnum (e.g. 'start 10859').
+
 See also: QUESTS, LEVEL COLORS, START
 #
 "QUEST TRACKER"
@@ -199,7 +201,7 @@ be counted by the quest tracker. Unkeep it for it to appear.
 
 See also: KEEP, QUEST
 #
-"CITY DAILIES"
+"CITY DAILIES" "CITY DAILIES QUESTS" "CITY DAILY" "CITY DAILY QUESTS"
 
 These basic daily quests can be completed for a little extra bonus experience.
 They can be started from an artisan in the listed building (for example, the

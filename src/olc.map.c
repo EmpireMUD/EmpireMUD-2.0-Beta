@@ -30,12 +30,44 @@
 *   Edit Modules
 */
 
+// external variables
+extern bool manual_evolutions;
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// EDIT MODULES ////////////////////////////////////////////////////////////
+
+OLC_MODULE(mapedit_basesector) {
+	sector_data *sect = NULL;
+	
+	// prefer vnum; allow name
+	if (isdigit(*argument)) {
+		sect = sector_proto(atoi(argument));
+	}
+	else {
+		sect = get_sect_by_name(argument);
+	}
+	
+	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "Leave the building or area first.\r\n");
+	}
+	else if (!*argument || !sect) {
+		msg_to_char(ch, "What type of sector would you like to set as the base terrain for this tile (VNum or name)?\r\n");
+	}
+	else if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		msg_to_char(ch, "That sector requires extra data and can't be set this way.\r\n");
+	}
+	else {
+		msg_to_char(ch, "The base sect for this room is now [%d] %s.\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		
+		change_base_sector(IN_ROOM(ch), sect);
+	}
+}
+
 
 OLC_MODULE(mapedit_build) {
 	char bld_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
@@ -297,9 +329,7 @@ OLC_MODULE(mapedit_decay) {
 OLC_MODULE(mapedit_terrain) {
 	struct empire_city_data *city;
 	empire_data *emp, *rescan_emp = NULL;
-	int count;
-	sector_data *sect = NULL, *next_sect, *old_sect = NULL;
-	crop_data *crop, *next_crop;
+	sector_data *sect = NULL, *old_sect = NULL;
 	crop_data *cp = NULL;
 	
 	if (isdigit(*argument)) {
@@ -313,17 +343,7 @@ OLC_MODULE(mapedit_terrain) {
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
 		msg_to_char(ch, "Leave the building or area first.\r\n");
 	else if (!*argument || (!sect && !cp)) {
-		msg_to_char(ch, "What type of terrain would you like to set?\r\nYour choices are:");
-		
-		count = 0;
-		HASH_ITER(hh, sector_table, sect, next_sect) {
-			msg_to_char(ch, "%s %s", (count++ > 0 ? "," : ""), GET_SECT_NAME(sect));
-		}
-		HASH_ITER(hh, crop_table, crop, next_crop) {
-			msg_to_char(ch, ", %s", GET_CROP_NAME(crop));
-		}
-		
-		msg_to_char(ch, "\r\n");
+		msg_to_char(ch, "What type of terrain would you like to set (sector name, crop name, or sector vnum)?\r\n");
 	}
 	else if (sect && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
 		msg_to_char(ch, "That sector requires extra data and can't be set this way.\r\n");
@@ -354,7 +374,7 @@ OLC_MODULE(mapedit_terrain) {
 			}
 		}
 		else if (cp) {
-			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, get_climate(IN_ROOM(ch))))) {
+			if (!(sect = find_first_matching_sector(SECTF_CROP | SECTF_BASIC_CROP, NOBITS, GET_CROP_CLIMATE(cp)))) {
 				msg_to_char(ch, "No crop sector types are set up.\r\n");
 				return;
 			}
@@ -575,6 +595,19 @@ OLC_MODULE(mapedit_decustomize) {
 }
 
 
+OLC_MODULE(mapedit_evolve) {
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type: .map evolve confirm\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .map evolve", GET_NAME(ch));
+		send_config_msg(ch, "ok_string");
+		manual_evolutions = TRUE;	// triggers a log
+		run_external_evolutions();
+	}
+}
+
+
 OLC_MODULE(mapedit_room_name) {
 	if (SHARED_DATA(IN_ROOM(ch)) == &ocean_shared_data) {
 		msg_to_char(ch, "You cannot customize ocean tiles.\r\n");
@@ -635,7 +668,7 @@ OLC_MODULE(mapedit_delete_room) {
 		home = HOME_ROOM(in_room);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_c, next_in_room) {
-			char_to_room(c, home ? home : find_load_room(c));
+			char_to_room(c, home ? home : find_load_room(c, NULL));
 			act("$n appears in front of you.", TRUE, c, NULL, NULL, TO_ROOM);
 			if (c != ch) {
 				msg_to_char(c, "Room deleted.\r\n");
@@ -689,6 +722,9 @@ OLC_MODULE(mapedit_ruin) {
 	else if (*arg) {
 		msg_to_char(ch, "You don't see that here.\r\n");
 	}
+	else if (room != IN_ROOM(ch)) {
+		msg_to_char(ch, "You can't do that here. Ruin it from the main room or entrance.\r\n");
+	}
 	else if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
 		msg_to_char(ch, "You can only ruin map buildings and vehicles.\r\n");
 	}
@@ -702,6 +738,12 @@ OLC_MODULE(mapedit_ruin) {
 			ruin_one_building(room);
 		}
 	}
+}
+
+
+OLC_MODULE(mapedit_spawn) {
+	msg_to_char(ch, "You trigger mob spawning in this room.\r\n");
+	spawn_one_room(IN_ROOM(ch), FALSE);
 }
 
 
@@ -822,7 +864,7 @@ OLC_MODULE(mapedit_naturalize) {
 				// already same -- but refresh crop type if applicable
 				if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA)) {
 					if (room || (room = real_room(map->vnum))) {
-						new_crop = get_potential_crop_for_location(room, NOTHING);
+						new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 						set_crop_type(room, new_crop ? new_crop : crop_table);
 					}
 				}
@@ -850,7 +892,7 @@ OLC_MODULE(mapedit_naturalize) {
 				
 				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
 					room = real_room(map->vnum);	// need it loaded after all
-					new_crop = get_potential_crop_for_location(room, NOTHING);
+					new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 					set_crop_type(room, new_crop ? new_crop : crop_table);
 				}
 				else {
@@ -888,7 +930,7 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// reset crop?
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA)) {
-			new_crop = get_potential_crop_for_location(IN_ROOM(ch), NOTHING);
+			new_crop = get_potential_crop_for_location(IN_ROOM(ch), NOTHING, NULL);
 			set_crop_type(IN_ROOM(ch), new_crop ? new_crop : crop_table);
 		}
 		
@@ -1026,5 +1068,17 @@ OLC_MODULE(mapedit_roomtype) {
 		attach_building_to_room(id, IN_ROOM(ch), TRUE);
 		msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_BLD_NAME(id)), GET_BLD_NAME(id));
 		complete_wtrigger(IN_ROOM(ch));
+	}
+}
+
+
+OLC_MODULE(mapedit_worldreset) {
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type '.map worldreset confirm' to do this. It will cause decay on the entire map.\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .map worldreset", GET_NAME(ch));
+		send_config_msg(ch, "ok_string");
+		annual_world_update();
 	}
 }

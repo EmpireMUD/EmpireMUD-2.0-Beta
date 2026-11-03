@@ -1,0 +1,250 @@
+#12817
+silent~
+4 0
+0 0 0 0
+S
+#12818
+rust stream~
+4 0
+0 0 0 0
+T5
+...it seems to be growing as streams of rust join its body!~
+S
+#12819
+armor all~
+4 0
+0 0 0 0
+T5
+...it's plated in bits of metal from the battlefield.~
+S
+#12820
+shield fling~
+4 0
+0 0 0 0
+T0
+You recover from that flung shield.~
+T2
+All you can see is stars!~
+T5
+...$e is stunned!~
+S
+#12821
+timely dodge~
+4 0
+0 0 0 0
+S
+#12822
+rain of rusted blades~
+4 0
+61 0 0 0
+T0
+Your wounds stop bleeding.~
+T2
+You're bleeding!~
+T5
+...$e's bleeding!~
+S
+#12827
+companion rebuild~
+3 0
+0 0 0 0
+T0
+Your companion has finished rebuilding.~
+S
+#12828
+reinforced~
+4 0
+0 0 0 0
+T5
+...it has reinforced itself with hardened shards.~
+S
+#12829
+shard pen~
+4 0
+0 0 0 0
+T0
+You escape the shard pen.~
+T4
+...$e is penned in by metal shards.~
+T5
+...$e's being slowed by the shard flurry.~
+S
+#12830
+shard flurry~
+4 0
+0 0 0 0
+T0
+You're free of the shard flurry.~
+T5
+...$e's being slowed by the shard flurry.~
+S
+#12831
+shard-pinned~
+4 0
+0 0 0 0
+T0
+You free yourself of the shards pinning you down.~
+T1
+$n frees $mself of the shards pinning $m down.~
+T5
+...$e is pinned down by jagged shards!~
+S
+#12832
+rebuilding~
+4 0
+0 0 0 0
+T5
+...it is rebuilding itself shard by shard!~
+S
+#12833
+companion abilities~
+3 0
+0 0 0 0
+T0
+&Y** Your companion is ready for another command! **&0~
+S
+#12834
+fractal spines~
+4 0
+0 0 0 0
+T4
+Its spines have a fractal pattern of tiny blades. (orders: actuate)~
+S
+#12835
+undisarmable~
+4 0
+0 0 0 0
+S
+#12836
+heavy-plated~
+4 0
+0 0 0 0
+T4
+It is covered in heavy plates for better defense.~
+S
+#12837
+magnetic field~
+4 0
+0 0 0 0
+T4
+It's generating a magnetic field. (orders: magnetize)~
+S
+#12838
+enhanced field~
+4 0
+0 0 0 0
+T4
+Its magnetic field has been enhanced with tremendous power.~
+S
+#12839
+resonance field~
+4 0
+0 0 0 0
+T0
+Your resonance field dissipates and your regeneration returns to normal.~
+T2
+You feel uplifted by the resonance!~
+S
+#12840
+magnetic deflection~
+4 0
+0 0 0 0
+T0
+Your magnetic deflection field ends.~
+T2
+The magnetic field seems to be deflecting attacks!~
+S
+#12841
+advanced defense~
+4 0
+0 0 0 0
+T4
+It is equipped with an advanced defense module. (orders: rebuild, reinforce, reproach, reset)~
+S
+#12842
+breached~
+4 0
+0 0 0 0
+T0
+You no longer feel breached and stop taking extra damage.~
+T5
+...$e has been breached and is taking more damage!~
+S
+#12843
+electromagnetic~
+4 0
+0 0 0 0
+T0
+You feel yourself slow back down.~
+T2
+The electromagnetic pulse speeds you up considerably!~
+T3
+...$e seems to speed up considerably!~
+S
+#12844
+waveguide~
+4 0
+0 0 0 0
+T0
+Your weapon is no longer guided as the waves of energy fade.~
+T2
+The waves of energy seem to guide your weapon!~
+S
+#12845
+shard-covered~
+4 0
+0 0 0 0
+T0
+The shards drop off of you and your damage returns to normal.~
+S
+#12857
+whirling sawblades~
+4 0
+61 0 0 0
+T0
+Your wounds stop bleeding.~
+T2
+You're bleeding!~
+T5
+...$e's bleeding!~
+S
+#12858
+hammer tremor~
+4 0
+0 0 0 0
+T0
+You recover from the tremor and dust yourself off.~
+T5
+...$e is stunned!~
+S
+#12859
+scalding vents~
+4 0
+12859 0 0 0
+T0
+Your steam burns begin to subside.~
+T2
+You're badly burned by the hot steam!~
+T5
+...$e's badly burned!~
+S
+#12891
+The Unrang Bell~
+3 0
+0 0 0 0
+S
+#12897
+piercing headache~
+4 0
+0 0 0 0
+T0
+Your head starts to recover.~
+T5
+...$e is stunned!~
+S
+#12898
+echo amplification~
+4 0
+0 0 0 0
+S
+$

@@ -1,3 +1,98 @@
+#12630
+cassava~
+A Shrubby Field of Cassava Plants~
+25 l ch
+0 100 0 100
+D0
+wwww~
+&G~
+D0
+w&t|&?ww~
+&G~
+D0
+ww&t|&?w~
+&G~
+D0
+wwww~
+&G~
+D0
+wwww~
+&G~
+D0
+wwww~
+&G~
+I 6 3048 100.00 25  # FORAGE: tasty weeds
+I 8 12630 20.00 1 H  # HARVEST: sack of cassava roots
+I 8 12630 20.00 2 H  # HARVEST: sack of cassava roots
+I 8 12630 20.00 3 H  # HARVEST: sack of cassava roots
+I 8 12630 20.00 4 H  # HARVEST: sack of cassava roots
+I 8 12630 20.00 5 H  # HARVEST: sack of cassava roots
+I 8 12631 25.00 1 S  # HARVEST: bundle of cassava stem cuttings
+I 8 12631 75.00 2 S  # HARVEST: bundle of cassava stem cuttings
+M
+12630 10.00 bh
+M
+12633 10.00 bg
+U
+0
+The woody stems sprout lush green bushes and the earth buckles as roots grow underneath!~
+X
+crop around plants cassava roots stems bushes shrubs field~
+   Tall stalks of cassava rise all around you. Their thin, woody stems are
+topped with clusters of broad, hand-shaped leaves. The plants stand in loose
+rows, each one rooted in mounded soil to give the heavy tubers room to grow.
+~
+S
+#12632
+unknown plants~
+A Crop of Unknown Plants~
+25 l c
+0 100 0 100
+D0
+iiii~
+&G~
+I 8 3048 100.00 1  # HARVEST: tasty weeds
+X
+info~
+This is a placeholder crop that should be replaced by a trigger before planting.
+~
+S
+#12633
+yams~
+Standing Amongst Rows of Yams~
+25 l ch
+0 100 0 100
+D0
+.&Gv&t|&Gv~
+&g~
+D0
+&Gv&t|&Gv&?.~
+&g~
+D0
+.&Gvvv~
+&g~
+D0
+&Gvvv&?.~
+&g~
+I 6 12634 100.00 25  # FORAGE: knobbly yam
+I 8 12633 20.00 2 H  # HARVEST: bundle of yams
+I 8 12633 20.00 3 H  # HARVEST: bundle of yams
+I 8 12633 20.00 4 H  # HARVEST: bundle of yams
+I 8 12633 20.00 5 H  # HARVEST: bundle of yams
+I 8 12633 20.00 6 H  # HARVEST: bundle of yams
+M
+12630 10.00 bh
+M
+12633 10.00 bg
+U
+0
+Leafy stalks burst from the ground full-grown!~
+X
+yams crop plants around leafy leaves stalks rows around field~
+   Broad-leaved yam vines sprawl in every direction. Heart-shaped leaves climb
+from low mounds of earth and twist across the rows.
+~
+S
 #12687
 cotton candy~
 A Cotton Candy Bush~
@@ -26,11 +121,7 @@ U
 Bits of sweet fluff take to the wind as the field bursts open with pink cotton!~
 X
 bush cotton candy plants bushes crop~
-   Your eyes widen at the sight of the fluffy pink clouds of cotton candy
-growing on this singular, enormous bush. You have seen few sights in this life
-that compare to this plant; surely it cannot be natural. The sweet smell that
-floats on the wind is enough to make you drool in anticipation -- you can
-almost taste the candy.
+This enormous bush is covered in fluffy pink clouds of cotton candy!
 ~
 S
 $

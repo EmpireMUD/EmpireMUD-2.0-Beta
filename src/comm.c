@@ -74,8 +74,10 @@ void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
+void clean_channel_histories();
 void clear_leftover_page_displays();
 void display_automessages();
+void expire_old_politics();
 void frequent_combat(unsigned long pulse);
 void process_import_evolutions();
 void process_imports();
@@ -92,7 +94,6 @@ void save_data_table(bool force);
 void update_actions();
 void update_empire_npc_data();
 void update_guard_towers();
-void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
 void write_book_library_file();
@@ -192,6 +193,25 @@ void add_slow_ip(char *ip) {
 	}
 	
 	detected_slow_ips[num_slow_ips++] = str_dup(ip);
+}
+
+
+/**
+* Clears command history, e.g. to remove password from command history.
+*
+* @param descriptor_data *d The descriptor whose history should be cleared.
+*/
+void clear_command_history(descriptor_data *d) {
+	int iter;
+	
+	if (d) {
+		for (iter = 0; iter < HISTORY_SIZE; ++iter) {
+			if (d->history[iter]) {
+				free(d->history[iter]);
+				d->history[iter] = NULL;
+			}
+		}
+	}
 }
 
 
@@ -721,6 +741,7 @@ void perform_reboot(void) {
 		system("fgrep \"OLC:\" syslog >> log/olc");
 		system("fgrep \"DIPL:\" syslog >> log/diplomacy");
 		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
+		system("fgrep \"EMPIRE:\" syslog >> log/empires");
 		system("cp syslog log/syslog.old");
 		system("echo 'Rebooting EmpireMUD...' > syslog");
 		
@@ -895,7 +916,7 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 	
 	// odd timing to avoid lining up with other ticks
-	if (HEARTBEAT(119)) {
+	if (HEARTBEAT(61)) {
 		update_empire_npc_data();
 		HEARTBEAT_LOG("14")
 	}
@@ -931,6 +952,8 @@ void heartbeat(unsigned long heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
 		HEARTBEAT_LOG("22")
+		clean_channel_histories();
+		HEARTBEAT_LOG("22.1")
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
@@ -971,8 +994,8 @@ void heartbeat(unsigned long heart_pulse) {
 			write_running_events_file();
 			HEARTBEAT_LOG("28")
 		}
-		save_marked_empires();
-		HEARTBEAT_LOG("29")
+		// formerly: save_marked_empires, now part of run_delayed_refresh
+		// HEARTBEAT_LOG("29")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
@@ -981,6 +1004,11 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		update_instance_world_size();
 		HEARTBEAT_LOG("31")
+	}
+	
+	if (HEARTBEAT(SECS_PER_REAL_WEEK)) {
+		expire_old_politics();
+		HEARTBEAT_LOG("31.5")
 	}
 	
 	// check if we've been asked to import new evolutions
@@ -1244,7 +1272,7 @@ void send_to_all(const char *messg, ...) {
 
 /* higher-level communication: the act() function */
 void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags) {
-	const char *i = NULL;
+	const char *i = NULL, *start = orig;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL, temp[MAX_STRING_LENGTH];
 	bool real_ch = FALSE, real_vict = FALSE;
 	char_data *dg_victim = NULL;
@@ -1262,7 +1290,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 	
 	// check fight messages (may exit early)
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_BUFF)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_BUFF) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		if (!show && vict_obj && to == vict_obj) {
 			any = TRUE;
@@ -1285,7 +1313,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_AFFECT)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_AFFECT) && !IAF(ACT_DIE)) {
 		// aff flags in combat
 		show = any = FALSE;
 		if (!show && to == ch) {
@@ -1308,7 +1336,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_ABILITY)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_ABILITY) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1343,7 +1371,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1374,7 +1402,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && ch != vict_obj && IAF(ACT_COMBAT_HIT | ACT_COMBAT_MISS)) {
+	if (!IS_NPC(to) && ch != vict_obj && IAF(ACT_COMBAT_HIT | ACT_COMBAT_MISS) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		// hits
 		if (IAF(ACT_COMBAT_HIT)) {
@@ -1411,7 +1439,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			}
 		}
 		// misses
-		if (IAF(ACT_COMBAT_MISS)) {
+		if (IAF(ACT_COMBAT_MISS) && !IAF(ACT_DIE)) {
 			if (!show && to == ch && !vict_obj) {
 				any = TRUE;	// hitting self with no vict-obj
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);
@@ -1462,7 +1490,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'N': {
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $N with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $N with a non-mob vict_obj flag: %s", start);
 					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, FALSE));
 					dg_victim = (char_data*) vict_obj;
@@ -1475,7 +1503,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'O': {
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $O with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $O with a non-mob vict_obj flag: %s", start);
 					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
@@ -1494,7 +1522,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'K': {	// loyalty/empire adjective of $N
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $K with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $K with a non-mob vict_obj flag: %s", start);
 					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
@@ -1518,7 +1546,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'L': {	// loyalty/empire name of $N
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $L with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $L with a non-mob vict_obj flag: %s", start);
 					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
@@ -1536,7 +1564,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'M': {
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $M with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $M with a non-mob vict_obj flag: %s", start);
 					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HMHR((char_data*) vict_obj) : HMHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
@@ -1548,7 +1576,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'S': {
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $S with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $S with a non-mob vict_obj flag: %s", start);
 					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HSHR((char_data*) vict_obj) : HSHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
@@ -1560,7 +1588,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'E': {
 					if (IAF(ACT_NON_MOB_VICT)) {
-						log("SYSERR: Using $E with a non-mob vict_obj flag: %s", orig);
+						log("SYSERR: Using $E with a non-mob vict_obj flag: %s", start);
 					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HSSH((char_data*) vict_obj) : HSSH((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
@@ -1568,14 +1596,14 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'p': {
 					if (IAF(ACT_NON_OBJ_OBJ)) {
-						log("SYSERR: Using $p with a non-obj obj flag: %s", orig);
+						log("SYSERR: Using $p with a non-obj obj flag: %s", start);
 					}
 					CHECK_NULL(obj, OBJS((obj_data*)obj, (char_data*)to));
 					break;
 				}
 				case 'P': {
 					if (!IAF(ACT_OBJ_VICT)) {
-						log("SYSERR: Using $P without ACT_OBJ_VICT: %s", orig);
+						log("SYSERR: Using $P without ACT_OBJ_VICT: %s", start);
 					}
 					CHECK_NULL(vict_obj, OBJS((obj_data*) vict_obj, (char_data*)to));
 					dg_target = (obj_data*) vict_obj;
@@ -1583,14 +1611,14 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'a': {
 					if (IAF(ACT_NON_OBJ_OBJ)) {
-						log("SYSERR: Using $a with a non-obj obj flag: %s", orig);
+						log("SYSERR: Using $a with a non-obj obj flag: %s", start);
 					}
 					CHECK_NULL(obj, SANA((obj_data*)obj));
 					break;
 				}
 				case 'A': {
 					if (!IAF(ACT_OBJ_VICT)) {
-						log("SYSERR: Using $A without ACT_OBJ_VICT: %s", orig);
+						log("SYSERR: Using $A without ACT_OBJ_VICT: %s", start);
 					}
 					CHECK_NULL(vict_obj, SANA((const obj_data*) vict_obj));
 					dg_target = (obj_data*) vict_obj;
@@ -1598,7 +1626,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'T': {
 					if (!IAF(ACT_STR_VICT)) {
-						log("SYSERR: Using $T without ACT_STR_VICT: %s", orig);
+						log("SYSERR: Using $T without ACT_STR_VICT: %s", start);
 					}
 					CHECK_NULL(vict_obj, (const char *) vict_obj);
 					dg_arg = (char *) vict_obj;
@@ -1606,7 +1634,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 't': {
 					if (!IAF(ACT_STR_OBJ)) {
-						log("SYSERR: Using $t without ACT_STR_OBJ: %s", orig);
+						log("SYSERR: Using $t without ACT_STR_OBJ: %s", start);
 					}
 					CHECK_NULL(obj, (const char *) obj);
 					dg_arg = (char *) obj;
@@ -1614,28 +1642,28 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'F': {
 					if (!IAF(ACT_STR_VICT)) {
-						log("SYSERR: Using $F without ACT_STR_VICT: %s", orig);
+						log("SYSERR: Using $F without ACT_STR_VICT: %s", start);
 					}
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
 				}
 				case 'f': {
 					if (!IAF(ACT_STR_OBJ)) {
-						log("SYSERR: Using $f without ACT_STR_OBJ: %s", orig);
+						log("SYSERR: Using $f without ACT_STR_OBJ: %s", start);
 					}
 					CHECK_NULL(obj, fname((const char *) obj));
 					break;
 				}
 				case 'v': {	// $v: vehicle
 					if (!IAF(ACT_VEH_OBJ)) {
-						log("SYSERR: Using $v without ACT_VEH_OBJ: %s", orig);
+						log("SYSERR: Using $v without ACT_VEH_OBJ: %s", start);
 					}
 					CHECK_NULL(obj, get_vehicle_short_desc((vehicle_data*)obj, (char_data*)to));
 					break;
 				}
 				case 'V': {	// $V: vehicle
 					if (!IAF(ACT_VEH_VICT)) {
-						log("SYSERR: Using $V without ACT_VEH_VICT: %s", orig);
+						log("SYSERR: Using $V without ACT_VEH_VICT: %s", start);
 					}
 					CHECK_NULL(vict_obj, get_vehicle_short_desc((vehicle_data*)vict_obj, (char_data*)to));
 					break;
@@ -1646,8 +1674,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				default: {
 					if (!IAF(TO_IGNORE_BAD_CODE)) {
-						log("SYSERR: Illegal $-code to act(): %c", *orig);
-						log("SYSERR: %s", orig);
+						log("SYSERR: Illegal $-code to act(): $%c: %s", *orig, start);
 						i = "";
 					}
 					else {
@@ -1981,7 +2008,7 @@ void free_descriptor(descriptor_data *desc) {
 	if (desc->showstr_head) {
 		free(desc->showstr_head);
 	}
-	if (desc->showstr_count) {
+	if (desc->showstr_count && desc->showstr_vector) {
 		free(desc->showstr_vector);
 	}
 	if (desc->backstr) {
@@ -2500,7 +2527,7 @@ int new_descriptor(int s) {
 	/* determine if the site is banned */
 	if (isbanned(newd->host) == BAN_ALL) {
 		CLOSE_SOCKET(desc);
-		syslog(SYS_LOGIN, 0, FALSE, "Connection attempt denied from [%s]", newd->host);
+		syslog(SYS_BANS, 0, FALSE, "Connection attempt denied from [%s]", newd->host);
 		free(newd);
 		return (0);
 	}
@@ -2848,6 +2875,7 @@ int process_input(descriptor_data *t) {
 			}
 		}
 		else if (*input == '!' && *(input + 1)) {
+			bool replaced = FALSE;
 			char *commandln = (input + 1);
 			int cnt;
 
@@ -2879,6 +2907,7 @@ int process_input(descriptor_data *t) {
 							t->history_pos = 0;		// Wrap to top
 						}
 					}
+					replaced = TRUE;
 					break;	// done
 				}
 				
@@ -2889,6 +2918,16 @@ int process_input(descriptor_data *t) {
 				else if (cnt == 0) {
 					cnt = HISTORY_SIZE;		// loop back around
 				}
+			}
+			
+			if (!replaced) {
+				// no match
+				if (*commandln) {
+					SEND_TO_Q("'", t);
+					SEND_TO_Q(commandln, t);
+					SEND_TO_Q("' not found in command history.\r\n", t);
+				}
+				strcpy(input, "");
 			}
 		}
 		else if (*input == '^') {
@@ -2906,6 +2945,13 @@ int process_input(descriptor_data *t) {
 			if (*input == '+') {	// add to head of queue
 				add_to_head = TRUE;
 				++input;
+				
+				// remove leading ! to prevent players starting commands with ! (which interferes with other systems)
+				if (strchr(input, '!')) {
+					while (*input == '!' || *input == ' ') {
+						++input;
+					}
+				}
 			}
 			
 			strncpy(t->last_input, input, sizeof(t->last_input)-1);
@@ -3522,6 +3568,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
 							strcat(i, "\tcO");
 						}
+						if (!NOHASSLE(ch)) {
+							strcat(i, "\tVH");
+						}
 					}
 					
 					if (!*i) {
@@ -3549,6 +3598,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						}
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
 							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+						}
+						if (!NOHASSLE(ch)) {
+							sprintf(i + strlen(i), "%shassle", (*i ? " " : ""));
 						}
 					}
 					
@@ -3581,7 +3633,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 'f': {	// %f enemy's focus (tank): health percent
 					if (FIGHTING(ch) && (vict = FIGHTING(FIGHTING(ch))) && vict != ch) {
-						sprintf(i, "%s %d%%", (IS_NPC(vict) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
+						sprintf(i, "%s %d%%", ((IS_NPC(vict) || !CAN_RECOGNIZE(ch, vict)) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
 					}
 					else {
 						*i = '\0';
@@ -3591,8 +3643,13 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				
 				}
 				case 'F': {	// %f enemy's focus (tank): health total
-					if (FIGHTING(ch) && (vict = FIGHTING(FIGHTING(ch))) && !IS_NPC(vict) && vict != ch) {
-						sprintf(i, "%s %d/%d", (IS_NPC(vict) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict), GET_MAX_HEALTH(vict));
+					if (FIGHTING(ch) && (vict = FIGHTING(FIGHTING(ch))) && vict != ch) {
+						if (IS_NPC(vict)) {
+							sprintf(i, "%s %d%%", PERS(vict, vict, FALSE), GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
+						}
+						else {
+							sprintf(i, "%s %d/%d", (!CAN_RECOGNIZE(ch, vict) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict), GET_MAX_HEALTH(vict));
+						}
 					}
 					else {
 						*i = '\0';
@@ -3776,34 +3833,43 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case '_':
+				case '_': {
 					tmp = "\r\n";
 					break;
-				case '%':
-					*(cp++) = '%';
-					str++;
-					continue;
-					break;
-				default :
-					*(cp++) = '%';
-					str++;
-					continue;
+				}
+				case '%': {
+					tmp = "%";
 					break;
 				}
+				default : {
+					tmp = "%";
+					break;
+				}
+			}
 
-			while ((*cp = *(tmp++))) {
+			while ((cp - pbuf) < sizeof(pbuf) && (*cp = *(tmp++))) {
 				cp++;
 			}
-			str++;
+			++str;
 		}
 		else if (!(*(cp++) = *(str++))) {
 			break;
 		}
 	}
-
-	*cp = '\0';
-
-	strcat(pbuf, "\t0");
+	
+	// guarantee string terminator
+	if ((cp - pbuf) < sizeof(pbuf)) {
+		*cp = '\0';
+	}
+	else {
+		pbuf[sizeof(pbuf)-1] = '\0';
+	}
+	
+	// append color terminator if possible
+	if (strlen(pbuf) + 2 < sizeof(pbuf)) {
+		strcat(pbuf, "\t0");
+	}
+	
 	return (pbuf);
 }
 
@@ -4279,7 +4345,7 @@ int main(int argc, char **argv) {
 					   "  -d <directory> Specify library directory (defaults to 'lib').\n"
 					   "  -h             Print this command line argument help.\n"
 					   "  -o <file>      Write log to <file> instead of stderr.\n"
-					   "  -q             Quick boot (doesn't auto-delete players)\n"
+					   "  -q             Quick boot (doesn't auto-delete players or empires)\n"
 					   "  -r             Restrict MUD -- no new players allowed.\n",
 					argv[0]);
 				exit(0);

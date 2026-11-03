@@ -41,7 +41,7 @@ demon grinchy tall green~
 a grinchy demon~
 A tall, green grinchy demon sneaks about.
 ~
-0 400 bdhoK cG 4
+0 425 bdhoK cG 4
 1 0 9 7 -1 -1
 D
    This demon is a furry green cave-dweller who absolutely hates Christmas.
@@ -70,7 +70,7 @@ dog max reindeer~
 Max the reindeer dog~
 A dog is here, dressed as a reindeer.
 ~
-50 400 bdhjoDK qG 3
+50 425 bdhjoDK qG 3
 1 0 0 9 -1 -1
 D
    Someone has attached a single fake antler to this little brown dog, and
@@ -144,6 +144,7 @@ T 16637
 T 16639
 T 16642
 T 16648
+T 9903
 S
 #16636
 dog~
@@ -162,6 +163,7 @@ T 16637
 T 16639
 T 16642
 T 16648
+T 9903
 S
 #16637
 dog heroic~
@@ -179,6 +181,7 @@ T 16638
 T 16637
 T 16642
 T 16648
+T 9903
 S
 #16638
 kitten~
@@ -197,6 +200,7 @@ T 16637
 T 16639
 T 16642
 T 16648
+T 9903
 S
 #16639
 cat~
@@ -215,6 +219,7 @@ T 16637
 T 16639
 T 16642
 T 16648
+T 9903
 S
 #16640
 cat heroic~
@@ -232,6 +237,7 @@ T 16638
 T 16637
 T 16642
 T 16648
+T 9903
 S
 #16643
 goat straw~
@@ -303,7 +309,7 @@ a red-nosed reindeer~
 A red-nosed reindeer flies overhead!
 ~
 30 70 dej m 4
-0 0 2 27 -1 -1
+0 0 2 40 -1 -1
 D
    This reindeer has a shiny nose. Now that you can see it, you would even say
 it glows!
@@ -756,6 +762,65 @@ M
 $n cuddles up against you.~
 T 16672
 S
+#16672
+goblin lumpy sweater~
+a goblin in a lumpy sweater~
+A goblin in a lumpy sweater is here.
+~
+1 1 bdoD n 2
+0 0 11 4 -1 -1
+D
+   The goblin looks no worse for the wear, though that sweater is both far too
+large for him, and also horribly made. This is the goblin who's going to win
+the ugly sweater contest. But he seems to wear it proudly, showing it off to
+all who pass by. At least, when he's not picking at the threads.
+~
+M
+6
+A goblin in a lumpy sweater is picking at a loose thread.~
+M
+6
+A goblin in a lumpy is sweater here, somewhere between cozy and annoyed.~
+M
+6
+A goblin is waddling around in a lumpy sweater.~
+M
+6
+A goblin in a lumpy sweater is scratching himself nearby.~
+M
+6
+A goblin in a lumpy sweater is chewing on his sleeve.~
+M
+6
+A goblin in a lumpy sweater beams proudly before you.~
+M
+6
+A goblin in a lumpy sweater is fighting with a piece of yarn.~
+M
+6
+A goblin in a lumpy sweater swishes as he waddles in circles.~
+M
+6
+A goblin in a lumpy sweater is twirling around, showing off.~
+M
+6
+A goblin is unraveling his lumpy sweater nearby.~
+M
+15
+A goblin in a lumpy sweater is struggling to stay afloat.~
+M
+15
+A goblin in a lumpy sweater is trying to dog-paddle nearby.~
+M
+15
+A goblin in a lumpy sweater is clinging desperately to a plank.~
+M
+15
+A goblin in a lumpy sweater is flailing to keep up.~
+M
+15
+A goblin in a lumpy sweater is floating on his back. ~
+S
 #16675
 #n~
 #n~
@@ -834,8 +899,8 @@ krampus demon~
 the Krampus demon~
 The Krampus demon stands on mismatched legs, brandishing a switch.
 ~
-25 400 bdoK cqEG 3
-1 0 14 27 -1 -1
+25 425 bdoK cqEG 3
+1 0 14 42 -1 -1
 D
    This demonic figure is half goat and half human, with the division down the
 center of his body. One side sports a hoof at the end of his leg, and the other
@@ -858,6 +923,43 @@ T 9604
 T 16684
 T 16621
 S
+#16681
+automaton wicked little~
+a wicked little automaton~
+A wicked little automaton runs around festively.
+~
+1 1 bdoD n 1
+1 0 11 15 -1 -1
+D
+   This little clockwork man is running around dressed as Santa Claus, with his
+red suit and white fur trim. His eyes fume with red smoke, mixing a sinister
+demeanor with his festive holiday clothes.
+~
+M
+1
+Ho, ho, ho! Time to get jolly on your naughty butts!~
+M
+1
+I'm going to shove coal so far up your stocking you'll be coughing up diamonds!~
+M
+1
+I perform over fifty mega-checks per second, and you're naughty!~
+M
+1
+The scammers cheated me out of my naughty list to use it for teleport-marketing. Can you imagine the harm they could do with that? I wanted to do that harm!~
+M
+1
+Season's greetings! Hold still next year so I don't miss.~
+M
+0
+$n mutters a sinister 'ho, ho, ho' as $e plots.~
+M
+0
+$n whirs and smokes.~
+M
+0
+$n's gears tick loudly... and ominously.~
+S
 #16682
 mobile new~
 snow mother~
@@ -873,6 +975,48 @@ A new mobile is standing here.
 ~
 0 0 d 0 3
 0 0 0 15 -1 -1
+S
+#16684
+Charlie-in-the-box box~
+a Charlie-in-the-box~
+A Charlie-in-the-box is bobbling around.
+~
+1 1 bdoD n 1
+1 0 15 15 -1 -1
+D
+   It's a violet wooden box with a handle on the side. The lid is open, with a
+long-bodied Christmas clown bobbling out the top. He wears a white costume with
+a many-colored diamond pattern, large white poms on the front, and a red Santa
+hat. His fat cheeks are permanently rosy, but his permanent scowl prevents any
+sense of mirth.
+~
+M
+1
+I am the official sentry.~
+M
+1
+We're all broken or smashed in some way.~
+M
+1
+Why am I such a misfit?~
+M
+1
+I'm not just a nitwit.~
+M
+1
+No child wants to play with a Charlie-in-the-box.~
+M
+1
+Have you seen King Moonracer?~
+M
+0
+$n hops around.~
+M
+0
+$n watches you sternly.~
+M
+0
+$n ducks into $s box and then pops out.~
 S
 #16685
 goat straw burning~
@@ -907,6 +1051,62 @@ The burning straw goat stops, drops, and rolls.~
 M
 0
 The burning straw goat catches an ember on its tongue.~
+S
+#16688
+santa clockwork demonic~
+the Clockwork Santa~
+A demonic Clockwork Santa takes aim with his toy blaster!
+~
+25 425 bdoK cqEG 3
+1 0 0 16688 -1 -1
+D
+   Though he has the mirthy belly, white beard, and fuming red outfit of Santa
+Claus, this clockwork automaton is no jolly old elf. His red eyes and sharp
+clockwork teeth reveal his true motive: destruction!
+~
+I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
+I 4 16670 13.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 13.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 13.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 13.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 13.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16681 4.00 1 l  # LOOT: wicked little automaton minipet whistle
+I 4 16684 4.00 1 l  # LOOT: Charlie-in-the-box minipet
+M
+11
+!naughty !merry !tinsel !jingleshock~
+M
+1
+Ho, ho, ho! Time to get jolly on your naughty butts!~
+M
+1
+I'm going to shove coal so far up your stocking you'll be coughing up diamonds!~
+M
+1
+I perform over fifty mega-checks per second, and you're naughty!~
+M
+1
+The scammers cheated me out of my naughty list to use it for teleport-marketing. Can you imagine the harm they could do with that? I wanted to do that harm!~
+M
+1
+Season's greetings! Hold still next year so I don't miss.~
+M
+0
+$n mutters a sinister 'ho, ho, ho' as $e plots.~
+M
+0
+$n whirs and smokes.~
+M
+0
+$n's gears tick loudly... and ominously.~
+T 16603
+T 16621
+T 16688
+T 9600
+T 9601
+T 9604
+T 9609
 S
 #16698
 raven enchanted~

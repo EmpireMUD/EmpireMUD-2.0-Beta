@@ -1484,6 +1484,7 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
+	trig_data *trig, *next_trig;
 	event_data *ev, *next_ev;
 	int found;
 	bool any;
@@ -1545,6 +1546,14 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_EVENT, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -2269,6 +2278,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
+	trig_data *trig, *next_trig;
 	event_data *ev, *next_ev;
 	descriptor_data *desc;
 	char_data *chiter;
@@ -2373,6 +2383,16 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_EVENT, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to event [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_EVENT(desc)) {
@@ -2417,6 +2437,12 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "An event required by the social you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_EVENT, vnum);
+			if (found) {
+				msg_to_desc(desc, "Event [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 	}
@@ -2555,6 +2581,71 @@ event_data *setup_olc_event(event_data *input) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
+
+/**
+* Log active events to the player on login.
+*
+* @param char_data *ch The player.
+*/
+void log_active_events_to_char(char_data *ch) {
+	char point_str[256], rank_str[256], when_str[256];
+	double math;
+	int rank, when;
+	struct event_running_data *running;
+	struct player_event_data *ped;
+	
+	LL_FOREACH(running_events, running) {
+		if (!running->event) {
+			continue;
+		}
+		if (running->status != EVTS_RUNNING) {
+			continue;
+		}
+		
+		// point count?
+		if ((ped = get_event_data(ch, running->id))) {
+			// determine cap and point amount
+			if (EVT_MAX_POINTS(running->event) > 0) {
+				safe_snprintf(point_str, sizeof(point_str), "%d/%d point%s", ped->points, EVT_MAX_POINTS(running->event), PLURAL(ped->points));
+			}
+			else {
+				safe_snprintf(point_str, sizeof(point_str), "%d point%s", ped->points, PLURAL(ped->points));
+			}
+			
+			if ((rank = get_event_rank(ch, running)) > 0) {
+				safe_snprintf(rank_str, sizeof(rank_str), "rank %d", rank);
+			}
+			else {
+				safe_snprintf(rank_str, sizeof(rank_str), "unranked");
+			}
+		}
+		else {
+			safe_snprintf(point_str, sizeof(point_str), "not played");
+			safe_snprintf(rank_str, sizeof(rank_str), "unranked");
+		}
+		
+		// ends when?
+		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
+		if (when >= SECS_PER_REAL_DAY) {
+			math = round((double) when / SECS_PER_REAL_DAY);
+			safe_snprintf(when_str, sizeof(when_str), "%d day%s", (int)math, PLURAL((int)math));
+		}
+		else if (when >= SECS_PER_REAL_HOUR) {
+			math = round((double) when / SECS_PER_REAL_HOUR);
+			safe_snprintf(when_str, sizeof(when_str), "%d hour%s", (int)math, PLURAL((int)math));
+		}
+		else if (when >= SECS_PER_REAL_MIN) {
+			math = round((double) when / SECS_PER_REAL_MIN);
+			safe_snprintf(when_str, sizeof(when_str), "%d minute%s", (int)math, PLURAL((int)math));
+		}
+		else {
+			safe_snprintf(when_str, sizeof(when_str), "%d second%s", when, PLURAL(when));
+		}
+		
+		msg_to_char(ch, "\tt[ Event: %s is running for %s: %s, %s ]\t0\r\n", EVT_NAME(running->event), when_str, point_str, rank_str);
+	}
+}
+
 
 /**
 * Displays a set of event rewards.
@@ -2847,7 +2938,7 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 		}
 		
 		index = find_player_index_by_idnum(lb->id);
-		build_page_display(ch, "%s. %s (%d)", part, index ? index->fullname : "???", lb->points);
+		build_page_display(ch, "%s%s. %s (%d)%s", (lb->id == GET_IDNUM(ch) ? "\tc" : ""), part, index ? index->fullname : "???", lb->points, (lb->id == GET_IDNUM(ch) ? " (you)\t0" : ""));
 	}
 	
 	if (!re->player_leaderboard) {

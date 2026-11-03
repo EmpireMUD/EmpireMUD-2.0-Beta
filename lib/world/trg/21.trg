@@ -1,6 +1,7 @@
 #2100
 Start Chop Tutorial~
-2 u 0
+2 u 0 1
+L t 919
 ~
 * start axe tutorial
 if !%actor.completed_quest(919)% && !%actor.on_quest(919)%
@@ -9,7 +10,8 @@ end
 ~
 #2149
 Guard whistle~
-1 c 2
+1 c 2 1
+L w 2029
 use~
 * 'use' summons several guards based on charisma; vnum is val 0 on the obj
 if %actor.obj_target(%arg%)% != %self%

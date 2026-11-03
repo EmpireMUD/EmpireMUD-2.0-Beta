@@ -9,6 +9,48 @@ M 0 12602 100.00 1
 M 0 12603 100.00 1
 M 0 12604 100.00 1
 S
+#12625
+A Green Pit~
+   The air is damp and heavy with a sour, resinous stench. You're suspended
+waist-dep in a cold, syrupy fluid that clings to your legs as you try to move.
+Your splashes are muffled as the liquid and the green walls swallow every
+sound. Your skin tingles ever so slightly where the liquid touches it, and
+starts to turn red.
+~
+d 0 0 -1
+E
+pool liquid juice water down~
+   You're standing almost waist-deep in a pool of liquid. There's an acrid
+smell to it; something isn't right.
+~
+E
+walls curved~
+   The walls curve high around you in slick, glistening arcs of green. Each
+slope is ribbed with downward-pointing hairs, guiding anything that slips
+inside deeper toward the pool. Every attempt to climb the sides meets only the
+plant's treacherous sheen, leaving you to slide back down into the sweet pool
+of liquid at the bottom.
+~
+E
+nectar~
+   Beads of nectar form on the inside of the plant's great, curving wall.
+Occasionally, one drips into the pool below.
+~
+E
+hairs downward-facing~
+   Hair-like structures protrude from the inner walls of the plant. They're
+aimed downward, making any attempt at climbing them futile.
+~
+T 12625
+T 12640
+T 12638
+S
+#12626
+Strange Plant holding pen~
+This room is used to hold temporary objects used by the strange plant adventure.
+~
+cgi 0 0 -1
+S
 #12650
 A Portal in the Fog~
    You find yourself in a thick bank of fog which has nestled itself into an

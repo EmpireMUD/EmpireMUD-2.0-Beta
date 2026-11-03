@@ -100,9 +100,12 @@ A vibrantly colored portal draws light down from the sky!~
 rainbow. If you're new here, try using 'quest start' to begin the tutorial
 quests. You can enter the portal by typing 'enter soulstream'.
 ~
-8 B 0 0 0 4
+8 cB 0 0 0 6
 -1 0 0
 10 0
+M
+33
+You can type 'enter soulstream' to get into the tutorial area.~
 S
 #10851
 portal bright exit soulstream stream~
@@ -111,9 +114,12 @@ A bright portal leads back out into the world! (enter portal)~
    The portal whips and churns as it spills light in every color of the
 rainbow. Type 'enter portal' to leave the Soulstream and return to the world.
 ~
-8 B 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 10 0
+M
+33
+You can type 'enter portal' to get out of the soulstream and back into the world.~
 S
 #10852
 token spirit~
@@ -144,6 +150,9 @@ it to skin the corpses of animals. First wield or hold the knife, then type
 1 0
 C
 0 1
+M
+33
+You can use it to skin the corpses of animals. Type 'skin corpse' when holding the knife.~
 Q 10853
 S
 #10859
@@ -155,6 +164,32 @@ Type 'use bell' to summon a companion spirit!
 19 p a 0 0 5
 10859 0 0
 2 0
+S
+#10862
+object strange-looking looking~
+a strange-looking object~
+A strange-looking object is lying here.~
+   You turn the object over and over in your hands. You've seen one of these
+before, you just can't think of the name for it. Your trip through the
+Soulstream must have been disorienting, because the name for the item is just
+on the tip of your tongue, but you can't quite get to it.
+   Looking at items is a great way to learn about them, but it's not the only
+way. Next, try identifying the strange-looking object to learn more about its
+properties.
+   Type 'identify object' (or just 'ID object') to find out what it is.
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+C
+1 1
+I 28 100 30.00 1 i  # IDENTIFIES-TO: rock
+I 28 121 30.00 1 i  # IDENTIFIES-TO: sticks and leaves
+I 28 3374 10.00 1 i  # IDENTIFIES-TO: roast fruit on a stick
+I 28 102 20.00 1 i  # IDENTIFIES-TO: flint stone
+I 28 2005 10.00 1 i  # IDENTIFIES-TO: bonnet
+Q 10862
+T 10862
 S
 #10865
 omen good~

@@ -7,6 +7,31 @@ dragon token~
 T1
 dragon tokens~
 S
+#10905
+enraged~
+4 0
+0 0 0 0
+T5
+...$e is enraged!~
+S
+#10906
+rock to the head~
+4 0
+0 0 0 0
+T0
+You're no longer stunned by the rock to the head.~
+T5
+...$e is dazed.~
+S
+#10910
+pommel bash~
+4 0
+0 0 0 0
+T0
+You're no longer stunned by that pommel bash.~
+T5
+...$e looks stunned.~
+S
 #10950
 swamp dragon attack~
 3 0

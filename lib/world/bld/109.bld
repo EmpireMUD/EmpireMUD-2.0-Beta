@@ -14,7 +14,7 @@ S
 Butcher Tent~
 The Butcher Tent~
 &r{BB}~
-48 1 bgR 0
+48 1 bgzR 0
 0 0 0 -1
 C
 (functions as a stable with a cooking fire)~
@@ -94,7 +94,7 @@ S
 Butcher Tent~
 The Butcher Tent~
 &r{BB}~
-48 0 abgR 0
+48 0 abgzR 0
 0 0 0 -1
 C
 (functions as a stable with a cooking fire)~
@@ -271,7 +271,7 @@ S
 Fractured Tower~
 A Fractured Sorcery Tower~
 .&A||&?.~
-128 2 rR efm
+128 2 rzR efm
 4 1 0 -1
 C
 inventory, retrieve, store, study~

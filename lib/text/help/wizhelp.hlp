@@ -1,19 +1,13 @@
-"ACCESS LEVEL"
+"ACCESS LEVEL" "ACCESS LEVELS"
 
 Access levels determine what commands a player can use. This is mainly used for
-immortals. Here is a breakdown of the access levels:
+immortals. The number of levels is dynamic and can be configured by each
+EmpireMUD. You can view all the access levels with the 'levels' command.
 
- 1 - Mortal: players
- 2 - God: an unused system for advanced players
- 3 - Immortal: the base admin level
- 4 - Assistant
- 5 - Co-Implementor: can use virtually all commands and privileges
- 6 - Implementor: the top access level
+The lowest ranks do not have access to most admin commands; instead they can
+be granted specific commands by higher administrators.
 
-Immortals and Assistants don't have access to most of the admin commands.
-Instead, they can be given specific commands with the grant system.
-
-See also: GOD SYSTEM, GRANT
+See also: LEVELS COMMAND, GOD SYSTEM, GRANT
 #d
 ADVANCE
 
@@ -28,7 +22,7 @@ Don't confuse access levels with skill/gear levels.
 Example:
   > advance rasmussen 4
 
-See also: GRANT, SET
+See also: ACCESS LEVEL, GRANT, LEVELS COMMAND, SET
 #d
 APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL
 
@@ -150,7 +144,7 @@ specific skill, or "all". This command is grantable.
 
 See also: GRANT, SET
 #d
-CONFIG
+CONFIG CONFIGURE CONFIGURATIONS
 
 Usage:  config <type> [-v]
         config [type] <key> [value]
@@ -249,6 +243,25 @@ for entering the game, only if there are any notes to show.
 
 See also: GRANT
 #d
+ENDTHIEVERY "END THIEVERY"
+
+Usage:  endthievery [empire] [second empire]
+
+This command is used by immortals to cancel active thievery permits. This
+command is part of the 'empires' grant. It has 3 modes:
+
+> endthievery
+With no arguments, this just lists active thievery permits.
+
+> endthievery <empire>
+With one empire, it ends all thievery permits for that empire.
+
+> endthievery <empire> <second empire>
+With two arguments, it ends the thievery permit for the first empire against
+the second.
+
+See also: END WAR, GRANT
+#d
 ENDWAR "END WAR"
 
 Usage:  endwar [empire] [second empire]
@@ -265,13 +278,13 @@ With one empire, it ends all wars for that empire.
 > endwar <empire> <second empire>
 With two arguments, it ends the war between those two empires.
 
-See also: GRANT
+See also: END THIEVERY, GRANT
 #d
 EVOLVE EVOLVER EVOLUTIONS
 
 The 'evolve' utility is a separate program the EmpireMUD runs once per 30
 minutes to update the map. This is normally silent, but will result in logs if
-you run it manually ('util evolve') or if the evolver fails to run.
+you run it manually ('.map evolve') or if the evolver fails to run.
 
 If not all of the evolver's suggested changes could be made, the most likely
 reason is that the tile already changed on the mud (e.g. due to chopping) so
@@ -479,6 +492,57 @@ of inactivity. You can still idle out if you lose your link.
 
 See also: TOGGLE
 #d
+IMMORTAL IMMORTALS IMMORT IMM IMPLEMENTORS CO-IMPLEMENTORS ASSISTANTS 
+
+Immortals are the game's administration and staff. They are organized into
+several access levels. Implementors and co-implementors generally have access
+to all game commands, while assistants and the lowest immortals have a smaller
+number of commands. Additional commands can be bestowed upon them using the
+'grant' command.
+
+Immortal rules are available on the 'handbook' command.
+
+You can type 'wizhelp' to see a list of all immortal-level commands available
+to you.
+
+Basic immortal commands:
+ at - Perform a task as if you were elsewhere.
+ goto - Teleport yourself around.
+ last - See when a player was last online.
+ poofin/poofout - Change your goto messages.
+ show - Multi-purpose command with many options.
+ stat - See stats on something in-game.
+ vnum - Look up virtual numbers by name.
+ vstat - See stats on something by virtual number.
+ wiznet - Immortal channel (use ; as a shortcut).
+ wizhistory - Immortal channel history.
+
+Common grantable commands:
+ addnotes/editnotes - Update a player's notes.
+ advance - Increase a player's access level (not character level).
+ approve - Authorize a character to play the game.
+ automessage - Set recurring messages for players.
+ clearabilities - Reset ability purchases for a player.
+ force - Cause a mob or player to perform an action.
+ instance - Create and delete adventure instances.
+ load - Create a copy of an object, mob, or vehicle.
+ oset - Modify object properties.
+ purge - Destroy a mob, object in the room, or all contents in the room.
+ rescale - Change the level of a mob or object.
+ restore - Heal a player or mob.
+ set - Change stats on a player or mob.
+ snoop - Watch what a player is typing and seeing.
+
+Check out HELP IMMORTAL COMMANDS for more.
+
+Immortal empires are restricted from the following activities by default:
+  Stealth actions (config immortal_empire_restrict_stealth)
+  Import/export (config immortal_empire_restrict_trade)
+  War (config immortal_empire_restrict_war)
+  Diplomacy, joining mortal empires (config immortal_empire_restrictions)
+
+See also: ACCESS LEVEL, CONFIG, GRANT, SHOW, WIZHELP
+#d
 IMOTD
 
 Usage:  imotd
@@ -557,7 +621,7 @@ prompted to press any key to enter the game.
 
 See also: INVIS, VISIBLE, SET
 #d
-ISLAND "ISLAND COMMAND" CONTINENT
+ISLAND "ISLAND COMMAND" CONTINENT "ISLAND FLAGS"
 
 Usage:  island list [keywords]
         island rename <id> <name>
@@ -578,6 +642,7 @@ Island flags:
  &cALWAYS-DARK&0 - Outdoor tiles are dark even during the day
  &cALWAYS-DAY&0 - The sun is always up.
  &cALWAYS-NIGHT&0 - The sun is always down.
+ &c!ADVENTURES&0 - Island will not spawn adventures.
 
 See also: CHART, GRANT
 #d
@@ -595,6 +660,17 @@ Example:
 
 See also: STAT
 #d
+"LEVELS COMMAND" "LEVEL COMMAND"
+
+Usage:  levels
+
+The "levels" command shows you all of the access levels.
+
+For mortals, this command merely tells them EmpireMUD does not have the normal
+levels command they might expect from CircleMUD.
+
+See also: ACCESS LEVEL, SET
+#d
 LOAD
 
 Usage:  load <type> <virtual number>
@@ -603,11 +679,14 @@ LOAD is used to create instances of mobs, objects, and vehicles. The first
 argument specifies what type you are trying to load; the second is the virtual
 number. This command is grantable.
 
+To set the level of a loaded thing, use 'rescale'. To get rid of it, use
+'purge'.
+
 (For the mortal command, try LOAD VEHICLE.)
 
 You can load: mob, obj, vehicle, book
 
-Example:
+Examples:
 
   > load obj 1
   You create a bulletin board.
@@ -615,7 +694,37 @@ Example:
   > load mob 1
   You create a snarling wolf.
 
-See also: GRANT, VNUM
+See also: GRANT, PURGE, RESCALE, VNUM
+#d
+LORE "LORE COMMAND" "EDIT LORE" "LORE EDITOR"
+
+Usage:  lore <player>
+        lore <player> add <type> <text>
+        lore <player> delete <number>
+        lore <player> edit <number> <type | text> <new value>
+
+This command is used for viewing and editing lore entries for a player.
+
+This command is grantable.
+
+Lore types:
+ &cJOIN-EMPIRE&0 - First joins an empire.
+ &cDEFECT-EMPIRE&0 - Chose to leave an empire.
+ &cKICKED-EMPIRE&0 - Was kicked from an empire.
+ &cPLAYER-KILL&0 - Killed a player.
+ &cPLAYER-DEATH&0 - Died to a player.
+ &cTOWER-DEATH&0 - Died to a guard tower.
+ &cFOUND-EMPIRE&0 - Started an empire.
+ &cSTART-VAMPIRE&0 - Started the game as a vampire.
+ &cSIRE-VAMPIRE&0 - Became a vampire in-game.
+ &cPURIFY&0 - Lost vampire status from the purify spell.
+ &cCREATED&0 - Character creation (based on archetype).
+ &cMAKE-VAMPIRE&0 - Turned another person into a vampire.
+ &cPROMOTED&0 - Gained empire rank.
+
+To see the mortal version of this help file, see: MORTAL LORE
+
+See also: GRANT
 #d
 MISSINGHELP MISSINGHELPS "MISSING HELPS"
 
@@ -649,6 +758,10 @@ grantable.
 See also: FLAGS, GRANT
 #d
 NATURALIZE "NATURAL SECTOR"
+
+A 'natural sector' is the terrain type (sector) a tile had when the map was
+generated, or which was updated using the map editor. Neither player actions
+nor scripts can change a natural sector; it is a permanent record of the tile.
 
 'Naturalize' means return a map tile to its natural sector type. You can see
 what that is by using 'stat room' on the map. It shows a display like this:
@@ -715,12 +828,14 @@ You can change the following fields:
 Setting the keywords, longdescription, or shortdescription to "none" will
 restore its strings from the prototype (if one exists).
 
+To change the level of an item, use 'rescale'.
+
 Examples:
 
   > oset sword flag HARD-DROP
   > oset bread value 0 72
 
-See also: GRANT, OEDIT, OBJ VALUES
+See also: GRANT, OEDIT, OBJ VALUES, RESCALE
 #d
 PAGE
 
@@ -883,7 +998,7 @@ Examples:
   > purge sword
   > purge dragon
 
-See also: DC, GRANT
+See also: DC, GRANT, LOAD, RESCALE
 #d
 RANDOM
 
@@ -948,7 +1063,7 @@ maximum scale value.
 Caution: Rescaling an item will almost always cause it to be re-loaded and it
 will lose any enchantments or modifications.
 
-See also: GRANT
+See also: GRANT, LOAD, PURGE
 #d
 RESTORE
 
@@ -1075,7 +1190,7 @@ wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 
-See also: ACCESS LEVEL, GRANT, STAT
+See also: ACCESS LEVEL, GRANT, LEVELS COMMAND, STAT
 #d
 "SET COMPANION"
 
@@ -1168,6 +1283,7 @@ Mode         Level    Description
 &c author&0      Immort   All books from a given author idnum.
 &c bonusabilities&0  Imm  The bonus abilities a player has acquired.
 &c buildings&0   Immort   Locations of buildings (vnum/name optional).
+&c builtwith&0   Immort   Shows resources used to build or maintain a building.
 &c commons&0     Immort   Players currently connected from duplicate sites.
 &c companions&0  Immort   A player's available companions.
 &c components&0  Immort   All items matching a generic component vnum.
@@ -1189,6 +1305,7 @@ Mode         Level    Description
 &c learned&0     Immort   Learned recipes for a player.
 &c libraries&0   Immort   Where a book is shelved.
 &c lostbooks&0   Immort   Books that are not shelved in any libraries.
+&c lostmobs&0    Immort   Adventure mobs that lost their instance.
 &c minipets&0    Immort   Minipets collected by a player.
 &c moons&0       Immort   Moons and their current phases/positions.
 &c mounts&0      Immort   Mounts owned by a player.
@@ -1275,6 +1392,13 @@ Shows bonus abilities a player has acquired.
 
 See also: BONUS ABILITIES
 #e
+"SHOW BUILTWITH" "SHOW BUILT WITH"
+
+Uasge:  show builtwith [vehicle]
+
+Shows what the room you're in was built with or, if targeting a vehicle, it
+will show what that was built with.
+#e
 "SHOW COMPANIONS"
 
 Usage:  show companions <player> [search phrase]
@@ -1329,7 +1453,7 @@ Usage:  show dropped <empire>
 
 Shows the recorded counts of items on the ground in the empire. These items
 count towards the 'total' on the einventory command. You can refresh them
-with 'util rescan [empire].
+with 'eedit rescan [empire | all]'.
 
 See also: EINVENTORY
 #e
@@ -1437,6 +1561,23 @@ Shows you the recipes learned by a player or empire. For multi-word empire
 names, use "quotation marks".
 
 See also: SET LEARNED
+#e
+"SHOW LOSTMOBS" "SHOW LOST MOBS"
+
+Usage:  show lostmobs
+
+Finds adventure mobs that have slipped free of their instances.
+
+This specifically looks for mobs that:
+- have an instance ID
+- the ID does not correspond to an active instance
+
+This should be a rare case and usually these mobs can be safely purged.
+
+View a mob's instance information by using the 'stat' command on it; this
+section only appears if the mob has an instance ID.
+
+See also: PURGE, STAT
 #e
 "SHOW MINIPETS" "SHOW MINI-PETS"
 
@@ -1727,9 +1868,13 @@ indicate if they are the leader of any of those empires.
 "SHOW QUESTS"
 
 Usage:  show quests <player> [active | completed | quest name]
+        show quests <quest vnum>
 
 This option allows you to see what quests players are on, and their progress.
 If you don't specify an option, you will see their list of active quests.
+
+You can also use it to view all active players who are on a quest or have
+completed that quest.
 #e
 SHUTDOWN
 
@@ -1793,6 +1938,8 @@ argument is optional.
 STAT PLAYER will search only for players; useful for statting people with
 names such as Wolf or Dolph.
 
+STAT EMPIRE will show critical stats about an empire.
+
 STAT OBJECT will search only for objects.
 
 STAT VEHICLE will search only for vehicles.
@@ -1825,7 +1972,7 @@ Examples:
   > stat crop
   > stat building -d
 
-See also: VSTAT
+See also: RESCALE, VSTAT
 #d
 SWITCH
 
@@ -1863,6 +2010,7 @@ Available syslog types are:
   validation - the approve command
   empire - merges, diplomacy, and wars
   event - event beginning, end, and all point gains
+  bans - banning/unbanning and banned characters trying to connect
 
 See also: TOGGLE
 #d
@@ -1940,7 +2088,7 @@ The following switches are available:
 
 See also: DC, GRANT
 #d
-UTILITY
+UTILITY UTIL "UTILITY COMMAND"
 
 Usage:  utility <option> <arguments>
 
@@ -1953,9 +2101,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- &cevolve&0 - Triggers map evolutions (just like a normal cycle), see EVOLVER.
  &cexportcsv&0 - Output a csv file with some game data.
- &cislandsize&0 - Counts and displays tile counts for all islands.
  &cpathtest&0 - Test function for the pathfinding code.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
@@ -1963,15 +2109,12 @@ Available utilities:
     reports the results.
  &credoislands&0 - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
- &crescan <empire | all>&0 - Rereads territory and members, which can fix issues.
-    Also re-scans items on the ground (SHOW DROPPED).
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
  &ctemperature&0 - Gives a temperature breakdown of the room. You can also
     give it any sun status or season to simulate those here (e.g. spring dark).
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
- &cyearly&0 - Runs a full maintenance/decay/newbie reset on the world.
 #d
 "UTILITY BLDCONVERT" "UTIL BLDCONVERT" "UTILITY BLD CONVERT" "UTIL BLD CONVERT" "UTILITY BUILD CONVERT" "UTIL BUILD CONVERT" BLDCONVERT
 

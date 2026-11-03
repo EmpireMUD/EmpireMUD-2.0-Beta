@@ -30,8 +30,10 @@ earn their prized gear. You won't be able to fight each goblin until you pick
 a difficulty with the 'difficulty' command.
    The gear sold in the shops is the same as the gear created by the crafting
 patterns and the loot dropped by the goblins, but it will be BoE instead of BoP
-when crafted, can go as high as level 175, and may be crafted as superior. See
-HELP GOBLIN OUTPOST for craft info.
+when crafted, can go as high as level 175, and may be crafted as superior. Note
+that "list id" and "craft info" will show these items as BOP even though they
+are only BOP when they drop as loot.
+   See HELP GOBLIN OUTPOST for craft info.
 ~
 10450 10499 50-150
 30 120 kp 2

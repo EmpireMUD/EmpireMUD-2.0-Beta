@@ -79,15 +79,19 @@ DPS "DAMAGE PER SECOND"
 
 The term DPS means 'damage per second'. This is a way of comparing the total
 damage dealt by two people using different weapons and abilities. For example,
-a slow weapon with high damage might really being dealing the same amount
-overall as a fast weapon with low damage.
+a slow weapon with high damage might really be dealing the same amount overall
+as a fast weapon with low damage.
+
+When you 'identify' a weapon, the weapon's base damage is shown, followed by
+the base DPS for the weapon, which is determined by both the damage and speed.
+An attribute, such as Strength or Intelligence, is added to the DPS.
 
 DPS can also refer to the members of a group whose role is to deal damage, as
 opposed to tanking or healing.
 
 You can see your effective DPS using the 'meters' command.
 
-See also: MELEE DPS, CASTER DPS, METERS
+See also: MELEE DPS, CASTER DPS, METERS, IDENTIFY
 #
 HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 

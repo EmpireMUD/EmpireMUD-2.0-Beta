@@ -1,0 +1,48 @@
+#12200
+A Steep and Treacherous Pit~
+   The steep walls close around you, gouged from earth and stone by saw-toothed
+scales that leave deep grooves. Roots dangle overhead, providing the only
+hand-holds. The floor is hard-packed with chips of tree bark, splinters, and
+shed scales that glimmer like rubies and emeralds in the dim light.
+~
+cd 0 0 -1
+E
+roots~
+Frayed roots dangle from the walls where they've been shredded by the serragon.
+~
+E
+walls around up~
+   The earthen walls are deeply grooved, but they give way when you try to
+climb. Only the roots provide traction for you to escape.
+~
+E
+floor chips bark splinters~
+   The bits of wood on the floor might pose a hazard if they weren't so
+thoroughly trampled and packed.
+~
+E
+scales~
+   Shed scales the size of a small kite shield litter the floor. In this light,
+they gleam like gems.
+~
+E
+gems rubies emeralds ruby emerald~
+Though they glint like gems, the scales are just scales.
+~
+E
+trees~
+The tree canopy blocks most of the sky high above the pit.
+~
+M 0 12200 100.00 1
+T 12204
+S
+#12250
+The Elephant's Stomping Ground~
+This is a holding room where mobs are loaded for the stomping ground.
+~
+gi 0 0 12250
+M 0 12250 100.00 1
+M 0 12251 100.00 2
+M 0 12251 100.00 2
+S
+$

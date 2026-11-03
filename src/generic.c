@@ -572,6 +572,9 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 			if (multi_isname(find_keywords, GEN_NAME(gen))) {
 				any = TRUE;
 			}
+			else if (GEN_NOTES(gen) && multi_isname(find_keywords, GEN_NOTES(gen))) {
+				any = TRUE;
+			}
 			
 			for (iter = 0; iter < NUM_GENERIC_STRINGS && !any; ++iter) {
 				if (GEN_STRING(gen, iter) && multi_isname(find_keywords, GEN_STRING(gen, iter))) {
@@ -622,6 +625,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	int found;
 	bool any;
 	
@@ -815,6 +819,14 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_GENERIC, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		}
+	}
+	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
@@ -939,6 +951,9 @@ void free_generic(generic_data *gen) {
 	if (GEN_NAME(gen) && (!proto || GEN_NAME(gen) != GEN_NAME(proto))) {
 		free(GEN_NAME(gen));
 	}
+	if (GEN_NOTES(gen) && (!proto || GEN_NOTES(gen) != GEN_NOTES(proto))) {
+		free(GEN_NOTES(gen));
+	}
 	
 	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 		if (GEN_STRING(gen, iter) && (!proto || GEN_STRING(gen, iter) != GEN_STRING(proto, iter))) {
@@ -1032,6 +1047,11 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 					log(" - error in %s: invalid string pos T%d", error, int_in[0]);
 					free(ptr);
 				}
+				break;
+			}
+			
+			case '_': {	// notes
+				GEN_NOTES(gen) = fread_string(fl, error);
 				break;
 			}
 			
@@ -1191,7 +1211,7 @@ void write_generic_index(FILE *fl) {
 */
 void write_generic_to_file(FILE *fl, generic_data *gen) {
 	struct generic_relation *rel, *next_rel;
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!fl || !gen) {
@@ -1221,6 +1241,13 @@ void write_generic_to_file(FILE *fl, generic_data *gen) {
 		if (GEN_STRING(gen, iter) && *GEN_STRING(gen, iter)) {
 			fprintf(fl, "T%d\n%s~\n", iter, GEN_STRING(gen, iter));
 		}
+	}
+	
+	// '_'
+	if (GEN_NOTES(gen) && *GEN_NOTES(gen)) {
+		strcpy(temp, GEN_NOTES(gen));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1299,6 +1326,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	shop_data *shop, *next_shop;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	descriptor_data *desc;
 	generic_data *gen, *gen_iter, *next_gen;
 	char_data *chiter, *next_ch;
@@ -1625,6 +1653,16 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_GENERIC, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to generic [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(veh), res_type, vnum)) {
@@ -1788,6 +1826,12 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "A 'generic' required by the social you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_GENERIC, vnum);
+			if (found) {
+				msg_to_desc(desc, "Generic [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
+			}
+		}
 		if (GET_OLC_VEHICLE(desc)) {
 			if (remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(GET_OLC_VEHICLE(desc)), res_type, vnum)) {
 				msg_to_char(desc->character, "One of the resources used for maintenance for the vehicle you're editing was deleted.\r\n");
@@ -1834,6 +1878,9 @@ void save_olc_generic(descriptor_data *desc) {
 	if (GEN_NAME(proto)) {
 		free(GEN_NAME(proto));
 	}
+	if (GEN_NOTES(proto)) {
+		free(GEN_NOTES(proto));
+	}
 	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 		if (GEN_STRING(proto, iter)) {
 			free(GEN_STRING(proto, iter));
@@ -1857,6 +1904,10 @@ void save_olc_generic(descriptor_data *desc) {
 			free(GEN_STRING(gen, iter));
 			GEN_STRING(gen, iter) = NULL;
 		}
+	}
+	if (GEN_NOTES(gen) && !*GEN_NOTES(gen)) {
+		free(GEN_NOTES(gen));
+		GEN_NOTES(gen) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1905,6 +1956,7 @@ generic_data *setup_olc_generic(generic_data *input) {
 		
 		// copy things that are pointers
 		GEN_NAME(new) = GEN_NAME(input) ? str_dup(GEN_NAME(input)) : NULL;
+		GEN_NOTES(new) = GEN_NOTES(input) ? str_dup(GEN_NOTES(input)) : NULL;
 		for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 			GEN_STRING(new, iter) = GEN_STRING(input, iter) ? str_dup(GEN_STRING(input, iter)) : NULL;
 		}
@@ -2025,7 +2077,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_CURRENCY: {
 			build_page_display(ch, "Singular: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
 			build_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
-			build_page_display(ch, "Custom Origin: %s", GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(none)");
+			build_page_display(ch, "Custom Origin: %s", GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN) ? GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN) : "(none)");
 			break;
 		}
 		case GENERIC_COMPONENT: {
@@ -2046,6 +2098,10 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			// no known properties
 			break;
 		}
+	}
+	
+	if (GEN_NOTES(gen) && *GEN_NOTES(gen)) {
+		build_page_display(ch, "Notes:\r\n%s", GEN_NOTES(gen));
 	}
 
 	send_page_display(ch);
@@ -2134,6 +2190,8 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GEN_NOTES(gen)), NULLSAFE(GEN_NOTES(gen)));
 		
 	send_page_display(ch);
 }
@@ -2193,6 +2251,19 @@ OLC_MODULE(genedit_liquidflags) {
 OLC_MODULE(genedit_name) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
 	olc_process_string(ch, argument, "name", &GEN_NAME(gen));
+}
+
+
+OLC_MODULE(genedit_notes) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GEN_NAME(gen));
+		start_string_editor(ch->desc, buf, &GEN_NOTES(gen), MAX_NOTES, TRUE);
+	}
 }
 
 

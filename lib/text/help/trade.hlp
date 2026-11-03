@@ -26,6 +26,7 @@ See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
 Advanced Woodworking (Trade ability)
 
 With Advanced Woodworking you can craft:
+  wreath
   beehive*
   carriage*
   wagon*
@@ -41,6 +42,8 @@ Trade Synergy Ability: 100 Natural Magic
 
 You can find and learn recipes that require Alchemist Crafts, including some
 of the higher tiers of crafter items.
+
+See also: CRAFTER ITEMS
 #
 "ANIMAL HUSBANDRY"
 
@@ -59,6 +62,8 @@ Trade Synergy Ability: 100 Vampire
 
 This ability lets you make:
   guild-patterned cloth (weave; makes a crafter item)
+
+See also: CRAFTER ITEMS
 #
 ARCHITECT "ARCHITECT ABILITY"
 
@@ -124,11 +129,10 @@ Basic Crafts:
   candle
   rope, leather rope, cord rope
   shiv
-  canoe
-  raft
   bound wooden column
   saddle
   backstrap loom
+  glass ingot
   violet dye, orange dye
 
 This ability also allows you to:
@@ -141,16 +145,15 @@ This ability also allows you to:
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS, MILL, MASTER CRAFTSMAN
 #
-CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
+CART CARTS WAGON WAGONS CARRIAGE CARRIAGES CARAVANS "LAND VEHICLES"
 
-Carts and their more advanced cousins, carriages, caravans and wagons, are
-essentially large chests on wheels, allowing you to carry large piles of
-resources quickly from one place to another. They can also be ridden on and
-driven to move around without spending moves.
+Carts and their more advanced cousins (carriages, caravans, and wagons) are
+essentially large chests on wheels, allowing you to carry a pile of resources
+quickly from one place to another. You can also ride on them ("sit wagon") and
+"drive" them to move around without spending movement points.
 
-You can board caravans and carriages, and ride around inside them. Caravans can
-even have a few different rooms redesignated inside. You can also usually sit
-on/in a vehicle from the outside.
+You can also "board" caravans and carriages, and ride around inside them.
+Caravans can even have a few different rooms redesignated inside.
 
 Storage capacities (large items count twice):
 Cart: 200 items
@@ -158,7 +161,10 @@ Carriage: 200 items, 1 room inside
 Wagon: 400 items
 Caravan: 100 items: 2 rooms inside
 
-See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SIT
+Note: Most vehicles cannot enter portals. To move a large number of items
+between islands, build docks and use the "ship" command.
+
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SHIP, SIT
 #
 CHORES CHORE
 
@@ -391,7 +397,9 @@ See also: FORGE, WEAPONCRAFTING, IRON BLADES
 Exquisite Woodworking (Trade ability)
 
 With Exquisite Woodworking you can craft:
-  caravan*                        elegant handle
+  elegant handle
+  floral crown
+  caravan*
 
 * Crafts marked with an asterisk require the Carpenter building.
 
@@ -465,6 +473,7 @@ Forge (Trade ability)
 Building:  (FF)  Forge  (Build ability)
 Temperature:  warmer than outside
 Tool:  hammer
+Speed boosts:  superior tool, mastery ability
 Commands:  forge [number] <item>
            forge info <item>
            forge list <keywords>
@@ -704,6 +713,7 @@ You can make:
   conical hat
   furrowed sleeves
   apprentice shoes
+  mana-vested pocket
 
 Most magical attire requires the Mage Armor ability.
 
@@ -725,6 +735,7 @@ You can make:
   armbands of power
   earth-hewn sandals
   magewhisper pouch
+  magewhisper backpack
   snakeskin robe (cooling)
   white fur robe (warm)
 
@@ -784,16 +795,18 @@ See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
 #
 "MOONSTONE SMELTING" "MOONSTONE ORE" MOONSTONE "ARGENTINE INGOT" "EVENTIDE INGOT"
 
-Moonstone Smelting (goal)
 Command:  smelt <argentine | eventide> ingot
 
 The super-rare moonstone ore is highly prized by metallurgists, and can be
 smelted with imperium and nocturnium ingots to produce valuable argentine and
 eventide metals, respectively.
 
-These metals are generally used in crafts in the 200-300 level range.
+Learn to smelt these ingots at the legendary Celestial Forges (also requires
+the Forge ability).
 
-See also: RARE METALS, SMELT
+These metals are generally used in crafts in the 200-400 level range.
+
+See also: CELESTIAL FORGE, RARE METALS, SMELT
 #
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 
@@ -848,6 +861,8 @@ Primitive crafts:
   fire sticks  (for lighting torches and fires)
   grinding stones  (for milling)
   feather sewing kit  (for sewing)
+  canoe
+  raft
 
 This ability also allows you to:
   saw
@@ -887,8 +902,8 @@ command. You will find more rocks before a quarry depletes, compared to digging
 anywhere else.
 
 Building a quarry allows your workforce to produce rocks and flint with the
-"digging" chore and stone blocks with the "production" chore. Workforce won't
-dig for rocks anywhere except quarries (and sand pits).
+"production" chore and stone blocks with the "production" chore. Workforce
+won't dig for rocks anywhere except quarries (and sand pits).
 
 Quarries count as in-city territory when built in the outskirts (4x radius).
 
@@ -1014,7 +1029,7 @@ With basic Sewing, you can make:
   canteen -- holds drinks
   satchel -- increases carrying capacity
   tent -- a portable shelter
-  sail -- for shipbuilding
+  canvas sail -- for shipbuilding
 
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
@@ -1052,6 +1067,10 @@ Ships can be constructed via the manufacture command. This can only be done at
 a shipyard, and the vessel can be sailed to a dock when finished. You can also
 upgrade the shipyard, if your empire has this knowledge.
 
+Take note that some ships will require items from other abilities such as
+anchors (Forge), cannons (Deadly Weapons), and canvas sails (Sew). You can also
+import these components.
+
 You gain experience every time you add resources to a ship being manufactured.
 Shipyards cannot be painted.
 
@@ -1077,7 +1096,8 @@ Unlock more advanced ships through empire progression:
   Hulk (shipping, 1000 capacity)
 
 See also: CRAFT INFO, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
-   RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES, CRAFTING ABILITIES
+   RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES, CRAFTING ABILITIES, SEW,
+   DEADLY WEAPONS
 #
 SIEGEWORKS "SIEGE WORKS"
 
@@ -1098,6 +1118,8 @@ Trade Synergy Ability: 100 Stealth
 
 You can find and learn recipes that require Smuggler Crafts, including some
 of the higher tiers of crafter items.
+
+See also: CRAFTER ITEMS
 #
 "STEELSMITH CRAFTS"
 
@@ -1136,7 +1158,7 @@ TAN TANNING
 Tan (Basic Crafts ability)
 
 Usage:  tan <skin>
-Speed boosts:  Work ethic bonus
+Speed boosts:  Work ethic bonus, haste
 Stored in:  Tannery
 
 You can tan skins into leather. This process will go faster at a tannery. Both
@@ -1213,6 +1235,7 @@ This ability lets you craft items from wood, and lets you saw or scrape trees
 faster.
 
 With Woodworking you can craft:
+  bouquet
   flute
   shortbow
   lyre

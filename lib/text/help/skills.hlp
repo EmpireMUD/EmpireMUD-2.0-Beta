@@ -307,7 +307,9 @@ Usage:  lead [mount | vehicle]
 The lead command is used to move vehicles around. Once you are leading a
 vehicle, it will move with you until type "lead" again to stop. Some vehicles
 need you to harness animals to them before they can move. You can also lead
-any animal which is mountable.
+any animal that's mountable.
+
+Type 'lead' again to stop leading.
 
 Some vehicles can't be led. If you can't lead a mob, try 'herd' instead.
 
@@ -340,7 +342,7 @@ container to hold the milk. Cows can be milked once or twice per day.
 
 Milking requires the Animal Husbandry ability.
 
-See also: ANIMAL HUSBANDRY
+See also: ANIMAL HUSBANDRY, UNITS OF LIQUID
 #
 MILL MILLING
 
@@ -350,7 +352,7 @@ Building:  (MM)  Mill  (must be by a river; Build ability)
 Stored at the mill:  cornmeal, flour, salt
 Command:  mill [number] <item>
           mill info <item>
-Tool:  grinding  stone
+Tool:  grinding stone
 
 You can mill:
   wheat into flour
@@ -450,7 +452,7 @@ PLANT
 Plant (Cook ability)
 
 Usage:  plant [seed/food]
-Speed boosts:  Work ethic bonus, haste
+Speed boosts:  Work ethic bonus, haste, shovel
 
 You can replant crops in open fields so that they may regrow and be harvested
 again. This is essential in keeping your crops from dying out.
@@ -465,10 +467,11 @@ Be sure to claim your crops. Unclaimed crops decay over time.
 Crops must be planted on the following tiles:
 Temperate: plains
 Arid: desert
-Jungle: light jungle (partially chopped but not plains)
+Tropical: fertile soil
 
 Some crops can only be planted within 4 tiles of a fresh water source such as a
 river. You can irrigate any terrain, including deserts, by making canals.
+Irrigating deserts will allow them to grow crops from other climates.
 
 See also: CROPS, HARVEST, PICK, FARMING, WORKFORCE CHORES, IRRIGATION
 #
@@ -498,6 +501,12 @@ them.
 Typing ready by itself will list the things you know how to ready, along with
 their costs (if any).
 
+Note: If you're already using a weapon from any Ready Weapon-type ability when
+you ready another weapon in the same slot from any ability of this type, the
+new weapon is capped at the same level as the current readied weapon. If this
+results in the wrong weapon level, remove the other readied weapon before
+readying a new one.
+
 See also:
   READY FIREBALL  (Natural Magic)
   READY BLOOD WEAPONS  (Vampire)
@@ -516,12 +525,16 @@ Gods receive resources when items are sacrifice to them. Sacrifices are worth
 to the god to whom you are making the sacrifice. The value of a sacrifice is
 based on its gear level.
 
-See GODLIST for a list of gods to whom you can offer sacrifices.
+See GODLIST for a list of gods to whom you can offer sacrifices. See HELP GOD
+SYSTEM for more information.
+
+To destroy something without offering it to a god, use "junk". To break down
+unneeded gear for shards, use "shatter".
 
 Example:
   > sacrifice stick Exar
 
-See also: DEDICATE, GODLIST, IDENTIFY
+See also: DEDICATE, JUNK, GODLIST, GOD SYSTEM, IDENTIFY, SHATTER
 #
 SAW
 
@@ -584,9 +597,9 @@ Example:
 
   > shoot deer 
 
-See also: APPROACH, USE
+See also: APPROACH, RANGED COMBAT, USE
 #
-SKILL SKILLS "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
+SKILL SKILLS "SKILL BUY" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
         skill <name> [-all] -- see a skill's details and abilities 
@@ -594,7 +607,7 @@ Usage:  skills -- list all skills
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
         skill synergy <skill 1> <skill 2> -- see list of synergy abilities
-        skill swap
+        skill swap [1 : 2]
 
 Sorting: skill -level [name]
          skill -level [min-max] [name]
@@ -651,14 +664,15 @@ This command allows you to voluntary give up points in one of your skills.
 You might do this because you accidentally raised one from 0, or because you
 want to try a different specialty.
 
-Once you use this command, those skill points are gone forever. You will also
-lose any abilities you purchased above the new level.
+There is no way to undo this command. If you drop skill points, you will have
+to re-earn them. You will also lose any abilities you purchased above the new
+level.
 
 Some skills cannot be dropped all the way to zero voluntarily.
 
 See also: SKILL
 #
-"SKILL RESET" "ABILITY RESET" "RESET ABILITY" "RESET ABILITIES"
+"SKILL RESET" "ABILITY RESET" "RESET ABILITY" "RESET ABILITIES" "RESET SKILL"
 
 Usage:  skill reset [skill]
 
@@ -668,8 +682,9 @@ refunded.
 
 You can reset in order to buy a different set of abilities, because you bought
 the wrong ability, or because you were using a certain set of abilities to
-level up and are ready for a longterm set. Resetting a skill only resets your
-current set (see SKILL SWAP).
+level up and are ready for a longterm set.
+
+Resetting a skill only resets it on your active skill set (see SKILL SWAP).
 
 Using "skill reset" without a skill name will display how many resets you have
 available in each skill tree. You get a free reset in each skill when you hit
@@ -681,11 +696,11 @@ See also: SKILLS, SPECIALIZE, SKILL CAPS, ABILITY POINTS, SKILL SWAP,
 #
 "SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
 
-Usage:  skill swap
+Usage:  skill swap [1 | 2]
 
-Players who reach level 100 can have two different sets of ability purchases
-for their skills. When you use "skill swap", all of your skills change from
-one set to the other.
+Players who reach a skill level* of 100 can have two different sets of ability
+purchases for their skills. When you use "skill swap", all of your skills
+change from one set to the other.
 
 Swapping skill sets costs 75% of your mana and movement points; it will
 regenerate normally. This prevents you from swapping during short breaks in
@@ -698,7 +713,10 @@ between both sets.
 
 Swapping skill sets takes 15 seconds and cannot be done in combat.
 
-See also: SKILLS, SLEEP
+* Note this requires skill level -- the one shown at the top of your 'skills'
+command -- rather than composite level.
+
+See also: SKILL LEVEL, SKILLS, SLEEP
 #
 SYNERGY SYNERGIES "SYNERGY ABILITY" "SKILL SYNERGY"
 

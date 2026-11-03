@@ -21,4 +21,28 @@ You're finally free!~
 T5
 ...$e is struggling to get free!~
 S
+#9603
+SCF cooldown~
+3 0
+0 0 0 0
+S
+#9604
+distracted~
+4 0
+0 0 0 0
+T0
+You're no longer distracted.~
+S
+#9605
+recovering~
+4 0
+0 0 0 0
+T0
+You recover from the jump.~
+S
+#9621
+storytime~
+4 0
+0 0 0 0
+S
 $

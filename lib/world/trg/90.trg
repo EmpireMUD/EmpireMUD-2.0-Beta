@@ -1,6 +1,6 @@
 #9000
 Cow Animation~
-0 bw 1
+0 bw 1 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 * The cow will do a couple different things, so we do an if on a random generator.
@@ -17,7 +17,8 @@ end
 ~
 #9001
 Wolf Pack~
-0 n 100
+0 n 100 1
+L b 9003
 ~
 set num %random.2%
 while %num% > 0
@@ -27,7 +28,7 @@ done
 ~
 #9002
 Herd Cats~
-0 c 0
+0 c 0 0
 herd~
 * test targeting me
 if %actor.char_target(%arg.argument1%)% != %self%
@@ -40,7 +41,15 @@ return 1
 ~
 #9003
 Daily Quest Item Handout~
-2 u 100
+2 u 100 8
+L c 9010
+L c 9031
+L c 9034
+L c 9036
+L t 9009
+L t 9030
+L t 9033
+L t 9036
 ~
 if %questvnum% == 9009
   %load% obj 9010 %actor% inv
@@ -83,7 +92,7 @@ end
 ~
 #9004
 Sheep Animation~
-0 bw 1
+0 bw 1 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 * The sheep will do a couple different things, so we do an if on a random generator.
@@ -100,7 +109,7 @@ end
 ~
 #9005
 No Herd~
-0 c 0
+0 c 0 0
 herd~
 * test targeting me
 if %actor.char_target(%arg.argument1%)% != %self%
@@ -113,7 +122,7 @@ return 1
 ~
 #9008
 Squirrel Animation~
-0 bw 4
+0 bw 4 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 * Get current terrain.
@@ -125,7 +134,7 @@ end
 ~
 #9009
 Cow Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 * The cow will do a couple different things, so we do an if on a random generator.
@@ -142,10 +151,9 @@ end
 ~
 #9010
 Chicken Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Chicken Animation (9010)
 switch (%random.4%)
   case 1
     * Hunt for food.
@@ -167,10 +175,9 @@ done
 ~
 #9011
 Rooster Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Rooster Animation (9011)
 switch (%random.4%)
   case 1
     * Hunt for food.
@@ -192,10 +199,9 @@ done
 ~
 #9012
 Dog Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Dog Animation (9012)
 switch (%random.8%)
   case 1
     * scratch
@@ -245,10 +251,9 @@ done
 ~
 #9013
 Prairie Dog Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Prairie Dog Animation (9013)
 switch (%random.6%)
   case 1
     * Vanishing act.
@@ -265,18 +270,16 @@ done
 ~
 #9018
 Vulture Animation~
-0 bw 1
+0 bw 1 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Vulture Animation (9018)
 %echo% ~%self% circles high overhead, patiently waiting...
 ~
 #9020
 Quail Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Quail Animation (9020)
 if (%random.2% == 1)
   %echo% ~%self% runs around on the ground looking for food.
 else
@@ -289,18 +292,16 @@ end
 ~
 #9021
 Donkey Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Donkey Animation (9021)
 %echo% ~%self% brays loudly.
 ~
 #9022
 Black Cat Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Black Cat Animation (9022)
 switch (%random.3%)
   case 1
     %echo% ~%self% leaps from the shadows and dashes across your path!
@@ -325,10 +326,9 @@ done
 ~
 #9025
 Eagle Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Eagle Animation (9025)
 if (%self.room.sector% == River)
   %echo% ~%self% dives into the water, then emerges with a fish.
   halt
@@ -347,7 +347,14 @@ done
 ~
 #9027
 Feed to Tame: Fruit/Veg/Grain~
-0 j 100
+0 j 100 7
+L w 6120
+L w 6130
+L w 6140
+L w 6150
+L w 6160
+L w 6170
+L w 9027
 ~
 * Amount of tameness required
 set target 5
@@ -395,7 +402,8 @@ mjunk all
 ~
 #9028
 Tameness Required to Tame~
-0 c 0
+0 c 0 1
+L o 34
 tame feed~
 * Amount of tameness required
 set target 5
@@ -437,8 +445,43 @@ end
 ~
 #9030
 Butcher detect~
-1 c 3
+1 c 3 32
+L b 9001
+L b 9002
+L b 9016
+L b 9017
+L b 9019
+L b 9059
+L b 9060
+L b 9100
+L b 9102
+L b 9114
+L b 9118
+L b 9143
+L b 9177
+L b 9213
+L b 9225
+L b 9231
+L b 9236
+L b 9242
+L b 9243
+L b 9246
+L b 9247
+L b 9258
+L b 9262
+L b 9263
+L b 9264
+L b 9265
+L b 9266
+L b 9270
+L b 9279
+L b 9288
+L b 9298
+L c 9030
 butcher~
+* Config list:
+set danger_vnums 9001 9002 9016 9017 9019 9059 9060 9100 9102 9114 9118 9143 9177 9213 9225 9231 9236 9242 9243 9246 9247 9258 9262 9263 9264 9265 9266 9270 9279 9288 9298
+*
 set target %actor.obj_target(%arg%)%
 if !%target%
   * Invalid target
@@ -458,13 +501,7 @@ else
   halt
 end
 * Check mob vnum
-if %mob_vnum% == 9017 || %mob_vnum% == 9177
-  * Bear, polar bear
-elseif %mob_vnum% == 9001 || %mob_vnum% == 9002
-  * Snarling and brown wolf
-elseif %mob_vnum% == 9016 || %mob_vnum% == 9100 || %mob_vnum% == 9143 || %mob_vnum% == 9118 || %mob.vnum% == 9102
-  * Tiger, leopard, snow leopard, cougar, jaguar
-else
+if !(%danger_vnums% ~= %mob_vnum%)
   * Wrong kind of corpse
   return 0
   halt
@@ -477,8 +514,15 @@ end
 %send% %actor% You cut the head off @%target%...
 %load% obj 9030 %actor% inv
 set item %actor.inventory()%
-if %item%
-  %send% %actor% You get @%item%!
+if %item% && %item.vnum% == 9030
+  set mob_name %_mob.name(%mob_vnum%)%
+  if %mob_name%
+    %mod% %item% keywords head %mob_name.skip_filler% severed
+    %mod% %item% shortdesc the head of %mob_name%
+    %mod% %item% longdesc The severed head of %mob_name% has been left here.
+    %mod% %item% append-lookdesc It appears to be the head of %mob_name%.
+  end
+  %send% %actor% You get %item.shortdesc%! Better get this back to the tavern.
 end
 * Don't butcher normally this time. Less buggy this way.
 return 1
@@ -486,7 +530,12 @@ halt
 ~
 #9033
 Fake pickpocket~
-1 c 2
+1 c 2 5
+L b 202
+L b 203
+L c 9033
+L o 142
+L t 9033
 pickpocket~
 set target %actor.char_target(%arg%)%
 if !%target%
@@ -534,10 +583,9 @@ end
 ~
 #9034
 Horse Animation~
-0 bw 3
+0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Horse Animation (9034)
 switch (%random.3%)
   case 1
     %echo% ~%self% nays loudly.
@@ -552,7 +600,9 @@ done
 ~
 #9036
 Disenchant detector~
-1 p 100
+1 p 100 2
+L c 9036
+L o 180
 ~
 if %abilityname% != Disenchant
   return 1
@@ -573,7 +623,10 @@ return 1
 ~
 #9042
 Postmaster quest start~
-2 u 100
+2 u 100 3
+L c 9042
+L c 9043
+L c 9044
 ~
 eval vnum 9041+%random.3%
 %load% obj %vnum% %actor% inv
@@ -582,12 +635,20 @@ set item %actor.inventory(%vnum%)%
 ~
 #9043
 Postmaster daily letter delivery~
-1 i 100
+1 i 100 8
+L b 212
+L b 228
+L b 231
+L b 278
+L c 9042
+L c 9043
+L c 9044
+L t 9042
 ~
 switch %self.vnum%
   case 9042
     * Smith / Forgemaster
-    if %victim.vnum% == 212 || %victim.vnum% == 278
+    if %victim.vnum% == 212 || %victim.vnum% == 278 || %victim.vnum% == 12800
       set found 1
     end
   break
@@ -622,7 +683,8 @@ end
 ~
 #9046
 Tame Sheep Evolution~
-0 ab 100
+0 ab 100 1
+L b 9004
 ~
 %load% mob 9004
 set sheep %self.room.people%
@@ -633,7 +695,9 @@ end
 ~
 #9047
 Chicken: Lay egg~
-0 b 1
+0 b 1 2
+L c 3202
+L w 9047
 ~
 if %self.cooldown(9047)%
   halt
@@ -648,7 +712,8 @@ end
 ~
 #9061
 Hypnotoad fight~
-0 k 75
+0 k 75 1
+L w 9061
 ~
 wait 1
 if (!%actor% || %actor.room% != %self.room%)
@@ -662,7 +727,8 @@ flee
 ~
 #9064
 Wandering Vampire combat~
-0 k 25
+0 k 25 1
+L f 9064
 ~
 if !%self.vampire()%
   halt
@@ -671,8 +737,8 @@ set room %self.room%
 if %room.time(hour)% >= 7 && %room.time(hour)% <= 19
   halt
 end
-if %actor.aff_flagged(!DRINK-BLOOD)%
-  * Don't bite !DRINK-BLOOD targets
+if %actor.aff_flagged(NO-DRINK-BLOOD)%
+  * Don't bite NO-DRINK-BLOOD targets
   halt
 end
 %send% %actor% ~%self% lunges forward and sinks ^%self% teeth into your shoulder!
@@ -712,7 +778,8 @@ end
 ~
 #9066
 Nerf bat random debuffs~
-0 bw 15
+0 bw 15 1
+L w 9066
 ~
 set effect %random.4%
 switch %effect%

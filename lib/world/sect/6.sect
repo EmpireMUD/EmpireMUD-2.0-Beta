@@ -1,7 +1,7 @@
 #600
 Enchanted Saplings~
 Some Enchanted Saplings~
-'.' 35 ij 2 0 p
+'.' 35 ij 2 D p
 C
 chant nature~
 D1
@@ -40,7 +40,7 @@ S
 #601
 Clear-Cut Starwood Forest~
 A Clear-Cut Starwood Forest~
-'.' 35 ij 2 0 p
+'.' 35 ij 2 D p
 C
 dig~
 D1
@@ -96,7 +96,7 @@ S
 #602
 Starwood Copse~
 A Starwood Copse~
-'.' 35 ijqw 4 d np
+'.' 35 ijqw 4 dD np
 C
 chop, dig~
 D1
@@ -166,7 +166,7 @@ S
 #603
 Starwood Stand~
 A Stand of Starwood~
-'.' 35 ijqw 6 d np
+'.' 35 ijqw 6 dD np
 C
 chop, dig~
 D1
@@ -251,7 +251,7 @@ S
 #604
 Starwood Forest~
 An Enchanting Starwood Forest~
-'^' 35 ijqw 8 d dnp
+'^' 35 ijqw 8 dD dnp
 C
 chop, dig~
 D1
@@ -555,7 +555,7 @@ S
 #606
 Sprouting Starwood Stumps~
 A Field of Sprouting Starwood Stumps~
-'.' 38 ijqw 4 a p
+'.' 38 ijqw 4 aD p
 C
 dig~
 D1
@@ -648,7 +648,7 @@ S
 #607
 Sprouting Starwood Copse~
 A Sprouting Starwood Copse~
-'.' 6 ijqw 4 a p
+'.' 6 ijqw 4 aD p
 C
 dig~
 D1
@@ -765,7 +765,7 @@ S
 #608
 Sprouting Starwood Stand~
 A Sprouting Stand of Starwood~
-'w' 38 ijqw 6 a p
+'w' 38 ijqw 6 aD p
 C
 dig~
 D1
@@ -954,7 +954,7 @@ S
 #610
 Weirdwood Saplings~
 Among the Weirdwood Saplings~
-'.' 38 ik 2 0 p
+'.' 38 ik 2 D p
 C
 chant nature~
 D1
@@ -993,7 +993,7 @@ S
 #611
 Clear-Cut Weirdwood~
 A Clear-Cut Enchanted Grove~
-'.' 38 ik 2 0 p
+'.' 38 ik 2 D p
 C
 dig~
 D1
@@ -1049,7 +1049,7 @@ S
 #612
 Weirdwood Thicket~
 A Weirdwood Thicket~
-'.' 38 ikqw 4 d np
+'.' 38 ikqw 4 dD np
 C
 chop, dig~
 D1
@@ -1123,7 +1123,7 @@ S
 #613
 Weirdwood Grove~
 A Weirdwood Grove~
-'.' 38 ikqw 6 d np
+'.' 38 ikqw 6 dD np
 C
 chop, dig~
 D1
@@ -1272,7 +1272,7 @@ S
 #614
 Weirdwood Weald~
 A Weirdwood Weald~
-'w' 39 ikqw 8 dl dnp
+'w' 39 ikqw 8 dlD dnp
 C
 chop, dig~
 D1
@@ -1544,7 +1544,7 @@ S
 #616
 Enchanted Oasis~
 An Enchanted Oasis~
-'.' 35 ikovw 6 iw jp
+'.' 35 ikovw 6 iwD jp
 C
 dig, drink, fill, pick~
 D0
@@ -1579,7 +1579,7 @@ I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
 I 7 1206 2.00 125 p  # PICK: iridescent blue iris
 I 7 1300 2.00 125 p  # PICK: glowing green seashell
-I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I 7 1203 87.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 M
@@ -1606,7 +1606,7 @@ S
 #617
 Lush Enchanted Oasis~
 A Lush Enchanted Oasis~
-'.' 35 ikoqvw 6 adiw jp
+'.' 35 ikoqvw 6 adiwD jp
 C
 chop, dig, drink, fill, pick~
 D0
@@ -1652,7 +1652,7 @@ I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
 I 7 1206 2.00 125 p  # PICK: iridescent blue iris
 I 7 1300 2.00 125 p  # PICK: glowing green seashell
-I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I 7 1203 87.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 618 100.00 1  # CHOP: weirdwood tree
@@ -1680,7 +1680,7 @@ S
 #618
 Shady Enchanted Oasis~
 A Shady Enchanted Oasis~
-'.' 35 ikoqvw 6 adiw jp
+'.' 35 ikoqvw 6 adiwD jp
 C
 chop, dig, drink, fill, pick~
 D0
@@ -1724,7 +1724,7 @@ I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
 I 7 1206 2.00 125 p  # PICK: iridescent blue iris
 I 7 1300 2.00 125 p  # PICK: glowing green seashell
-I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I 7 1203 87.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 618 100.00 1  # CHOP: weirdwood tree
@@ -1752,7 +1752,7 @@ S
 #621
 Sprouting Weirdwood Stumps~
 A Grove of Sprouting Weirdwood Stumps~
-'.' 6 ikw 2 a p
+'.' 6 ikw 2 aD p
 C
 dig~
 D1
@@ -1831,7 +1831,7 @@ S
 #622
 Sprouting Weirdwood Thicket~
 A Sprouting Thicket of Weirdwood~
-'.' 36 ikqw 4 a p
+'.' 36 ikqw 4 aD p
 C
 dig~
 D1
@@ -1977,7 +1977,7 @@ S
 #623
 Sprouting Weirdwood Grove~
 A Sprouting Grove of Weirdwood~
-'n' 35 ikqw 6 a p
+'n' 35 ikqw 6 aD p
 C
 dig~
 D1

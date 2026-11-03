@@ -1,0 +1,87 @@
+EmpireMUD 2.0 Shutting Down, Updating, and Reboots
+
+This document has instructions on how to safely shut down and update EmpireMUD.
+
+Contents:
+   I. Shutting Down
+  II. Rebooting
+ III. Updating EmpireMUD
+
+=================
+I. Shutting Down
+=================
+
+The 'shutdown' command is used to shut EmpireMUD down completely. In some cases
+it will reboot again on its own. There are several options for the type of
+shutdown, and you can either shutdown 'now' or provide a timer in minutes.
+
+Usage:  shutdown [now | timer | cancel] [normal | pause | die | complete]
+
+Timing:
+- now: Shuts down immediately.
+- timer: Provide a number of minutes; the shutdown will happen after that.
+- cancel: Cancels a shutdown timer.
+
+Types:
+- normal: The MUD will shut down, but if the autorun script is still going, it
+   will start up again on its own.
+- pause: Creates a 'pause' file in the MUD's directory; the autorun will sleep
+   until you delete that file manually.
+- die: Cancels the autorun after shutting down the MUD. The MUD will not
+   reboot on its own; you'll have to start the autorun again.
+- complete: Like DIE, this will kill the autorun script and prevent the MUD
+   from starting up again. But this also frees ALL allocated memory; this
+   option is only intended for use with a memory profiler like Valgrind.
+
+Examples:
+> shutdown die now
+> shutdown 15 die
+
+
+==============
+II. Rebooting
+==============
+
+The 'reboot' command triggers a 'soft' reboot, also called a 'copyover', which
+won't disconnect any players. It saves their connections and logs them back in,
+reducing the impact of the reboot.
+
+Usage:  reboot [now | minutes | cancel]
+
+Options:
+- now: Reboots immediately, with no delay.
+- minutes: Specify a number of minutes; it will reboot when that expires.
+- cancel: Cancels a reboot timer.
+
+Examples:
+> reboot 15
+> reboot cancel
+> reboot now
+
+
+========================
+III. Updating EmpireMUD
+========================
+
+To update your copy of EmpireMUD, for example on patch day, follow these steps:
+
+1. From inside the MUD, type: shutdown die <optional timer>
+2. Let it shut down completely - this takes a few seconds as it makes a full
+   save of the database.
+3. Create a backup, for example by using empiremud/php/make-backup.php
+4. If you're managing your MUD with Github, use these commands:
+     4a. git stash
+     4b. git pull
+     4c. git stash pop
+     4d. Look for any CONFLICT lines and resolve them (see below).
+   Otherwise, apply the patch (or other changes) manually.
+5. In the empiremud/src/ directory, compile any changes with 'make all'.
+6. In your base empiremud directory, restart the game with: ./autorun &
+
+NOTE: It's extremely important to use the 'git stash pop' step (4c) to re-apply
+your changes. If you boot your EmpireMUD without this step, you will corrupt
+your game data. This is also why backups are so important.
+
+Resolving conflicts with Git: If you're new to Git version control, there are
+many good walk-throughs online for resolving conflicts. If you need assistance
+beyond this, contact paul@empiremud.net

@@ -29,6 +29,14 @@ R 6510
 T0
 thick magic skins~
 S
+#6512
+thick elegant skin~
+6 0
+0 6512 0 0
+R 6510
+T0
+thick elegant skins~
+S
 #6520
 leather~
 6 a
@@ -59,6 +67,14 @@ thick magic leather~
 R 6530
 T0
 thick magic leathers~
+S
+#6532
+thick elegant leather~
+6 0
+0 6532 0 0
+R 6530
+T0
+thick elegant leather~
 S
 #6540
 fur~

@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -267,6 +268,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
+	trig_data *trig, *next_trig;
 	int found;
 	bool any;
 	
@@ -351,6 +353,14 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_FACTION, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -448,6 +458,7 @@ void clear_faction(faction_data *fct) {
 	memset((char *) fct, 0, sizeof(faction_data));
 	
 	FCT_VNUM(fct) = NOTHING;
+	FCT_REP_LOSS_PER_KILL(fct) = default_rep_per_kill;
 }
 
 
@@ -498,6 +509,9 @@ void free_faction(faction_data *fct) {
 	}
 	if (FCT_DESCRIPTION(fct) && (!proto || FCT_DESCRIPTION(fct) != FCT_DESCRIPTION(proto))) {
 		free(FCT_DESCRIPTION(fct));
+	}
+	if (FCT_NOTES(fct) && (!proto || FCT_NOTES(fct) != FCT_NOTES(proto))) {
+		free(FCT_NOTES(fct));
 	}
 	
 	if (FCT_RELATIONS(fct) && (!proto || FCT_RELATIONS(fct) != FCT_RELATIONS(proto))) {
@@ -563,6 +577,16 @@ void parse_faction(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// amount of reputation lost
+				if (sscanf(line, "A %d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in line A of %s", error);
+					exit(1);
+				}
+				
+				FCT_REP_LOSS_PER_KILL(fct) = int_in[0];
+	
+				break;
+			}
 			case 'R': {	// relations
 				if (sscanf(line, "R %d %s", &int_in[0], str_in) != 2) {
 					log("SYSERR: Format error in line R of %s", error);
@@ -577,6 +601,11 @@ void parse_faction(FILE *fl, any_vnum vnum) {
 				rel->vnum = int_in[0];
 				rel->flags = asciiflag_conv(str_in);
 				HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
+				break;
+			}
+			
+			case '_': {	// notes
+				FCT_NOTES(fct) = fread_string(fl, error);
 				break;
 			}
 			
@@ -644,9 +673,21 @@ void write_faction_to_file(FILE *fl, faction_data *fct) {
 	// 4. rep
 	fprintf(fl, "%d %d %d\n", FCT_MIN_REP(fct), FCT_MAX_REP(fct), FCT_STARTING_REP(fct));
 	
+	// 'A': amount of rep lost
+	if (FCT_REP_LOSS_PER_KILL(fct) != default_rep_per_kill) {
+		fprintf(fl, "A %d\n", FCT_REP_LOSS_PER_KILL(fct));
+	}
+	
 	// 'R': relations
 	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 		fprintf(fl, "R %d %s\n", rel->vnum, bitv_to_alpha(rel->flags));
+	}
+	
+	// '_'
+	if (FCT_NOTES(fct) && *FCT_NOTES(fct)) {
+		strcpy(temp, FCT_NOTES(fct));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -702,6 +743,9 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
 		return;	// faction doesn't exist?
 	}
+	if (FACTION_FLAGGED(fct, FCT_NPC_ONLY)) {
+		return;	// players cannot gain this
+	}
 	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
 		return;	// unable to get a rep entry?
 	}
@@ -752,7 +796,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 	// seems ok
 	old_val = pfd->value;
 	old_rep = pfd->rep;
-	SAFE_ADD(pfd->value, amount, MIN_REPUTATION, MAX_REPUTATION, FALSE);
+	SAFE_ADD(pfd->value, amount, min_rep, max_rep, FALSE);
 	
 	// detect new rep now
 	do {
@@ -926,6 +970,9 @@ void set_reputation(char_data *ch, any_vnum vnum, int rep) {
 	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
 		return;	// faction doesn't exist?
 	}
+	if (FACTION_FLAGGED(fct, FCT_NPC_ONLY)) {
+		return;	// players cannot gain this
+	}
 	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
 		return;	// unable to get a rep entry?
 	}
@@ -968,7 +1015,7 @@ void update_reputations(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
-		if (!(fct = find_faction_by_vnum(pfd->vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+		if (!(fct = find_faction_by_vnum(pfd->vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT | FCT_NPC_ONLY)) {
 			HASH_DEL(GET_FACTIONS(ch), pfd);
 			free(pfd);
 			continue;
@@ -1046,6 +1093,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
+	trig_data *trig, *next_trig;
 	descriptor_data *desc;
 	char name[256];
 	bool found;
@@ -1156,6 +1204,16 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_FACTION, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to faction [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// remove from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_EVENT(desc)) {
@@ -1221,6 +1279,12 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "A faction required by the social you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_FACTION, vnum);
+			if (found) {
+				msg_to_desc(desc, "Faction [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
+			}
+		}
 	}
 	
 	// save index and faction file now
@@ -1257,6 +1321,9 @@ void save_olc_faction(descriptor_data *desc) {
 	if (FCT_DESCRIPTION(proto)) {
 		free(FCT_DESCRIPTION(proto));
 	}
+	if (FCT_NOTES(proto)) {
+		free(FCT_NOTES(proto));
+	}
 	free_faction_relations(FCT_RELATIONS(proto));
 	
 	// sanity
@@ -1265,6 +1332,10 @@ void save_olc_faction(descriptor_data *desc) {
 			free(FCT_NAME(fct));
 		}
 		FCT_NAME(fct) = str_dup(default_faction_name);
+	}
+	if (FCT_NOTES(fct) && !*FCT_NOTES(fct)) {
+		free(FCT_NOTES(fct));
+		FCT_NOTES(fct) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1307,6 +1378,7 @@ faction_data *setup_olc_faction(faction_data *input) {
 		// copy things that are pointers
 		FCT_NAME(new) = FCT_NAME(input) ? str_dup(FCT_NAME(input)) : NULL;
 		FCT_DESCRIPTION(new) = FCT_DESCRIPTION(input) ? str_dup(FCT_DESCRIPTION(input)) : NULL;
+		FCT_NOTES(new) = FCT_NOTES(input) ? str_dup(FCT_NOTES(input)) : NULL;
 		
 		// copy lists
 		FCT_RELATIONS(new) = copy_faction_relations(FCT_RELATIONS(input));
@@ -1348,8 +1420,16 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 	sprintbit(FCT_FLAGS(fct), faction_flags, part, TRUE);
 	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
+	if (FACTION_FLAGGED(fct, FCT_REP_FROM_KILLS)) {
+		build_page_display(ch, "Reputation per kill: \tc%d\t0", FCT_REP_LOSS_PER_KILL(fct));
+	}
+	
 	build_page_display_str(ch, "Relations:");
 	show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
+	
+	if (FCT_NOTES(fct) && *FCT_NOTES(fct)) {
+		build_page_display(ch, "Notes:\r\n%s", FCT_NOTES(fct));
+	}
 	
 	send_page_display(ch);
 }
@@ -1405,10 +1485,14 @@ void olc_show_faction(char_data *ch) {
 	build_page_display(ch, "<%smaxreputation\t0> %s", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
 	build_page_display(ch, "<%sstartingreuptation\t0> %s", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
 	
+	build_page_display(ch, "<%srepperkill\t0> %d%s", OLC_LABEL_VAL(FCT_REP_LOSS_PER_KILL(fct), default_rep_per_kill), FCT_REP_LOSS_PER_KILL(fct), (FACTION_FLAGGED(fct, FCT_REP_FROM_KILLS) ? "" : " (not used)"));
+	
 	build_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)));
 	if (FCT_RELATIONS(fct)) {
 		show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(FCT_NOTES(fct)), NULLSAFE(FCT_NOTES(fct)));
 	
 	send_page_display(ch);
 }
@@ -1561,6 +1645,29 @@ OLC_MODULE(fedit_minreputation) {
 OLC_MODULE(fedit_name) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	olc_process_string(ch, argument, "name", &FCT_NAME(fct));
+}
+
+
+OLC_MODULE(fedit_notes) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", FCT_NAME(fct));
+		start_string_editor(ch->desc, buf, &FCT_NOTES(fct), MAX_NOTES, TRUE);
+	}
+}
+
+
+OLC_MODULE(fedit_rep_per_kill) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	
+	FCT_REP_LOSS_PER_KILL(fct) = olc_process_number(ch, argument, "reputation per kill", "repperkill", 0, MAX_REPUTATION, FCT_REP_LOSS_PER_KILL(fct));
+	if (!FACTION_FLAGGED(fct, FCT_REP_FROM_KILLS)) {
+		msg_to_char(ch, "Note: This will have no effect unless you add the REP-FROM-KILLS flag.\r\n");
+	}
 }
 
 

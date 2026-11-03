@@ -5,18 +5,21 @@ An unattuned skystone has been dropped here.~
    The palm-sized stone is smoothed and polished like river rock. It has a
 soft, milky light blue color that almost seems to glow in even the slightest
 bit of light.
-   Skystones can be attuned in the Tower Skycleave and, once this complete, the
-tower will trade them for rare items, designs, and patterns. Each successful
-attunement will take more skystones than the previous one.
+   Skystones can be attuned in the Tower Skycleave and, once this is complete,
+the tower will trade them for rare items, designs, and patterns. Each
+successful attunement will take more skystones than the previous one.
    The true power of a skystone comes from its attunement to a person's soul or
 natural essence. The attunement spell is nearly impossible to cast because a
 sorcerer's own soul too easily taints the magic and spoils the attunement.
 ~
-3 p a 0 0 7
+3 p a 0 0 8
 0 0 0
 1 0
 C
 1 1
+M
+33
+Perhaps someone in the Attunement Lab can help you with this.~
 S
 #11901
 controller skycleave~
@@ -1530,9 +1533,9 @@ the blood in the arena~
 Blood stains the shining sand of the arena.~
 Spatters of blood crisscross the center of the arena.
 ~
-3 0 0 0 0 7
+3 0 0 0 0 8
 0 0 0
-7 2
+7 1
 C
 1 1
 M

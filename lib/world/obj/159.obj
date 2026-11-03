@@ -1,0 +1,1007 @@
+#15900
+banner burning~
+a burning banner~
+A banner burns over the wreckage.~
+   The banner is too charred to make out what it might once have depicted. It
+crisps and crackles in the wind for quite a while; it must have been soaked in
+tallow or beeswax.
+   Goblins long ago learned the meaning of a flag and are quick to carry one
+into any invasion.
+~
+3 0 0 0 0 2
+0 0 0
+0 24
+C
+1 1
+T 9683
+S
+#15901
+trap another~
+another trap~
+Another trap is lying here.~
+   This helper item restores a trap to the scrapboss.
+   Items like this don't require flavor text, but sometimes they get some
+anyway.
+~
+3 0 0 0 0 4
+0 0 0
+0 2
+C
+1 1
+T 15906
+S
+#15902
+pile debris~
+a debris pile~
+A debris pile is exploding!~
+It's exploding!
+~
+3 m 0 0 0 3
+0 0 0
+0 2
+C
+75 0
+T 15908
+S
+#15903
+lumber crude heap~
+a heap of crude lumber~
+Some crude lumber is heaped up on the ground.~
+   The lumber is roughly hewn from various woods, all unstained. Some of the
+boards seem to have been hacked off of armoirs, chests, and even doors.
+~
+3 e a 0 0 8
+0 0 0
+0 0
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
+M
+0
+You tie some crude lumber in place.~
+M
+1
+$n ties some crude lumber in place.~
+M
+6
+You tie some crude lumber onto $V.~
+M
+7
+$n ties some crude lumber onto $V.~
+O+ 1 6000
+R
+4 5118 0
+R
+4 5134 0
+S
+#15904
+nails bag bent~
+a bag of bent nails~
+A bag of bent nails is spilling on the ground.~
+   The bag, which smells rather similar to a barnyard in a rainstorm, is
+stuffed so full of rusty, bent nails that it feels risky to even hold it.
+~
+3 0 a 0 c 8
+0 0 0
+2 0
+C
+1 1
+M
+0
+You cautiously hammer some bent nails into the wood.~
+M
+1
+$n cautiously hammers some bent nails into the wood.~
+M
+6
+$n cautiously hammers some bent nails into $V.~
+M
+7
+$n cautiously hammers some bent nails into $V.~
+O+ 1 6790
+R
+4 5134 0
+R
+4 5121 0
+R
+4 5610 0
+S
+#15905
+block round stone~
+a round stone block~
+A round stone block is lying on its side.~
+   Minor damage aside, the block has been cut perfectly round. It looks like it
+may have been removed from a column or perhaps pilings.
+~
+3 e a 0 0 8
+0 0 0
+1 0
+C
+1 1
+M
+0
+You roll a stone block over and tilt it into place.~
+M
+1
+$n rolls a stone block over and tilts it into place.~
+O+ 1 6077
+R
+4 5117 0
+R
+4 5122 0
+S
+#15906
+tent goblin mess~
+a goblin mess tent~
+A bundled up goblin mess tent is lying here.~
+   It's a collapsed goblin mess tent, or at least, part of one. It's going to
+require some additional resources to set it up. You can still smell the aroma
+of smoked meat on it.
+   You can use this to build a 'goblin mess tent', a simple storage tent that
+holds all the items that can be stored in a cannery, granary, larder, root
+cellar, or smokehouse.
+   If there's one thing goblins do spectacularly well, it's mess.
+~
+3 e a 0 0 8
+0 0 0
+7 0
+C
+75 75
+S
+#15907
+tent goblin construction~
+a goblin construction tent~
+A goblin construction tent lies bundled on the ground.~
+   The tent is tightly bundled and rather unwieldy. It will require more
+materials to set it up properly as it's quite large when finished. There's some
+sawdust on it; these tents are used to store large amounts of raw material.
+   You can use this to build a 'goblin construction tent', a simple storage
+tent that holds all the items that can be stored in a gravel pit, lumber yard,
+or utility shed.
+   The only time goblins sort items is when divvying up the treasure. The rest
+of the time, they just pile it all somewhere dry.
+~
+3 e a 0 0 9
+0 0 0
+7 0
+C
+75 75
+S
+#15908
+hat raider's raiders hacksilver-plated plated silver~
+a hacksilver-plated raider's hat~
+A hacksilver-plated raider's hat has been dropped here.~
+   The leather hat is stitched all over with bits of hacksilver, from chains to
+buckles and even small ingots.
+   Goblins will use anything of value for money, usually hacking it apart into
+coin-sized pieces. Many merchants are used toa goblin paying with short lengths
+of chain, the stem of a goblet, or half a hat buckle.
+~
+2 mo ae 0 0 3
+0 0 0
+3 0
+A
+5 1 0
+A
+5 1 3
+A
+2 1 0
+A
+12 5 0
+C
+75 200
+S
+#15909
+crown melted plunder~
+a crown of melted plunder~
+A crown made of melted plunder is lying here.~
+   It's a rather hideous silver crown made from loosely-melted bits of plunder.
+At the front, what's left of a belt buckle forms the crown 'jewel'.
+   On the smouldering battlefield, there's nowhere to melt down the spoils into
+bars or ingots. It's musch quicker to hack it all apart and portion it out to
+the survivors on the spot.
+~
+2 mo ae 0 0 4
+0 0 0
+3 0
+A
+5 1 0
+A
+5 1 3
+A
+8 1 0
+A
+23 2 0
+A
+7 3 0
+C
+75 200
+S
+#15910
+crest silver-scavver's silver-scavvers silverscavver's silverscavvers scavver's scavvers~
+a silver-scavver's crest~
+A silver-scavver's crest is lying here.~
+   It seems someone has melted bits of hacksilver into a tall, thin crest,
+which has been attached to a leather hood that ties tightly around the chin.
+   Goblins love to wear their wealth on their head for all to see -- a habit
+they picked up from humans.
+~
+2 mo ae 0 0 5
+0 0 0
+3 0
+A
+5 1 0
+A
+5 1 3
+A
+1 1 0
+A
+21 2 0
+A
+17 3 0
+C
+75 200
+S
+#15911
+diadem hacksilver silver~
+a hacksilver diadem~
+Someone has left a hacksilver diadem behind.~
+   This thin and rather uncomfortable-looking diadem has been cobbled together
+from bits of silver chain, broaches, and even a buckle.
+   In the early days, goblins coveted only jade. But the economy of war changes
+through the ages, and a modern goblin will take anything of value.
+~
+2 mo ae 0 0 6
+0 0 0
+3 0
+A
+5 1 0
+A
+5 1 3
+A
+1 1 0
+A
+22 2 0
+A
+17 3 0
+C
+75 200
+S
+#15912
+schematic goblin hacksilver crowns silver~
+a schematic for one of the hacksilver crowns~
+A schematic for goblin hacksilver crowns lies here.~
+   This hastily-drawn schematic shows a series of goblincraft crowns made from
+bits of hacksilver. Unfortunately, the schematic is badly smudged and you can
+only make out 1 of the schematics.
+   Type 'learn hacksilver' to learn one of the five crown crafts; this will
+require you know how to make Jewelry. Each time you learn one of these
+schematics, you gain 1 more of the crowns. Once you know all five, this item
+will have no use. The crowns are: hacksilver-plated raider's hat, crown of
+melted plunder, silver-scavver's crest, hacksilver diadem, and loot-lord's
+crown.
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+C
+75 75
+M
+33
+Type 'learn hacksilver' to learn a random goblin crown.~
+T 15912
+S
+#15913
+crabmeat meat delectable~
+some delectable crabmeat~
+Some crabmeat is scattered on the ground.~
+   The flaky meat has an aroma that few would call 'fresh', but to
+connoisseurs, it's pure perfection. Substitute it for fish in any seafood
+recipe to add that extra kick, or bake up a crabby patty.
+~
+6 gC a 0 0 10
+8 0 0
+7 24
+C
+1 1
+O+ 1 6203
+R
+4 5119 0
+R
+4 5196 0
+R
+4 15912 0
+S
+#15914
+patty crabby krabby~
+a crabby patty~
+A crabby patty is rotting on the ground.~
+   It might better be called a crab cake, having been made from flaky,
+succulent crab meat.
+   The crabby patty is a rare recipe for goblins, who usually consume their
+food whole, and often uncooked.
+~
+6 gmE a 0 0 9
+24 0 0
+7 336
+A
+12 1 0
+C
+100 100
+R
+4 5132 0
+R
+4 5619 0
+S
+#15915
+whistle minipet privateer deck-rat deckrat rat~
+a deck-rat privateer minipet whistle~
+A deck-rat privateer minipet whistle is lying here.~
+   Made from bone, this little whistle has been meticulously carved by a sailor
+who clearly loved their deck-rat companion.
+   You can 'use' the whistle to gain a deck-rat privateer minipet!
+   Each goblin sailor befriends the next lowest goblin in rank, and the goblin
+at the bottom is friends with the deck-rat.
+~
+19 p a 0 0 13
+15915 0 0
+0 0
+C
+1 1
+S
+#15916
+whistle mount aquatic manatee~
+a manatee aquatic mount whistle~
+An aquatic mount whistle for a manatee is dangling here.~
+   This little reed whistle bears a rough cut in its upper surface to give it
+just the right pitch to call a manatee! This aquatic mount can only move on
+water, but it will ferry you from island to island.
+   Type 'use whistle' to summon the manatee.
+   There's nothing more frightening than a horde of goblins arriving on the
+backs of manatees. Since the manatees are just below the surface and the
+goblins like to stand on their backs, all the helpless onlookers see is a horde
+of waterwalking goblins racing toward them.
+~
+3 ep a 0 0 10
+15916 0 0
+0 0
+C
+75 75
+T 9910
+S
+#15917
+schematic sharkfold~
+the sharkfold schematic~
+The sharkfold schematic is on the ground.~
+   The schematic is sketched in charcoal on sealskin, so it's quite delicate
+and you'll need to commit it to memory. It depicts a round structure,
+mostly-submerged, forming a pen for sharks and other sea life.
+   'Learn' this schematic and it will enable you to build a 'sharkfold', a new
+type of stable that can be built in shallow water. Workers will produce shark
+meat and skin, in addition to tending aquatic animals.
+~
+7 0 a 0 0 3
+15917 0 0
+0 0
+C
+75 75
+S
+#15918
+trinket jade hovering dirigible~
+a hovering jade trinket in the shape of a dirigible~
+A small jade trinket hovers in the air.~
+   The trinket is carved from veined jade by fine tools -- so fine that you
+cannot see lines where the artisan worked it. The shape gives the impression of
+a tiny dirigible, all the more so because it floats.
+   With this trinket, a skilled woodworker can manufacture a patchwork
+dirigible, a vehicle held aloft by a giant leather balloon and the enchantment
+from this trinket.
+   Goblin magic once held great stones in the air, or so it is said. Today, it
+is considered a great feat that it can hold up a leather balloon. But such a
+thing is possible with the right chant.
+~
+3 0 a 0 0 2
+0 0 0
+12 0
+C
+100 100
+S
+#15919
+crown loot-lord's loot-lords lootlord's lootlords lord's lords~
+a loot-lord's crown~
+A loot-lord's crown is lying here.~
+   This unfortunate-looking crown is made from melted silver coins, arranged in
+a spiral pattern without regard to each coin's orientation. It's heavier than
+it looks, and not very comfortable to wear.
+   Goblins once worshipped great stones. Today they worship the goblin with the
+most loot.
+~
+2 mo ae 0 0 8
+0 0 0
+3 0
+A
+5 1 0
+A
+5 1 3
+A
+2 1 0
+A
+17 2 0
+A
+18 3 0
+C
+75 200
+S
+#15920
+schematic sea barricade~
+the sea barricade schematic~
+The sea barricade schematic is on the ground.~
+   The schematic is sketched in charcoal on sealskin, so it's quite delicate
+and you'll need to commit it to memory. It depicts a rather unique way of using
+debris and weights to build off-shore barricades that function like walls.
+   'Learn' this schematic and it will enable you to build a 'sea barricade', a
+new type of wall that can be built just off the coast, in shallow seas.
+~
+7 0 a 0 0 2
+15901 0 0
+0 0
+C
+75 75
+S
+#15921
+schematic crab pens~
+the crab pens schematic~
+The crab pens schematic is on the ground.~
+   The schematic is sketched in charcoal on sealskin, so it's quite delicate
+and you'll need to commit it to memory. It depicts a simple idea: building pens
+to farm crabs.
+   'Learn' this schematic and it will enable you to build 'crabpens', new
+pastoral buildings that produce crab meat.
+~
+7 0 a 0 0 3
+15912 0 0
+0 0
+C
+75 75
+S
+#15922
+services fine haberdasher~
+the services of a fine haberdasher~
+The services of a fine haberdasher are here.~
+   By purchasing this, you will temporarily hire a haberdasher who will produce
+clothing for you. The haberdasher acts as a companion and is summoned like any
+companion. When he has finished producing clothing for you, he will dismiss
+himself. Buying this item twice will have no effect if you still have the
+haberdasher in your companion list.
+~
+3 p a 0 0 3
+0 0 0
+0 2
+C
+75 75
+T 15922
+S
+#15923
+leathers scrapboss boss set~
+scrapboss leathers~
+A set of scrapboss leathers are crumpled on the ground.~
+   The scrapboss outfit is leather, with bulges all over where plates of metal
+and wood are crammed into every pocket. In fact, they're crammed so tight you
+can't get them out.
+   The scrapboss's job is to turn debris into barricades, huts, weapons, and
+even traps. As second-in-command of the raiding party, they also become a full
+boss if the leader doesn't survive.
+~
+2 p ad 0 0 7
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Scrapboss $n is dragging a bag of heavy construction materials.~
+M
+8
+You strap the scrapboss leathers to your body.~
+M
+9
+$n straps $p to $s body.~
+S
+#15924
+robes set wavewhisperer wave-whisperer whisperer~
+wavewhisperer robes~
+A set of wavewhisperer robes are piled on the ground.~
+   The deep violet robes are finely stitched with gleaming silver thread,
+though the edges are frayed and torn.
+   Goblins have long whispered to the waves and, in ages long past, it is said
+that the waves also whispered back.
+~
+2 p ad 0 0 8
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Wavewhisperer $n stares serenely off into the distance.~
+M
+8
+It takes a few minutes, but you manage to get the wavewhisperer robes wrapped around your body.~
+M
+9
+It takes a few minutes, but $n manages to get $p wrapped around $s body.~
+S
+#15925
+clothes set crabherd crab-herd herd~
+crabherd clothes~
+A set of crabherd clothes lie on the ground.~
+   A simple pair of coveralls is wrapped in strips of hardened leather -- at
+least, from the waist down. It looks like it has been armored against anything
+with a very low attack.
+   The crabherd is among the lowest of ranks among goblin sailors, but it is
+often the best-fed.
+~
+2 p ad 0 0 10
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Crabherd $n is looking for something.~
+M
+8
+You put on the crabherd clothes, taking care to wrap your legs.~
+M
+9
+$n puts on $p, taking care to wrap $s legs.~
+S
+#15926
+vestments set raidscribe raid-scribe scribe~
+raidscribe vestments~
+A set of raidscribe vestments have been left here, folded.~
+   Well-stitched layer of cloth and leather mark the vestments of a raidscribe.
+The belt holds hooks for the large number of precise woodworking tools required
+by the profession, while reddened legs reveal how much blood goes into the
+work.
+   Goblins certainly love their tales. A good raidscribe is always on hand to
+record a new epic.
+~
+2 p ad 0 0 12
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Raidscribe $n is carving notches into a long pole.~
+M
+8
+You don the elegant vestments of a raidscribe.~
+M
+9
+$n dons the elegant vestments of a raidscribe.~
+S
+#15927
+threads ropesnarl rope-snarl snarl~
+ropesnarl threads~
+A set of ropesnarl threads has been left in a heap.~
+   Never in the history of the world have fishnets been used so poorly to make
+clothing. Still, there's a certain fashion statement in constructing a whole
+outfit from them. For a ropesnarl, having netted clothing means easy repairs.
+   Ropesnarl is a high rank on a goblin ship, but it's still below captain.
+This, perhaps, is why goblins say, 'A bad captain is still better than
+knotting.'
+~
+2 p ad 0 0 12
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Ropesnarl $n is twirling a net.~
+M
+8
+With some effort, you manage to put on the ropesnarl outfit.~
+M
+9
+With some effort, $n manages to put on $p.~
+S
+#15928
+livery set bonecounter bone-counter counter~
+bonecounter livery~
+A set of bonecounter livery is piled on the ground.~
+   The bonecounter livery is made from tightly-woven yarn which binds dozens --
+or perhaps hundreds -- of small bones. The faint stench of death follows along
+with it.
+   Traditionally, bonecounters only counted bones individually, not while they
+were still articulated. Modern bonecounters don't make this distinction.
+~
+2 p ad 0 0 13
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Bonecounter $n is eyeing you up and down.~
+M
+8
+You rattle into the bonecounter livery.~
+M
+9
+$n rattles into a set of $p.~
+S
+#15929
+regalia set shellpicker shell-picker picker~
+shellpicker regalia~
+A set of shellpicker regalia has been tossed in a pile.~
+   This, er, elegant dress has been cobbled together from hundreds of shells
+such that it rattles and clacks with each movement. What better way to show off
+your collection than the clatter of seashells?
+   Shellpicker was once a prestigious position for a goblin, in the days before
+coins. Now it's more a task for the galley.
+~
+2 p ad 0 0 14
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Shellpicker $n is gleaming in the light.~
+M
+8
+You manage to put on the shellpicker regalia without losing any shells.~
+M
+9
+$n carefully rattles into $s $p.~
+S
+#15930
+jumpsuit suit cargo lootcaller's lootcallers loot-caller's loot-callers caller's callers~
+a lootcaller's cargo jumpsuit~
+A lootcaller's cargo jumpsuit has been left in a heap.~
+   It's a fairly standard jute jumpsuit, double-stitched for strength, but with
+an absolutely uncountable number of pockets, each with a clasp to securely hold
+anything you might find.
+   Loot-calling is a labor of peace. If not for the lootcaller, each goblin in
+the party might just grab all the valuables they see and fight over them later.
+~
+2 p ad 0 0 15
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Lootcaller $n is barking out orders.~
+M
+8
+You slip into $p.~
+M
+9
+$n slips into $p.~
+S
+#15931
+raiment set banner-lugger bannerlugger lugger~
+banner-lugger raiment~
+A set of banner-lugger raiment is lying here.~
+   This glorious raiment is finely stitched by tiny hands. This sort of
+outfit is traditionally worn by the goblin who drags the group's banner through
+the melee during a siege.
+   Goblinkind learned long ago that flags legitimize claims in this world. The
+ceremonial role of banner-lugger is usually a young goblin's first position of
+prestige, before they move on to the rough stuff.
+~
+2 p ad 0 0 16
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Banner-lugger $n stands proudly in $s raiment.~
+M
+8
+You proudly don the banner-lugger raiment.~
+M
+9
+$n dons $p.~
+S
+#15932
+garb set flame-skulker flameskulker skulker~
+flame-skulker garb~
+A set of flame-skulker garb is smouldering in a heap.~
+   The clothing -- if there's enough left to call it that -- is blackened
+almost beyond recognition with soot that somehow forms a cloud when you smack
+it, but also remains permanently embedded in the fabric.
+   Flame-skulking is less a job or party role and more a passion for those
+goblins who undertake it. Though their bodies are short-lived, the tale of a
+great fire can last for centuries.
+~
+2 p ad 0 0 17
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Flame-skulker $n is lurking nearby.~
+M
+8
+You cough as you put the sooty garb on your body.~
+M
+9
+$n coughs as $e puts $p on.~
+S
+#15933
+frock tarflinger's tarflingers flinger's flingers~
+a tarflinger's frock~
+A tarflinger's frock has fallen here.~
+   This fine frock is somewhat splattered with tar. But that seems to be the
+style.
+   Tarflingers and flame-skulkers often work closely with one another -- but
+not too closely, for obvious reasons.
+~
+2 p ad 0 0 18
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Tarflinger $n is preparing something.~
+M
+8
+You very carefully put on the tarflinger's frock.~
+M
+9
+$n very carefully puts on $p.~
+S
+#15934
+shrouds set deadwright dead-wright wright~
+deadwright shrouds~
+A set of deadwright shrouds hang in the air.~
+   These white shrouds show the tiny, tiny stitching of goblin hands, to the
+point that they're nearly seamless. Though they look more like parts of a death
+shroud, they seem to be made to be worn more like robes.
+   Goblin raids are mortal business in that many of the goblins die before the
+raid even starts. It's common to see a deadwright come along to make sure any
+who die on shore are saved.
+~
+2 p ad 0 0 19
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+Deadwright $n seems to be chanting under $s breath.~
+M
+8
+You somehow wrap yourself in the deadwright shrouds.~
+M
+9
+$n somehow wraps $mself in $p.~
+S
+#15935
+finery haberdasher set~
+haberdasher finery~
+A fine haberdasher set is lying here.~
+   These fine clothes were clearly made by a skilled haberdasher with nimble
+fingers. They are the height of fashion -- or perhaps beyond it.
+   Though often marginalized at the fringes of society, the tiny and nimble
+hands of a goblin create some of the most valuable crafts and clothing.
+~
+2 p ad 0 0 20
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+$n the haberdasher stands here in $s finery.~
+M
+8
+You spiff yourself up and put on your finest clothes.~
+M
+9
+$n puts on $s $p and looks quite fine.~
+S
+#15936
+fish frenzy stick~
+frenzy fish on a stick~
+There's a stick with some frenzy fish on the ground.~
+   This heavily-seasoned fish smells like it's past its prime. Though it
+probably wasn't very appetizing in the first place, goblin raiders swear by
+this stuff.
+   Goblin culture started on the coasts and riverbanks. It is said -- by
+goblins, at least -- that they were the earliest fishermen.
+~
+6 gE a 0 0 14
+12 0 0
+7 336
+B
+q
+C
+100 100
+O+ 1 6223
+R
+4 5619 0
+R
+4 5119 0
+S
+#15937
+recipe frenzy fish~
+the frenzy fish recipe~
+The frenzy fish recipe is on the ground.~
+   The recipe is scribbled in charcoal on sealskin, so it's quite delicate
+and you'll need to commit it to memory. It shows a pair of fish on a stick,
+coated judiciously in spices.
+   'Learn' this recipe and it will enable you to cook 'frenzy fish', a new buff
+food that briefly grants you haste.
+~
+7 0 a 0 0 2
+15936 0 0
+0 0
+C
+75 75
+S
+#15938
+tent hoard goblin~
+a goblin hoard tent~
+A goblin hoard tent is lying here.~
+   This bundled mass of leather and sticks is a goblin hoard tent. Setting it
+up will require more resources, but it's made to shelter all manner of pilfered
+treasures and gems.
+   Use this item to build a 'goblin hoard tent', a storage tent that holds all
+manner of looted collectibles and gems.
+   The lootcaller's job is to assign found items to each goblin and then dish
+them out to the survivors at the end of the raid.
+~
+3 e a 0 0 9
+0 0 0
+7 0
+C
+75 75
+S
+#15939
+fragment true Waur~
+a True Fragment of Waur~
+A True Fragment of Waur lies on the ground.~
+   Though you know what it's called, it just looks like a chunk of rock that
+someone chiseled out of a quarry.
+   In the early days, tall rocks were the focus of goblin worship.
+~
+15 0 a 0 0 6
+8 2 0
+1 0
+R
+4 5193 0
+S
+#15940
+gnome cracked ceramic~
+a cracked ceramic gnome~
+A cracked ceramic gnome is lying here.~
+   This delicate, painted ceramic figure has the shape of a gnome: it's a small
+man with a large, round nose and a red pileus cap. Despite a crack down its
+back side, it's quite finely made and may be worth some money.
+   The presence of a gnome in one's garden is said to bring good luck. However,
+openly displaying one's sculptures can also bring goblins.
+~
+15 0 a 0 0 7
+4 2 0
+6 0
+R
+4 5193 0
+S
+#15941
+stick calendar~
+a calendar stick~
+A calendar stick is lying here.~
+   This long, straight stick bears rough notches and carvings at regular
+intervals, divided by solid lines. The markings don't mean much to you, but
+this one stick might hold months or even years of precious records from a
+village somewhere.
+   An old raidscribe can rattle off the details of battles long, long ago with
+little more than a pass of the fingers.
+~
+15 0 a 0 0 8
+16 2 0
+0 0
+R
+4 5193 0
+S
+#15942
+knob doorknob up-market upmarket market brass~
+an up-market brass doorknob~
+An up-market brass doorknob is lying here.~
+   Splinters of wood remain where this elegant knob was prised from its door.
+The workmanship is excellent though, at the end of the day, it's still just a
+doorknob.
+   A shiny brass knob on the front door is a conspicuous way to show off one's
+wealth to the neighbors as well as to any approaching raiders.
+~
+15 0 a 0 0 12
+4 0 0
+13 0
+R
+4 5193 0
+S
+#15943
+bone art goblin~
+a goblin art bone~
+A goblin art bone is sticking up.~
+   Based on the ends, you'd say this is a femur. It's longer than your arm,
+though it has been made thin through intricate carving, including some fine bas
+relief. This work was done by tiny hands. The carvings appear to depict a ship,
+a crowd of people, and a lot of graves. Symbols for different currencies appear
+at the top of the scene as if they're floating in the sky.
+   Wood is a prime building material for the modern goblin, and is thus never
+available for art. Luckily -- for some -- goblins are good at finding other
+things to do art to.
+~
+15 0 a 0 0 11
+6 2 0
+14 0
+R
+4 5193 0
+S
+#15944
+chamberpot pot modified brass~
+a modified brass chamberpot~
+A modified brass chamberpot is rolling around.~
+   This slightly dented chamberpot nevertheless appears to be made of fine
+brass. The only concerning part is that someone has riveted it at the sides and
+attached what appears to be a strap.
+   Notoriously small in stature, goblins learn early to protect their heads.
+~
+15 0 a 0 0 13
+8 0 0
+13 0
+R
+4 5193 0
+S
+#15945
+chest silver~
+a chest of silver~
+A chest of silver is half-covered here.~
+   You open the chest expecting riches, but it's completely empty. Luckily it
+has been cast from pure silver.
+   A nobleman once filled this chest with wooden nickels, but those are now
+missing.
+~
+15 0 a 0 0 14
+24 0 0
+3 0
+R
+4 5193 0
+S
+$

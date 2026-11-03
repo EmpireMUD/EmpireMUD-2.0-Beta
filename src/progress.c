@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 
 /**
@@ -607,13 +608,14 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 		return;	// sanitation
 	}
 	
-	// apply points/cost
+	// apply value as points (costs are not applied to this as of b5.216)
 	if (PRG_VALUE(prg)) {	// adds to point total and pool
 		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 	}
-	if (PRG_COST(prg)) {	// adds to point total, subtracts from pool
-		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_COST(prg) : -PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
+	if (PRG_COST(prg)) {	// subtracts from pool
+		// no longer adds cost to the points total as of b5.216
+		// SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_COST(prg) : -PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? -PRG_COST(prg) : PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 	}
 	
@@ -761,6 +763,9 @@ void check_for_eligible_goals(empire_data *emp) {
 			}
 		}
 	}
+	
+	// always run this too
+	et_update_progress(emp, NOTHING);
 }
 
 
@@ -799,7 +804,7 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 	}
 	
 	if (!PRG_FLAGGED(prg, PRG_NO_ANNOUNCE)) {
-		if (!EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
+		if (!EMPIRE_ADMIN_FLAGGED(emp, EADM_HIDDEN_PROGRESS)) {
 			log_to_slash_channel_by_name(PROGRESS_LOG_CHANNEL, NULL, "%s%s\t0 achieved %s", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), PRG_NAME(prg));
 		}
 		log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
@@ -808,7 +813,7 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 	add_completed_goal(emp, goal->vnum);
 	cancel_empire_goal(emp, goal);
 	
-	check_for_eligible_goals(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 }
 
 
@@ -924,7 +929,7 @@ void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by
 	}
 	
 	add_completed_goal(emp, PRG_VNUM(prg));
-	check_for_eligible_goals(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 }
 
 
@@ -1016,6 +1021,8 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 			}
 		}
 	}
+	
+	et_update_progress(emp, only_vnum);
 }
 
 
@@ -1044,7 +1051,8 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_empire_objects(emp, task->vnum);
 				break;
 			}
-			case REQ_OWN_BUILDING: {
+			case REQ_OWN_BUILDING:
+			case REQ_NOT_OWN_BUILDING: {
 				task->current = count_owned_buildings(emp, task->vnum);
 				break;
 			}
@@ -1128,6 +1136,22 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_owned_roads(emp);
 				break;
 			}
+			case REQ_EMPIRE_HAS_PROGRESS: {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EMPIRE_LACKS_PROGRESS: {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? 0 : task->needed;
+				break;
+			}
+			case REQ_EMPIRE_ON_PROGRESS: {
+				task->current = get_current_goal(emp, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EMPIRE_NOT_ON_PROGRESS: {
+				task->current = get_current_goal(emp, task->vnum) ? 0 : task->needed;
+				break;
+			}
 			
 			// ones that cannot be detected but are always true for progress goals
 			case REQ_DAYTIME:
@@ -1188,7 +1212,7 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 		return;	// nothing to do
 	}
 	
-	if (!EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
+	if (!EMPIRE_ADMIN_FLAGGED(emp, EADM_HIDDEN_PROGRESS)) {
 		log_to_slash_channel_by_name(PROGRESS_LOG_CHANNEL, NULL, "%s%s\t0 achieved %s", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), PRG_NAME(prg));
 	}
 	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
@@ -1198,7 +1222,7 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 	if (goal) {
 		cancel_empire_goal(emp, goal);
 	}
-	check_for_eligible_goals(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 }
 
 
@@ -1429,6 +1453,10 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_NOT_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 			else if (task->type == REQ_OWN_VEHICLE && building_counts_as(bld, NOTHING, task->vnum)) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1504,6 +1532,10 @@ void et_gain_vehicle(empire_data *emp, vehicle_data *veh) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_NOT_OWN_BUILDING && vehicle_counts_as(veh, task->vnum, NOTHING)) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1538,8 +1570,7 @@ void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 	struct empire_goal *goal, *next_goal;
 	obj_data *proto = obj_proto(vnum);
 	struct req_data *task;
-	descriptor_data *desc;
-	char_data *ch;
+	char_data *ch_iter;
 	
 	if (!emp || vnum == NOTHING || amount == 0 || !proto) {
 		return;	// no work
@@ -1559,15 +1590,10 @@ void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 	}
 	
 	// members online
-	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
-			continue;
+	DL_FOREACH2(player_character_list, ch_iter, next_plr) {
+		if (!IS_NPC(ch_iter) && GET_LOYALTY(ch_iter) == emp) {		
+			qt_change_production_total(ch_iter, vnum, amount);
 		}
-		if (GET_LOYALTY(ch) != emp) {
-			continue;
-		}
-		
-		qt_change_production_total(ch, vnum, amount);
 	}
 }
 
@@ -1631,6 +1657,12 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
+				--task->current;
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_NOT_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
 				--task->current;
 				
 				// check min
@@ -1722,6 +1754,13 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 				// check min
 				task->current = MAX(task->current, 0);
 			}
+			else if (task->type == REQ_NOT_OWN_BUILDING && vehicle_counts_as(veh, task->vnum, NOTHING)) {
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1754,6 +1793,46 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 			}
 		}
 	}
+}
+
+
+/**
+* Empire Tracker: empire changes status on a progress goal.
+*
+* This is called by refresh_empire_goals() and check_for_eligible_goals();
+* anything that adds or removes an empire's current or completed goals but
+* doesn't call one of those should also call this function.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The progress goal vnum (or NOTHING to refresh all).
+*/
+void et_update_progress(empire_data *emp, any_vnum only_vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_EMPIRE_HAS_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? task->needed : 0;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_LACKS_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? 0 : task->needed;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_ON_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = get_current_goal(emp, task->vnum) ? task->needed : 0;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_NOT_ON_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = get_current_goal(emp, task->vnum) ? 0 : task->needed;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// update players
+	qt_empire_players(emp, qt_update_progress, only_vnum);
 }
 
 
@@ -1847,7 +1926,7 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No name set");
 		problem = TRUE;
 	}
-	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
+	if (ends_in_punct(PRG_NAME(prg))) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
 		problem = TRUE;
 	}
@@ -1914,7 +1993,12 @@ char *list_one_progress(progress_data *prg, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		if (PRG_COST(prg) > 0) {
+			safe_snprintf(output, sizeof(output), "[%5d] %s (%s) [costs %d]%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_COST(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		}
+		else {
+			safe_snprintf(output, sizeof(output), "[%5d] %s (%s) [%d point%s]%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		}
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
@@ -1934,6 +2018,7 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 	progress_data *prg = real_progress(vnum), *iter, *next_iter;
 	struct progress_list *pl;
 	quest_data *qiter, *next_qiter;
+	trig_data *trig, *next_trig;
 	int found;
 	bool any;
 	
@@ -1965,6 +2050,14 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_PROGRESS, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -2209,6 +2302,9 @@ void free_progress(progress_data *prg) {
 	if (PRG_PERKS(prg) && (!proto || PRG_PERKS(prg) != PRG_PERKS(proto))) {
 		free_progress_perks(PRG_PERKS(prg));
 	}
+	if (PRG_NOTES(prg) && (!proto || PRG_NOTES(prg) != PRG_NOTES(proto))) {
+		free(PRG_NOTES(prg));
+	}
 	
 	free(prg);
 }
@@ -2289,6 +2385,11 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 			}
 			case 'W': {	// tasks / work
 				parse_requirement(fl, &PRG_TASKS(prg), (*(line+1) == '+' ? TRUE : FALSE), error);
+				break;
+			}
+			
+			case '_': {	// notes
+				PRG_NOTES(prg) = fread_string(fl, error);
 				break;
 			}
 			
@@ -2383,6 +2484,13 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	// W. tasks (work)
 	write_requirements_to_file(fl, 'W', PRG_TASKS(prg));
 	
+	// '_'
+	if (PRG_NOTES(prg) && *PRG_NOTES(prg)) {
+		strcpy(temp, PRG_NOTES(prg));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
+	
 	// end
 	fprintf(fl, "S\n");
 }
@@ -2431,10 +2539,11 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	struct progress_list *pl, *next_pl;
 	quest_data *qiter, *next_qiter;
 	empire_data *emp, *next_emp;
+	trig_data *trig, *next_trig;
 	struct empire_goal *goal;
 	descriptor_data *desc;
 	char name[256];
-	bool any;
+	bool any, found;
 	
 	if (!(prg = real_progress(vnum))) {
 		msg_to_char(ch, "There is no such progress entry %d.\r\n", vnum);
@@ -2495,6 +2604,16 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_PROGRESS, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to progress [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// remove from from active editors
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_PROGRESS(desc)) {
@@ -2522,12 +2641,22 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "A quest used by the progress goal you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_PROGRESS, vnum);
+			if (found) {
+				msg_to_desc(desc, "Progress [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
+			}
+		}
 	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted progress entry %d %s", GET_NAME(ch), vnum, name);
 	msg_to_char(ch, "Progress entry %d (%s) deleted.\r\n", vnum, name);
 	
 	free_progress(prg);
+	
+	// refresh everyone (immediately)
+	need_progress_refresh = TRUE;
+	check_progress_refresh();
 }
 
 
@@ -2622,7 +2751,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, PRG_NAME(prg)) && !multi_isname(find_keywords, PRG_DESCRIPTION(prg))) {
+		if (*find_keywords && !multi_isname(find_keywords, PRG_NAME(prg)) && !multi_isname(find_keywords, PRG_DESCRIPTION(prg)) && (!PRG_NOTES(prg) || !multi_isname(find_keywords, PRG_NOTES(prg)))) {
 			continue;
 		}
 		
@@ -2672,6 +2801,9 @@ void save_olc_progress(descriptor_data *desc) {
 	if (PRG_DESCRIPTION(proto)) {
 		free(PRG_DESCRIPTION(proto));
 	}
+	if (PRG_NOTES(proto)) {
+		free(PRG_NOTES(proto));
+	}
 	free_progress_list(PRG_PREREQS(proto));
 	free_requirements(PRG_TASKS(proto));
 	free_progress_perks(PRG_PERKS(proto));
@@ -2686,6 +2818,10 @@ void save_olc_progress(descriptor_data *desc) {
 	if (PRG_DESCRIPTION(prg) && !*PRG_DESCRIPTION(prg)) {
 		free(PRG_DESCRIPTION(prg));
 		PRG_DESCRIPTION(prg) = NULL;
+	}
+	if (PRG_NOTES(prg) && !*PRG_NOTES(prg)) {
+		free(PRG_NOTES(prg));
+		PRG_NOTES(prg) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -2734,6 +2870,7 @@ progress_data *setup_olc_progress(progress_data *input) {
 		PRG_PREREQS(new) = copy_progress_list(PRG_PREREQS(input));
 		PRG_TASKS(new) = copy_requirements(PRG_TASKS(input));
 		PRG_PERKS(new) = copy_progress_perks(PRG_PERKS(input));
+		PRG_NOTES(new) = PRG_NOTES(input) ? str_dup(PRG_NOTES(input)) : NULL;
 		
 		PRG_VERSION(new) += 1;
 	}
@@ -2782,6 +2919,10 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	
 	build_page_display_str(ch, "Perks:");
 	show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
+	
+	if (PRG_NOTES(prg) && *PRG_NOTES(prg)) {
+		build_page_display(ch, "Notes:\r\n%s", PRG_NOTES(prg));
+	}
 	
 	send_page_display(ch);
 }
@@ -2833,6 +2974,8 @@ void olc_show_progress(char_data *ch) {
 	if (PRG_PERKS(prg)) {
 		show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(PRG_NOTES(prg)), NULLSAFE(PRG_NOTES(prg)));
 	
 	send_page_display(ch);
 }
@@ -3001,9 +3144,22 @@ OLC_MODULE(progedit_name) {
 }
 
 
+OLC_MODULE(progedit_notes) {
+	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", PRG_NAME(prg));
+		start_string_editor(ch->desc, buf, &PRG_NOTES(prg), MAX_NOTES, TRUE);
+	}
+}
+
+
 OLC_MODULE(progedit_tasks) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
-	olc_process_requirements(ch, argument, &PRG_TASKS(prg), "tasks", TRUE);
+	olc_process_requirements(ch, argument, &PRG_TASKS(prg), "task", TRUE);
 }
 
 

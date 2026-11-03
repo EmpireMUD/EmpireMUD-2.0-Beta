@@ -14,7 +14,7 @@ S
 donkey confused~
 a confused donkey~
 A confused donkey stands nearby.~
-bcj 11 14 0 0 3
+bcj 9021 14 0 0 3
 0 0 -1 -1
 A
 21 -5
@@ -31,7 +31,7 @@ S
 donkey confused~
 a confused donkey~
 A confused donkey stands nearby.~
-bcj 11 14 0 0 3
+bcj 9021 14 0 0 3
 0 0 -1 -1
 A
 21 -25
@@ -201,7 +201,7 @@ S
 warthog muddled~
 a muddled warthog~
 A warthog looks around, muddled.~
-bcj 27 43 0 0 2
+bcj 43 43 0 0 2
 0 0 -1 -1
 A
 21 -5
@@ -221,7 +221,7 @@ S
 warthog muddled~
 a muddled warthog~
 A warthog looks around, muddled.~
-bcj 27 43 0 0 2
+bcj 43 43 0 0 2
 0 0 -1 -1
 A
 21 -25

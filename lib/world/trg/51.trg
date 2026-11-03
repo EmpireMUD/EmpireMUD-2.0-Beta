@@ -1,6 +1,7 @@
 #5107
 Mine Rename Based on Type~
-2 o 100
+2 o 100 1
+L f 5107
 ~
 wait 0
 set type %room.mine_type%
@@ -13,7 +14,8 @@ detach 5107 %room.id%
 ~
 #5138
 Tavern Hideout Completion~
-2 o 100
+2 o 100 1
+L e 5510
 ~
 if !%room.down(room)%
   * Add Secret Hidout
@@ -31,7 +33,12 @@ detach 5138 %room.id%
 ~
 #5139
 Bartender: List drinks from empire inventory~
-0 c 0
+0 c 0 5
+L c 232
+L c 233
+L c 234
+L c 235
+L c 236
 list~
 set empire %self.empire%
 set room %self.room%
@@ -76,7 +83,12 @@ end
 ~
 #5140
 Bartender: Buy drink from empire inventory~
-0 c 0
+0 c 0 5
+L c 232
+L c 233
+L c 234
+L c 235
+L c 236
 buy~
 set empire %self.empire%
 set room %self.room%
@@ -126,7 +138,7 @@ end
 ~
 #5141
 Tavern: Charge a differnet price~
-2 c 0
+2 c 0 0
 price~
 set empire %self.empire%
 set cost %room.var(tavern_cost,50)%
@@ -161,7 +173,8 @@ end
 ~
 #5142
 Chant of Magic (gain natural magic at a henge)~
-2 c 0
+2 c 0 1
+L q 3
 chant~
 * Chant of Magic gains the player their 1st point of natural magic
 if !(magic /= %arg%)
@@ -234,7 +247,7 @@ while %cycles_left% >= 0
       %echoaround% %actor% ~%actor% looks up, saying, 'Chant softly, words that echo in the language of the land.'
     break
     case 6
-      %send% %actor% You chants, 'Sense the currents, weave the threads, as mana responds to your command.'
+      %send% %actor% You chant, 'Sense the currents, weave the threads, as mana responds to your command.'
       %echoaround% %actor% ~%actor% chants, 'Sense the currents, weave the threads, as mana responds to your command.'
     break
     case 5
@@ -259,7 +272,7 @@ while %cycles_left% >= 0
     case 0
       * chant complete
       if %actor.skill(Natural Magic)% < 1
-        %send% %actor% &&gAs you finish the chant, you finally to see the weave of mana through nature...&&0
+        %send% %actor% &&gAs you finish the chant, you finally begin to see the weave of mana through nature...&&0
         nop %actor.gain_skill(Natural Magic,1)%
         if %actor.skill(Natural Magic)% < 1
           %send% %actor% But you fail to grasp the concepts of the Chant of Magic (you cannot gain Natural Magic skill).
@@ -278,7 +291,7 @@ done
 ~
 #5143
 Chant of Magics 2nd person (denial)~
-2 c 0
+2 c 0 0
 chant~
 if !(magic /= %arg%)
   return 0
@@ -288,7 +301,7 @@ end
 ~
 #5149
 Library commands~
-2 c 0
+2 c 0 0
 browse checkout shelve~
 * just passes through commands to the library command
 return 1
@@ -304,15 +317,17 @@ end
 ~
 #5156
 Swamp Platform~
-2 o 100
+2 o 100 1
+L h 200
 ~
-%echo% The platform is complete and the area is now plains.
-%terraform% %room% 0
+%echo% The platform is complete and the area is now a grassland.
+%terraform% %room% 200
 return 0
 ~
 #5161
 Baths: Clothes / bathing process~
-1 ab 100
+1 ab 100 1
+L w 5162
 ~
 * this runs in a loop
 while %self.val1% > 0
@@ -367,7 +382,8 @@ done
 ~
 #5162
 Baths: Bathe command~
-2 c 0
+2 c 0 1
+L c 5162
 bathe~
 set valid_positions Standing Sitting Resting
 if %actor.action% || %actor.fighting% || !(%valid_positions% ~= %actor.position%)
@@ -375,6 +391,20 @@ if %actor.action% || %actor.fighting% || !(%valid_positions% ~= %actor.position%
   halt
 elseif !%actor.canuseroom_guest%
   %send% %actor% You wouldn't want to get caught bathing in here.
+  halt
+end
+* already bathing?
+set any 0
+set obj %room.contents%
+while %obj% && !%any%
+  if %obj.vnum% == 5162 && %obj.val0% == %actor.id%
+    set any 1
+  end
+  set obj %obj.next_in_list%
+done
+if %any%
+  %send% %actor% You are already bathing.
+  return 1
   halt
 end
 * ok bathe:
@@ -392,10 +422,12 @@ nop %obj.val1(4)%
 set stop_command 0
 set stop_message_char You climb out of the water and get dressed.
 set stop_message_room ~%actor% climbs out of the water and gets dressed.
+set stop_room_lock %room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * start messages
 if %actor.eq(clothes)%
@@ -408,7 +440,8 @@ end
 ~
 #5164
 Sorcery Tower Completion~
-2 o 100
+2 o 100 1
+L e 5511
 ~
 if !%room.up(room)%
   * Add Top of the Tower
@@ -416,9 +449,28 @@ if !%room.up(room)%
 end
 detach 5164 %room.id%
 ~
+#5185
+Portal dismantle~
+2 s 0 0
+~
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj.type% == PORTAL
+    %echo% @%obj% implodes and vanishes!
+    %purge% %obj%
+  end
+  set obj %next_obj%
+done
+~
 #5186
 Haven Interior~
-2 o 100
+2 o 100 5
+L e 5601
+L e 5605
+L e 5608
+L e 5612
+L e 5620
 ~
 eval firsthall %%room.%room.enter_dir%(room)%%
 * Add first hallway
@@ -461,7 +513,11 @@ detach 5186 %room.id%
 ~
 #5187
 Tunnel Haven Interior~
-2 o 100
+2 o 100 4
+L e 5601
+L e 5608
+L e 5612
+L e 5620
 ~
 eval firsthall %%room.%room.enter_dir%(room)%%
 * Add first tunnel
@@ -504,7 +560,8 @@ detach 5187 %room.id%
 ~
 #5191
 Oasis Drainage: Completing building converts to Dry Oasis~
-2 o 100
+2 o 100 1
+L h 82
 ~
 %echo% The drainage is complete. The plants begin to die as the oasis dries up.
 %terraform% %room% 82
@@ -512,54 +569,93 @@ return 0
 ~
 #5195
 Equipment Cruncher: shatter~
-2 c 0
+2 c 0 5
+L w 5100
+L w 5101
+L w 5102
+L w 5103
+L w 5104
 shatter~
-eval target %%actor.obj_target(%arg%)%%
-if !%target%
-  %send% %actor% Convert what into shards?
+* certain resources that are too easy to acquire
+set ban_list -1 100 102 106 131 134 135 136 142 146 148 180 181 184 616 851 852 919 2104 2140
+*
+eval target %%actor.obj_target(%arg.argument1%)%%
+if !%arg%
+  * no-arg: just list
+  %send% %actor% Shatter which piece of gear?
+  set any 0
+  set obj %actor.inventory%
+  while %obj%
+    if %obj.wearable% && !%obj.is_flagged(*KEEP)% && !%obj.is_stolen% && !(%ban_list% ~= %obj.vnum%)
+      if %obj.is_flagged(SUPERIOR)%
+        set qual &&Y superior&&0
+      elseif %obj.is_flagged(HARD-DROP)% && %obj.is_flagged(GROUP-DROP)%
+        set qual &&M boss&&0
+      elseif %obj.is_flagged(GROUP-DROP)%
+        set qual &&C group&&0
+      elseif %obj.is_flagged(HARD-DROP)%
+        set qual &&G hard&&0
+      else
+        set qual
+      end
+      %send% %actor% &&0  @%obj%  (level %obj.level%%qual%)
+      set any 1
+    end
+    set obj %obj.next_in_list%
+  done
+  if !%any%
+    %send% %actor%  (no shatterable items found)
+  end
   halt
-end
-if !%target.carried_by%
+elseif !%target%
+  %send% %actor% You don't see that to shatter here.
+  halt
+elseif !%target.carried_by%
   %send% %actor% Pick @%target% up first.
   halt
-end
-if !%target.wearable%
+elseif %target.vnum% < 0 || %ban_list% ~= %target.vnum%
+  %send% %actor% You cannot shatter that.
+  halt
+elseif !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
   halt
-end
-if %target.is_flagged(*keep)%
-  %send% %actor% You can not shatter something you are keeping.
+elseif %target.is_flagged(*KEEP)%
+  %send% %actor% You cannot shatter something you are keeping.
+  halt
+elseif %target.is_stolen%
+  %send% %actor% You cannot shatter a stolen item.
   halt
 end
 * 26 ~ 200
-eval level_modified %target.level% + 25
+eval level_modified %target.level%
 eval level_in_range (%level_modified% // 100)
 if %level_in_range% == 0
   set level_in_range 100
 end
-eval shard_value %level_in_range% + 25
+eval shard_value %level_in_range%
 if %target.is_flagged(HARD-DROP)%
   eval shard_value %shard_value% + 25
 end
 if %target.is_flagged(GROUP-DROP)%
   eval shard_value %shard_value% + 50
 end
-* 0~75: 5100
-* 76~175: 5101
-* 176~275: 5102
-* 276~375: 5103
+* 0~100: 5100
+* 101~200: 5101
+* 201~300: 5102
+* 301~400: 5103
+* 401~500: 5104
 eval shard_type 5100 + ((%level_modified%-1) / 100)
-eval currency_name %%currency.%shard_type%%%
+eval currency_name %%currency.%shard_type%(%shard_value%)%%
 if !%currency_name% || %currency_name% == UNKNOWN
-  %send% %actor% @%target% is too high level to convert into any current type of shards!
+  %send% %actor% @%target% is too high level to shatter into any current type of shard!
   halt
 end
-if %shard_value% < 1 || %target.quest% || %target.level% < 25
+if %shard_value% < 1 || %target.quest%
   %send% %actor% @%target% can't be converted into shards.
   halt
 end
 %send% %actor% You shatter @%target% into %shard_value% %currency_name%.
-%echoaround% %actor% ~%actor% shatters @%target% into %currency_name%.
+%echoaround% %actor% ~%actor% shatters @%target% into %shard_value% %currency_name%.
 eval money %%actor.give_currency(%shard_type%, %shard_value%)%%
 nop %money%
 %purge% %target%

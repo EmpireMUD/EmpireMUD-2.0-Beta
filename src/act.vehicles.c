@@ -73,6 +73,41 @@ void cancel_driving(char_data *ch) {
 
 
 /**
+* Calculates the distance remaining on a run/drive/sail/pilot path.
+*
+* @param char_data *ch A player who is running, driving, sailing, or piloting.
+* @return int The distance remaining in their path, or 0 if it can't be determined.
+*/
+int driving_distance_remaining(char_data *ch) {
+	char *ptr;
+	int distance;
+	
+	if (!IS_NPC(ch) && (GET_ACTION(ch) == ACT_RUNNING || GET_ACTION(ch) == ACT_DRIVING || GET_ACTION(ch) == ACT_SAILING || GET_ACTION(ch) == ACT_PILOTING)) {
+		// current travel -- check if avnum 1 would be -1 for unlimited (in which case, no estimate)
+		distance = (GET_ACTION_VNUM(ch, 1) > 0 ? GET_ACTION_VNUM(ch, 1) : 0);
+
+		// parse numbers from action string
+		for (ptr = GET_ACTION_STRING(ch); ptr && *ptr; ++ptr) {
+			if (isdigit(*ptr)) {
+				distance += atoi(ptr);
+				// skip past numbers
+				while (*ptr && isdigit(*(ptr + 1))) {
+					++ptr;
+				}
+			}
+			// otherwise ignore all contents
+		}
+	
+		// distance should now equal tiles remaining in the path
+		return distance;
+	}
+	
+	// all other cases
+	return 0;
+}
+
+
+/**
 * Finds a ship in ch's room or docked on ch's current island, which could be
 * dispatched. Ships in the same room are preferred even if they aren't owned
 * by ch; ships in other rooms are partially-validated for ownership and flags.
@@ -352,9 +387,9 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		
-		pre_greet_mtrigger(VEH_SITTING_ON(veh), to_room, dir, "move");	// cannot pre-greet for this
-		enter_triggers(VEH_SITTING_ON(veh), dir, "move", FALSE);
-		greet_triggers(VEH_SITTING_ON(veh), dir, "move", FALSE);
+		pre_greet_mtrigger(VEH_SITTING_ON(veh), to_room, dir, "move", was_in);	// cannot pre-greet for this
+		enter_triggers(VEH_SITTING_ON(veh), dir, "move", FALSE, was_in);
+		greet_triggers(VEH_SITTING_ON(veh), dir, "move", FALSE, was_in);
 		msdp_update_room(VEH_SITTING_ON(veh));
 		
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
@@ -374,6 +409,9 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 					if (SHOW_STATUS_MESSAGES(ch_iter, SM_VEHICLE_MOVEMENT)) {
 						safe_snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
 						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
+					}
+					if (SHOW_STATUS_MESSAGES(ch_iter, SM_PASSENGER_AUTO_LOOK) && ROOM_BLD_FLAGGED(IN_ROOM(ch_iter), BLD_LOOK_OUT)) {
+						look_at_room_by_loc(ch_iter, IN_ROOM(veh), LRR_LOOK_OUT_INSIDE, veh);
 					}
 					
 					// but always msdp-update
@@ -481,6 +519,10 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	
+	if (IS_STOLEN(obj)) {
+		act("$p: you can't put stolen items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return FALSE;
+	}
 	
 	// don't let people drop bound items in other people's vehicles
 	if (OBJ_BOUND_TO(obj) && VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
@@ -488,7 +530,7 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	
@@ -526,6 +568,15 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 * @param room_data *to_room Where to put the item in cont.
 */
 void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_data *to_room) {
+	room_data *was_in = IN_ROOM(mob);
+	
+	// cancel lead (player may be leading it)
+	if (GET_LED_BY(mob)) {
+		act("You stop leading $N.", FALSE, GET_LED_BY(mob), NULL, mob, TO_CHAR);
+		GET_LEADING_MOB(GET_LED_BY(mob)) = NULL;
+		GET_LED_BY(mob) = NULL;
+	}
+	
 	safe_snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, mob, TO_CHAR | ACT_VEH_OBJ);
 	safe_snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
@@ -534,7 +585,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEH_OBJ);
 	
 	char_to_room(mob, to_room);
-	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "enter");	// cannot pre-greet for this
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "enter", was_in);	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}
@@ -547,8 +598,8 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	safe_snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
 	act(buf, FALSE, mob, NULL, cont, TO_ROOM | ACT_VEH_VICT);
 	
-	enter_triggers(mob, NO_DIR, "enter", FALSE);
-	greet_triggers(mob, NO_DIR, "enter", FALSE);
+	enter_triggers(mob, NO_DIR, "enter", FALSE, was_in);
+	greet_triggers(mob, NO_DIR, "enter", FALSE, was_in);
 	msdp_update_room(mob);	// is this possibly a person?
 }
 
@@ -563,6 +614,13 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 */
 void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, room_data *to_room) {
 	char buf[256];
+	
+	// player may be leading it
+	if (VEH_LED_BY(veh)) {
+		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
 	
 	safe_snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, veh, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
@@ -587,12 +645,21 @@ void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, 
 * @param vehicle_data *cont The containing vehicle.
 */
 void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
+	room_data *was_in = IN_ROOM(mob);
+	
+	// cancel lead (player may be leading it)
+	if (GET_LED_BY(mob)) {
+		act("You stop leading $N.", FALSE, GET_LED_BY(mob), NULL, mob, TO_CHAR);
+		GET_LEADING_MOB(GET_LED_BY(mob)) = NULL;
+		GET_LED_BY(mob) = NULL;
+	}
+	
 	act("You unload $N from $v.", FALSE, ch, cont, mob, TO_CHAR | ACT_VEH_OBJ);
 	act("$n unloads you from $v.", FALSE, ch, cont, mob, TO_VICT | ACT_VEH_OBJ);
 	act("$n unloads $N from $v.", FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEH_OBJ);
 	
 	char_to_room(mob, IN_ROOM(cont));
-	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "exit");	// cannot pre-greet for this
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "exit", was_in);	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}
@@ -604,8 +671,8 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	
 	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM | ACT_VEH_VICT);
 	
-	enter_triggers(mob, NO_DIR, "exit", FALSE);
-	greet_triggers(mob, NO_DIR, "exit", FALSE);
+	enter_triggers(mob, NO_DIR, "exit", FALSE, was_in);
+	greet_triggers(mob, NO_DIR, "exit", FALSE, was_in);
 	msdp_update_room(mob);	// is this possibly a person?
 }
 
@@ -618,6 +685,13 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 * @param vehicle_data *cont The containing vehicle.
 */
 void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont) {
+	// player may be leading it
+	if (VEH_LED_BY(veh)) {
+		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
+	
 	act("You unload $V from $v.", FALSE, ch, cont, veh, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 	act("$n unloads $V from $v.", FALSE, ch, cont, veh, TO_ROOM | ACT_VEH_OBJ | ACT_VEH_VICT);
 	
@@ -691,8 +765,9 @@ void process_driving(char_data *ch) {
 	
 	// attempt to move the vehicle
 	if (!move_vehicle(ch, veh, dir, subcmd)) {
-		look_at_room(ch);	// show them where they stopped
-		msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
+		// as of b5.211, suppress auto-look when there's an error. This is hiding the error message above the 'look'.
+		// look_at_room(ch);	// show them where they stopped
+		// msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
 		cancel_action(ch);
 		return;
 	}
@@ -734,7 +809,14 @@ void process_driving(char_data *ch) {
 	}
 	
 	if (done) {
-		look_at_room(ch);	// show them where they stopped
+		// show them where they stopped
+		if (VEH_FLAGGED(veh, VEH_BUILDING) && IN_ROOM(ch) != IN_ROOM(veh) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+			look_at_room_by_loc(ch, IN_ROOM(veh), LRR_LOOK_OUT_INSIDE, veh);
+		}
+		else {
+			look_at_room(ch);
+		}
+		
 		msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
 		cancel_action(ch);
 		return;
@@ -742,7 +824,13 @@ void process_driving(char_data *ch) {
 	
 	// not stopped by anything? auto-look each move
 	if (SHOW_STATUS_MESSAGES(ch, SM_TRAVEL_AUTO_LOOK)) {
-		look_at_room(ch);
+		if (VEH_FLAGGED(veh, VEH_BUILDING) && IN_ROOM(ch) != IN_ROOM(veh) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+			look_at_room_by_loc(ch, IN_ROOM(veh), LRR_LOOK_OUT_INSIDE, veh);
+		}
+		else {
+			// look here
+			look_at_room(ch);
+		}
 	}
 }
 
@@ -1116,8 +1204,9 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 * @param char_data *ch The person trying to burn a vehicle.
 * @param vehicle_data *veh The vehicle to burn.
 * @param obj_data *lighter Optional: The lighter item, if any.
+* @param bool confirmed If TRUE, player typed 'CONFIRM' as the last argument. If FALSE, they didn't.
 */
-void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter, bool confirmed) {
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
@@ -1128,6 +1217,9 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It is already on fire!\r\n");
+	}
+	else if (VEH_OWNER(veh) && VEH_OWNER(veh) == GET_LOYALTY(ch) && !confirmed) {
+		msg_to_char(ch, "You must type 'burn <vehicle> CONFIRM' to burn one you own.\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
 		// owned vehicle
@@ -1333,7 +1425,7 @@ ACMD(do_board) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		msg_to_char(ch, "You are overburdened and cannot move (%d/%d items).\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
 	}
 	else if (!*arg) {
 		safe_snprintf(buf, sizeof(buf), "%s what?\r\n", command);
@@ -1392,6 +1484,9 @@ ACMD(do_disembark) {
 	}
 	else if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 		msg_to_char(ch, "You can only disembark from vehicles. Try 'exit'.\r\n");
+	}
+	else if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
+		msg_to_char(ch, "You cannot disembark on a barrier.\r\n");
 	}
 	else {
 		// shares MOVE_EXIT, which overrides the text with 'disembark' if it's a non-building vehicle
@@ -1478,7 +1573,7 @@ ACMD(do_dispatch) {
 	
 	// ready ready go
 	else {
-		if (!(worker = find_chore_worker_in_room(GET_LOYALTY(ch), IN_ROOM(veh), veh, OVERSEER))) {
+		if (!(worker = find_chore_worker_in_room(GET_LOYALTY(ch), IN_ROOM(veh), NULL, OVERSEER))) {
 			if ((npc = find_free_npc_for_chore(GET_LOYALTY(ch), IN_ROOM(veh)))) {
 				worker = spawn_empire_npc_to_room(GET_LOYALTY(ch), npc, IN_ROOM(veh), OVERSEER);
 			}
@@ -1750,7 +1845,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	char buf[MAX_STRING_LENGTH], *found_path = NULL;
+	char buf[MAX_STRING_LENGTH], dist_buf[256], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
 	long long time_check = -1;
@@ -1758,7 +1853,7 @@ ACMD(do_drive) {
 	vehicle_data *veh;
 	char_data *ch_iter;
 	obj_data *portal;
-	int dir = NO_DIR, dist = -1;
+	int dir = NO_DIR, calc_dist, dist = -1;
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
@@ -1769,11 +1864,17 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*argument && GET_ACTION(ch) == drive_data[subcmd].action) {
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(ch)) > 1) {
+			snprintf(dist_buf, sizeof(dist_buf), " Distance remaining: %d tiles.", calc_dist);
+		}
+		
 		if (GET_ACTION_VNUM(ch, 1) == -1) {
-			msg_to_char(ch, "You are currently %s %s.\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+			msg_to_char(ch, "You are currently %s %s.%s\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]], dist_buf);
 		}
 		else {
-			msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+			msg_to_char(ch, "You are currently %s %d tile%s %s.%s\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]], dist_buf);
 		}
 		
 		if (GET_ACTION_STRING(ch)) {
@@ -1913,11 +2014,18 @@ ACMD(do_drive) {
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;
 		
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
+			safe_snprintf(dist_buf, sizeof(dist_buf), " (total distance: %d)", calc_dist);
+		}
+		
+		// messaging
 		if (was_driving && !same_dir) {
-			msg_to_char(ch, "You turn %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+			msg_to_char(ch, "You turn %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], dist_buf);
 		}
 		else {
-			msg_to_char(ch, "You start %s %s.\r\n", drive_data[subcmd].verb, dirs[get_direction_for_char(ch, dir)]);
+			msg_to_char(ch, "You start %s %s%s.\r\n", drive_data[subcmd].verb, dirs[get_direction_for_char(ch, dir)], dist_buf);
 		}
 		
 		// alert whole vehicle
@@ -2023,7 +2131,7 @@ ACMD(do_fire) {
 			besiege_room(ch, room_targ, dam, veh);
 			
 			if (SECT(room_targ) != secttype) {
-				msg_to_char(ch, "It is destroyed!\r\n");
+				msg_to_char(ch, "The building is destroyed!\r\n");
 			}
 		}
 		else if (veh_targ) {
@@ -2258,7 +2366,7 @@ ACMD(do_load_vehicle) {
 				if (mob == ch || !IS_NPC(mob)) {
 					continue;
 				}
-				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
+				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || (GET_LED_BY(mob) && GET_LED_BY(mob) != ch)) {
 					continue;
 				}
 				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
@@ -2280,12 +2388,24 @@ ACMD(do_load_vehicle) {
 			if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 				continue;
 			}
-			if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+			if (VEH_SITTING_ON(veh) || (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) || VEH_DRIVER(veh)) {
 				continue;
 			}
-		
-			perform_load_vehicle(ch, veh, cont, to_room);
-			found = TRUE;
+			
+			// checks that could sent errors
+			if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, NULL) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+				act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
+				found = TRUE;
+			}
+			else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, NULL) >= config_get_int("vehicle_max_per_tile")) {
+				act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
+				found = TRUE;
+			}
+			else {
+				// ok!
+				perform_load_vehicle(ch, veh, cont, to_room);
+				found = TRUE;
+			}
 		}
 		
 		if (!found) {
@@ -2309,9 +2429,8 @@ ACMD(do_load_vehicle) {
 		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
-		else if (GET_LED_BY(mob)) {
-			safe_snprintf(buf, sizeof(buf), "You can't load $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
-			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
+		else if (GET_LED_BY(mob) && GET_LED_BY(mob) != ch) {
+			act("You can't load $N while someone else is leading $M.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
 			perform_load_mob(ch, mob, cont, to_room);
@@ -2347,8 +2466,14 @@ ACMD(do_load_vehicle) {
 		else if (VEH_DRIVER(veh)) {
 			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
-		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+		else if (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) {
+			msg_to_char(ch, "You can't load %s while someone else is leading it.\r\n", get_vehicle_short_desc(veh, ch));
+		}
+		else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, NULL) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+			act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
+		}
+		else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, NULL) >= config_get_int("vehicle_max_per_tile")) {
+			act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
@@ -2367,6 +2492,7 @@ ACMD(do_load_vehicle) {
 
 ACMD(do_scrap) {
 	char arg[MAX_INPUT_LENGTH];
+	obj_data *temp;
 	vehicle_data *veh;
 	char_data *iter;
 	
@@ -2376,7 +2502,13 @@ ACMD(do_scrap) {
 		msg_to_char(ch, "Scrap what?\r\n");
 	}
 	else if (!(veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
-		msg_to_char(ch, "You don't see anything like that here.\r\n");
+		// helpful check: could they have meant scrape?
+		if (((temp = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_SCRAPE)) || (can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && (temp = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SCRAPE)))) && has_interaction(GET_OBJ_INTERACTIONS(temp), INTERACT_SCRAPE)) {
+			act("You can't scrap $p. (Did you mean scrape?)", FALSE, ch, temp, NULL, TO_CHAR);
+		}
+		else {
+			msg_to_char(ch, "You don't see anything like that here to scrap.\r\n");
+		}
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You can't scrap that! It's not even yours.\r\n");
@@ -2477,6 +2609,9 @@ ACMD(do_unload_vehicle) {
 	else if (!VEH_IS_COMPLETE(cont)) {
 		act("You must finish constructing $V before anything can be unloaded.", FALSE, ch, NULL, cont, TO_CHAR | ACT_VEH_VICT);
 	}
+	else if (ROOM_BLD_FLAGGED(IN_ROOM(cont), BLD_BARRIER)) {
+		msg_to_char(ch, "You can't unload anything on a barrier.\r\n");
+	}
 	else if (VEH_FLAGGED(cont, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't load anything while there's a fire!\r\n");
 	}
@@ -2492,7 +2627,7 @@ ACMD(do_unload_vehicle) {
 				if (mob == ch || !IS_NPC(mob)) {
 					continue;
 				}
-				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
+				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || (GET_LED_BY(mob) && GET_LED_BY(mob) != ch)) {
 					continue;
 				}
 				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
@@ -2514,12 +2649,24 @@ ACMD(do_unload_vehicle) {
 			if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 				continue;
 			}
-			if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+			if (VEH_SITTING_ON(veh) || (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) || VEH_DRIVER(veh)) {
 				continue;
 			}
-		
-			perform_unload_vehicle(ch, veh, cont);
-			found = TRUE;
+			
+			// checks that send messages (no need for fail message)
+			if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(IN_ROOM(cont), NULL) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+				act("You can't load $v because there isn't enough space out there.", FALSE, ch, veh, NULL, TO_CHAR | ACT_VEH_OBJ);
+				found = TRUE;
+			}
+			else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(IN_ROOM(cont), NULL) >= config_get_int("vehicle_max_per_tile")) {
+				act("You can't load $v because there isn't enough space out there.", FALSE, ch, veh, NULL, TO_CHAR | ACT_VEH_OBJ);
+				found = TRUE;
+			}
+			else {
+				// ok!
+				perform_unload_vehicle(ch, veh, cont);
+				found = TRUE;
+			}
 		}
 		
 		if (!found) {
@@ -2543,9 +2690,8 @@ ACMD(do_unload_vehicle) {
 		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't unload $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
-		else if (GET_LED_BY(mob)) {
-			safe_snprintf(buf, sizeof(buf), "You can't unload $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
-			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
+		else if (GET_LED_BY(mob) && GET_LED_BY(mob) != ch) {
+			act("You can't unload $N while someone else is leading $M.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
 			perform_unload_mob(ch, mob, cont);
@@ -2577,8 +2723,14 @@ ACMD(do_unload_vehicle) {
 		else if (VEH_DRIVER(veh)) {
 			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
-		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+		else if (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) {
+			msg_to_char(ch, "You can't unload %s while someone else is leading it.\r\n", get_vehicle_short_desc(veh, ch));
+		}
+		else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(IN_ROOM(cont), NULL) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+			act("You can't unload $v because there's not enough space out there.", FALSE, ch, veh, NULL, TO_CHAR | ACT_VEH_OBJ);
+		}
+		else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(IN_ROOM(cont), NULL) >= config_get_int("vehicle_max_per_tile")) {
+			act("You can't unload $v because there's not enough space out there.", FALSE, ch, veh, NULL, TO_CHAR | ACT_VEH_OBJ);
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);

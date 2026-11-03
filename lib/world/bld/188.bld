@@ -131,7 +131,7 @@ S
 Slaughterhouse~
 The Slaughterhouse~
 &0[  ]~
-1 0 ag 0
+1 0 agz 0
 0 0 0 18877
 C
 retrieve, store~
@@ -141,7 +141,7 @@ have been striped with red until they nearly look plaid, and every instrument
 and work surface has taken on a deep reddish hue.
 ~
 I 29 5007 100.00 1  # RUINS-TO-BLD: Ruins
-I 31 3201 6.00 420 p  # PRODUCTION: slab of pork
+I 31 3201 6.00 420 p  # PRODUCTION: slab of raw pork
 I 31 3203 6.00 420 p  # PRODUCTION: side of raw mutton
 M
 18876 100.00 0

@@ -1,0 +1,85 @@
+#12200
+Deep Pit~
+Around a Deep Pit in the Forest~
+&?^&t\/&?^~
+1000 0 d 0
+0 0 0 -1
+C
+adventure~
+E
+pit deep depths down around forest~
+   The forest floor ends at the mouth of a wide pit, scoured clean by something
+vast and relentless. The walls of the pit are lined with gouges and slashes
+where the soil has been scraped raw in a spiraling pattern, leaving roots
+dangling with frayed ends.
+~
+E
+trees~
+   The trees around the pit are bent backwards and scraped clean of bark on
+this side.
+~
+T 12204
+S
+#12220
+Ribbon Serragon Shrine~
+A Shrine to the Ribbon Serragon~
+@.&G><@.~
+64 16 d 0
+0 0 0 -1
+E
+desc shrine around building monument ribbon serragon~
+   Two great pillars twist upward in a braided spiral, meeting at an arch
+crowned with serrated leaves of hammered bronze. At its base rests a basin
+carved from oak, stained where the first offering of blood was poured. Above
+you, ribbons of cloth flutter from the branches.
+~
+E
+basin offering blood~
+   Streaks of deep vermillion and viridian stain the basin, which is carved
+from a single block of oak.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+12204 1 5 0
+S
+#12250
+Stomping Grounds~
+In the Middle of the Elephant Stomping Grounds~
+&G,,,,~
+128 0 dp 0
+0 0 0 -1
+E
+stomping grounds grasslands jungle area around~
+   It looks as though a herd of elephants has started ripping out jungle to
+create a vast grassland to use as their new stomping grounds!
+~
+S
+#12255
+Elephant Graveyard~
+An Elephant Graveyard~
+@.&w(c@.~
+48 2 dx 0
+0 0 0 -1
+B0
+&w(c~
+B1
+&w(~
+C
+tomb~
+E
+graveyard elephant yard tomb area around bones~
+   As you step down into the dusty depression, the bones -- gleaming from a
+distance -- rise around you. These elephantine bones represent countless
+generations of the great creatures stretching back to the dawn of time.
+~
+F
+B
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+M
+12253 0.03 0
+R
+1002 1 5 0
+R
+12255 1 5 0
+S
+$

@@ -201,7 +201,7 @@ This will also work in adventures only from indoor rooms that allow "look out".
 
 Gains experience when you escape.
 #
-HIDE HIDING HIDDEN
+HIDE
 
 Hide (Stealth ability)
 
@@ -213,7 +213,7 @@ pressing return, regardless of whether you typed a command or not.
 
 Gains experience when you try to hide.
 
-See also: CLING TO SHADOW, SEARCH, SNEAK, SENSE LIFE RITUAL
+See also: CLING TO SHADOW, HIDDEN, SEARCH, SNEAK, SENSE LIFE RITUAL
 #
 HOWL
 
@@ -504,11 +504,14 @@ You can also steal stored resources. If you type "steal" in a storage room or
 building, it will list what you can steal there. Type "steal <item>" to take
 one.
 
-You need a thievery permit to steal from an empire.
+You need a thievery permit to steal from an empire. Stolen items must remain in
+your inventory until the timer expires and the (stolen) flag disappears from
+the item. Otherwise, they will automatically return to the original empire. You
+cannot quit during this period.
 
 Gains experience when you steal something.
 
-See also: VAULTCRACKING, THIEVERY PERMIT
+See also: VAULTCRACKING, STOLEN ITEMS, THIEVERY PERMIT
 #
 "SUMMON THUG"
 

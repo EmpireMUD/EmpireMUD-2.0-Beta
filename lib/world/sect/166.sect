@@ -1,7 +1,7 @@
 #16697
 Nordlys Stumps~
 A Field of Nordlys Tree Stumps~
-'.' 4 fij 2 0 p
+'.' 4 fij 2 D p
 C
 dig~
 D1
@@ -48,7 +48,7 @@ S
 #16698
 Nordlys Tree~
 A Towering Nordlys Tree~
-'.' 4 fijq 6 d np
+'.' 4 fijq 6 dD np
 C
 chop, dig~
 D1
@@ -135,7 +135,7 @@ S
 #16699
 Nordlys Grove~
 A Grove of Enchanting Nordlys Trees~
-'w' 4 fijq 8 d dnp
+'w' 4 fijq 8 dD dnp
 C
 chop, dig~
 D1

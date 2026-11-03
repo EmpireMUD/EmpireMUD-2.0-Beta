@@ -48,7 +48,7 @@ used to find places you claimed that you might not want any more.
 Once you've started your empire, you should use EEDIT to get it set up:
  > eedit name <name> - Change the full name of the empire.
  > eedit adjective <name> - Change the "adjective form" of the name.
- > eedit banner <color code> - See HELP COLORS for a list of color codes.
+ > eedit banner <color code/name> - Change your empire banner.
  > eedit rank 2 <rank name> - Rename your leader rank.
  
 Your empire adjective should be relatively short, as it's used to build some

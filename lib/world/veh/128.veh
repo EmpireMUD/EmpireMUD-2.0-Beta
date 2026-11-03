@@ -1,0 +1,38 @@
+#12839
+chariot iron age~
+an iron age chariot~
+An iron age chariot is parked here.~
+   The small chariot rests on two wheels, supported by a long pole shaft
+leading to a yoke for two animals. It's an agile vehicle which was once the key
+to both warfare and sport racing in the ancient world. The front is protected
+by a mottled hide and iron tires protect both wheels.
+~
+~
+bfhku 19 5 0 2 0 0 0 0 0 -1 0
+C
+50 100
+P
+2
+R
+6790 1 1 0
+R
+6402 1 1 0
+S
+#12878
+runner victory~
+a victory runner~
+A victory runner is parked here.~
+   The low, narrow war cart is built almost entirely for speed. Its imperium
+frame is thin but rigid, with long-spoked wheels set wide for balance and
+wrapped in black nocturnium rims polished smooth by constant use.
+~
+~
+bfgku 19 5 0 2 0 0 0 0 0 -1 0
+C
+100 200
+P
+4
+R
+6402 2 1 0
+S
+$

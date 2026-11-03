@@ -63,12 +63,12 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.189";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.9";
+const char *version = "EmpireMUD 2.0 beta 5.219";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.23";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
-const char *level_names[][2] = {
+const char *level_names[LVL_TOP+1][2] = {
 		{ "N/A", "Not Started" },
 		{ "MORT", "Mortal" },
 		{ "GOD", "God" },
@@ -197,6 +197,7 @@ const char *ability_flags[] = {
 	"BUFF-SELF-NOT-TARGET",
 	"STAY-HIDDEN",
 	"BUFFS-COMMAND",
+	"IGNORE-NO-EXP",
 	"\n"
 };
 
@@ -237,6 +238,7 @@ const char *ability_flag_notes[] = {
 	"buffs self not target",
 	"won't cancel hide",
 	"",	// ABILF_BUFFS_COMMAND
+	"",	// ABILF_IGNORE_NO_EXP
 	"\n"
 };
 
@@ -343,6 +345,7 @@ const char *ability_target_flags[] = {
 	"NOT-ENEMY",
 	"DEAD-OK",	// 30
 	"ROOM-RANDOM-CAN-USE",
+	"NOT-STOLEN",
 	"\n"
 };
 
@@ -431,6 +434,7 @@ const char *ability_data_types[] = {
 	"RANGE",
 	"PARENT",
 	"SUPERCEDED-BY",
+	"REQUIRES-ABIL",	// 10
 	"\n"
 };
 
@@ -648,6 +652,7 @@ const char *adventure_flags[] = {
 	"CHECK-OUTSIDE-FIGHTS",
 	"GLOBAL-NEARBY",
 	"DETECTABLE",	// 15
+	"FASTER-INSTANCING",
 	"\n"
 };
 
@@ -685,6 +690,8 @@ const char *adventure_link_types[] = {
 	"IN-VEHICLE-NEW-BDG-NEW",
 	"IN-VEHICLE-NEW-CROP",
 	"IN-VEHICLE-NEW-WORLD",
+	"REQUIRE-CLIMATE",
+	"FORBID-CLIMATE",	// 20
 	"\n"
 };
 
@@ -710,6 +717,8 @@ const bool adventure_link_is_location_rule[] = {
 	TRUE,	// ADV_LINK_IN_VEH_NEW_BUILDING_NEW
 	TRUE,	// ADV_LINK_IN_VEH_NEW_CROP
 	TRUE,	// ADV_LINK_IN_VEH_NEW_WORLD
+	FALSE,	// ADV_EDIT_REQUIRE_CLIMATE
+	FALSE,	// ADV_EDIT_FORBID_CLIMATE
 };
 
 
@@ -741,8 +750,8 @@ const char *room_template_flags[] = {
 	"!TELEPORT",
 	"LOOK-OUT",
 	"!LOCATION",
-	"*",
-	"*",	// 10
+	"WATER-DESCRIPTIONS",
+	"ALLOW-MOUNTS",	// 10
 	"\n"
 };
 
@@ -946,7 +955,7 @@ const char *condition_types[] = {
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
 	"emote",	// 0
-	"esay",
+	"etalk",
 	"gsay",
 	"oocsay",
 	"say",
@@ -976,7 +985,7 @@ const char *extra_attribute_types[] = {
 	"Crafting-Bonus",
 	"Blood-Upkeep",
 	"Age",
-	"Night-Vision",
+	"Light-Radius",
 	"Nearby-Range",	// 15
 	"Where-Range",
 	"Warmth",
@@ -1081,6 +1090,7 @@ const char *grant_bits[] = {
 	"unprogress",
 	"events",
 	"triggers",
+	"lore",
 	"\n"
 };
 
@@ -1094,8 +1104,29 @@ const char *informative_view_bits[] = {
 	"no-work",
 	"no-abandon",	// 5
 	"no-dismantle",
+	"private",
 	"\n"
 };
+
+
+// LORE_x: Lore types
+const char *lore_types[] = {
+	"JOIN-EMPIRE",
+	"DEFECT-EMPIRE",
+	"KICKED-EMPIRE",
+	"PLAYER-KILL",
+	"PLAYER-DEATH",
+	"TOWER-DEATH",	// 5
+	"FOUND-EMPIRE",
+	"START-VAMPIRE",
+	"SIRE-VAMPIRE",
+	"PURIFY",
+	"CREATED",	// 10
+	"MAKE-VAMPIRE",
+	"PROMOTED",
+	"\n"
+};
+
 
 
 // MOUNT_x: mount flags
@@ -1143,7 +1174,7 @@ const char *preference_bits[] = {
 	"!TELL",
 	"POLIT",
 	"RP",	// 5
-		"*",	// formerly MORTLOG
+	"GRAY-CITY-BG",
 	"!REP",
 	"LIGHT",
 	"INCOGNITO",
@@ -1152,7 +1183,7 @@ const char *preference_bits[] = {
 	"!HASSLE",
 	"!IDLE-OUT",
 	"ROOMFLAGS",
-	"	*",	// 15, formerly !CHANNEL-JOINS
+	"NO-COLUMNS",	// 15
 	"AUTOKILL",
 	"SCRL",
 	"NO-ROOM-DESCS",
@@ -1180,6 +1211,7 @@ const char *preference_bits[] = {
 	"!EXITS",	// 40
 	"SHORT-EXITS",
 	"NO-FRIENDS",
+	"HIDE-KEEP-ITEMS",
 	"\n"
 };
 
@@ -1210,7 +1242,7 @@ const char *class_role_color[] = {
 };
 
 
-// PRF_x: for do_toggle, this controls the "toggle" command and these are displayed in rows of 3	
+// PRF_x: for do_toggle, this controls the "toggles" command and these are displayed in rows of 3	
 const struct toggle_data_type toggle_data[] = {
 	// these are shown in rows of 3
 	// name, type, prf, level, func
@@ -1252,10 +1284,14 @@ const struct toggle_data_type toggle_data[] = {
 	{ "item-quality", TOG_ONOFF, PRF_ITEM_QUALITY, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
+	{ "no-friends", TOG_ONOFF, PRF_NO_FRIENDS, 0, NULL },
+	{ "hide-keep", TOG_ONOFF, PRF_HIDE_KEEP, 0, NULL },
+	
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
+	{ "gray-city-bg", TOG_ONOFF, PRF_GRAY_CITY_BG, 0, NULL },
 	
-	{ "no-friends", TOG_ONOFF, PRF_NO_FRIENDS, 0, NULL },
+	{ "no-columns", TOG_ONOFF, PRF_NO_COLUMNS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -1435,6 +1471,7 @@ const char *status_message_types[] = {
 	"vehicle movement",	// 15
 	"weather",
 	"fight prompt",
+	"passenger auto look",
 	"\n"
 };
 
@@ -1454,6 +1491,7 @@ const char *syslog_types[] = {
 	"validation",	// 10
 	"empire",
 	"event",
+	"bans",
 	"\n"
 };
 
@@ -1739,7 +1777,7 @@ const char *partial_dirs[][2] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER CONSTANTS /////////////////////////////////////////////////////
 
-// AFF_x (1/3) - flags
+// AFF_x (1/4) - flags
 const char *affected_bits[] = {
 	"BLIND",	// 0
 	"MAJESTY",
@@ -1751,8 +1789,8 @@ const char *affected_bits[] = {
 	"IMMUNE-PHYSICAL-DEBUFFS",
 	"SENSE-HIDDEN",
 	"!PHYSICAL",
-	"!TARGET",	// 10
-	"!SEE",
+	"NO-TARGET-IN-ROOM",	// 10
+	"NO-SEE-IN-ROOM",
 	"FLYING",
 	"!ATTACK",
 	"IMMUNE-MAGICAL-DEBUFFS",
@@ -1762,22 +1800,22 @@ const char *affected_bits[] = {
 	"SLOW",
 	"STUNNED",
 	"STONED",	// 20
-	"!BLOOD",
+	"NO-SPEND-BLOOD",
 	"*",	// formerly CLAWS
 	"DEATHSHROUDED",
 	"EARTHMELDED",
 	"MUMMIFIED",	// 25
-	"SOULMASK",
+	"MASK-AFFECTS",
 	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
 	"IMMUNE-MENTAL-DEBUFFS",
-	"!STUN",	// 30
+	"NO-STUN",	// 30
 	"*ORDERED",
-	"!DRINK-BLOOD",
+	"NO-DRINK-BLOOD",
 	"DISTRACTED",
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
-	"!WHERE",
+	"IMMUNE-WHERE",
 	"WATERWALKING",
 	"LIGHT",
 	"POOR-REGENS",
@@ -1787,12 +1825,12 @@ const char *affected_bits[] = {
 	"IMMUNE-TEMPERATURE",
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
-	"!DISARM",
-	"!MORPH",
+	"NO-DISARM",
+	"NO-MORPH",
 	"\n"
 };
 
-// AFF_x (2/3) - strings shown when you consider someone (empty for no-show)
+// AFF_x (2/4) - strings shown when you consider someone (empty for no-show)
 const char *affected_bits_consider[] = {
 	"",	// 0 - blind
 	"$E has a majestic aura!",	// majesty
@@ -1820,17 +1858,17 @@ const char *affected_bits_consider[] = {
 	"",	// deathshrouded
 	"",	// earthmeld
 	"",	// 25 - mummified
-	"$E is soulmasked.",	// soulmask
+	"",	// mask-affects
 	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs
 	"$E is immune to mental debuffs.",	// immune-mental-debuffs
-	"$E is immune to stuns.",	// 30 - !stun
+	"$E is immune to stuns.",	// 30 - no-stun
 	"",	// ordred
-	"",	// !drink-blood
+	"",	// no-drink-blood
 	"",	// distracted
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
-	"",	// !where
+	"",	// immune-where
 	"",	// waterwalking
 	"",	// light
 	"",	// poor-regens
@@ -1840,12 +1878,12 @@ const char *affected_bits_consider[] = {
 	"",	// immune-temperature
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
-	"$E cannot be disarmed",	// !disarm
-	"",	// !morph
+	"$E cannot be disarmed.",	// no-disarm
+	"",	// no-morph
 	"\n"
 };
 
-// AFF_x (3/3) - determines if an aff flag is "bad" for the bearer
+// AFF_x (3/4) - determines if an aff flag is "bad" for the bearer
 const bool aff_is_bad[] = {
 	TRUE,	// 0 - blind
 	FALSE,	// majesty
@@ -1858,7 +1896,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// sense-hidden
 	FALSE,	// immune-physical (damage)
 	FALSE,	// 10 - no-target-in-room
-	FALSE,	// no-see-in-room / !SEE
+	FALSE,	// no-see-in-room
 	FALSE,	// flying
 	FALSE,	// !attack
 	FALSE,	// immune-magical-debuffs
@@ -1868,16 +1906,16 @@ const bool aff_is_bad[] = {
 	TRUE,	// slow
 	TRUE,	// stunned
 	TRUE,	// 20 - stoned
-	TRUE,	// !blood
+	TRUE,	// no-spend-blood
 	FALSE,	// * unused
 	FALSE,	// deathshrouded
 	FALSE,	// earthmelded
 	FALSE,	// 25 - mummified
-	FALSE,	// soulmask
+	FALSE,	// mask-affects
 	FALSE,	// no-tracks
 	FALSE,	// immune-poison-debuffs
 	FALSE,	// immune-mental-debuffs
-	FALSE,	// 30 - !stun
+	FALSE,	// 30 - no-stun
 	FALSE,	// ordered
 	FALSE,	// no-drink-blood
 	TRUE,	// distracted
@@ -1893,8 +1931,60 @@ const bool aff_is_bad[] = {
 	FALSE,	// immune-temperature
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
-	FALSE,	// !disarm
-	TRUE,	// !morph
+	FALSE,	// no-disarm
+	TRUE,	// no-morph
+};
+
+// AFF_x (4/4) - whether or not the affect can be put on an item
+const bool allow_affect_flag_on_items[] = {
+	TRUE,	// BLIND	// 0
+	TRUE,	// MAJESTY
+	TRUE,	// INFRA
+	TRUE,	// SNEAK
+	TRUE,	// HIDDEN
+	FALSE,	// *CHARM	// 5
+	TRUE,	// INVIS
+	TRUE,	// IMMUNE-PHYSICAL-DEBUFFS
+	TRUE,	// SENSE-HIDDEN
+	FALSE,	// !PHYSICAL
+	FALSE,	// NO-TARGET-IN-ROOM	// 10
+	FALSE,	// NO-SEE-IN-ROOM
+	TRUE,	// FLYING
+	FALSE,	// !ATTACK
+	TRUE,	// IMMUNE-MAGICAL-DEBUFFS
+	FALSE,	// DISARMED	// 15
+	TRUE,	// HASTE
+	TRUE,	// IMMOBILIZED
+	TRUE,	// SLOW
+	FALSE,	// STUNNED
+	TRUE,	// STONED	// 20
+	TRUE,	// NO-SPEND-BLOOD
+	FALSE,	// *	// formerly CLAWS
+	FALSE,	// DEATHSHROUDED
+	FALSE,	// EARTHMELDED
+	FALSE,	// MUMMIFIED	// 25
+	TRUE,	// MASK-AFFECTS
+	TRUE,	// NO-TRACKS
+	TRUE,	// IMMUNE-POISON-DEBUFFS
+	TRUE,	// IMMUNE-MENTAL-DEBUFFS
+	TRUE,	// NO-STUN	// 30
+	FALSE,	// *ORDERED
+	TRUE,	// NO-DRINK-BLOOD
+	TRUE,	// DISTRACTED
+	FALSE,	// HARD-STUNNED
+	FALSE,	// IMMUNE-DAMAGE	// 35
+	TRUE,	// IMMUNE-WHERE
+	TRUE,	// WATERWALKING
+	TRUE,	// LIGHT
+	TRUE,	// POOR-REGENS
+	TRUE,	// SLOWER-ACTIONS	// 40
+	TRUE,	// HUNGRIER
+	TRUE,	// THIRSTIER
+	TRUE,	// IMMUNE-TEMPERATURE
+	TRUE,	// AUTO-RESURRECT
+	TRUE,	// COUNTERSPELL		// 45
+	TRUE,	// NO-DISARM
+	TRUE	// NO-MORPH
 };
 
 
@@ -2081,7 +2171,7 @@ const char *apply_types[] = {
 	"RESIST-MAGICAL",
 	"CRAFTING",	// 25
 	"BLOOD-UPKEEP",
-	"NIGHT-VISION",
+	"LIGHT-RADIUS",
 	"NEARBY-RANGE",
 	"WHERE-RANGE",
 	"WARMTH",	// 30
@@ -2119,7 +2209,7 @@ const double apply_values[] = {
 	0.3,	// RESIST-MAGICAL
 	0.01,	// 25, CRAFTING
 	1,		// BLOOD-UPKEEP
-	1,		// NIGHT-VISION
+	1,		// LIGHT-RADIUS
 	1,		// NEARBY-RANGE
 	1,		// WHERE-RANGE
 	1,		// 30, WARMTH
@@ -2156,7 +2246,7 @@ const int apply_attribute[] = {
 	NOTHING,	// resist-magical
 	NOTHING,	// 25,crafting
 	NOTHING,	// blood-upkeep
-	NOTHING,	// night-vision
+	NOTHING,	// light-radius
 	NOTHING,	// nearby-range
 	NOTHING,	// where-range
 	NOTHING,	// 30, warmth
@@ -2193,7 +2283,7 @@ const bool apply_never_scales[] = {
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// 25, CRAFTING
 	TRUE,	// BLOOD-UPKEEP
-	TRUE,	// NIGHT-VISION
+	TRUE,	// LIGHT-RADIUS
 	TRUE,	// NEARBY-RANGE
 	TRUE,	// WHERE-RANGE
 	TRUE,	// 30, WARMTH
@@ -2358,6 +2448,16 @@ const char *craft_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONSTANTS ////////////////////////////////////////////////////////
 
+// used for eedit_toggles (EADM_x: used for some admin flags)
+struct eedit_toggle_data_t eedit_toggle_data[] = {
+	// name, required-tech (optional), admin flag to toggle
+	{ "Roster Sharing", NOTHING, EADM_ROSTER_SHARING },
+	{ "Hidden Progress", TECH_HIDDEN_PROGRESS, EADM_HIDDEN_PROGRESS },
+	
+	{ "\n", NOTHING, NOBITS }	// must be last
+};
+
+
 // name, icon, radius, show-to-others, is-capital
 const struct city_metadata_type city_type[] = {
 	{ "outpost", "&0-&?C1&0-", 5, FALSE, FALSE },
@@ -2483,6 +2583,9 @@ const char *empire_admin_flags[] = {
 	"NO-DECAY",
 	"ALL-TECHS",
 	"FREE-WAR",
+	"ALLOW-NEWBIE-ISLE",	// 10
+	"ROSTER-SHARING",
+	"HIDDEN-PROGRESS",
 	"\n"
 };
 
@@ -2720,6 +2823,7 @@ const char *faction_flags[] = {
 	"REP-FROM-KILLS",
 	"HIDE-IN-LIST",
 	"HIDE-ON-MOB",
+	"NPC-ONLY",
 	"\n"
 };
 
@@ -2888,6 +2992,8 @@ const char *mob_custom_types[] = {
 	"script5",
 	"scavenge-corpse",
 	"consider-info",
+	"echo-visible",
+	"water-long-desc",	// 15
 	"\n"
 };
 
@@ -2895,9 +3001,9 @@ const char *mob_custom_types[] = {
 // MOB_CUSTOM_x (2/2): how they're shown in olc
 const char *mob_custom_type_help =
 "Types of messages:\r\n"
-"&w Echo messages: echo echo-day echo-night&0\r\n"
+"&w Echo messages: echo echo-visible echo-day echo-night&0\r\n"
 " Speak text: say say-day say-night\r\n"
-"&w Varying lond descriptions: long-desc&0\r\n"
+"&w Varying lond descriptions: long-desc water-long-desc&0\r\n"
 " Shown when a scavenger mob eats a corpse: scavenge-corpse\r\n"
 "&w Shown when the player considers the mob: consider-info&0\r\n"
 " Available for scripts: script1 script2 script3 script4 script5\r\n";
@@ -2927,6 +3033,7 @@ const char *mob_move_types[] = {
 	"tears",	"tiptoes",	"toddles",	"totters",	"traipses",	// 91 - 95
 	"tramps",	"travels",	"treks",	"trudges",	"vaults",	// 96 - 100
 	"wades",	"wanders",	"whizzes",	"zigzags",	"zooms",	// 101 - 105
+	"stalks",	"swings",	// 106 - 107
 	"\n"
 };
 
@@ -3189,7 +3296,7 @@ const char *extra_bits[] = {
 	"TWO-HANDED",
 	"BOE",
 	"BOP",	// 15
-	"*",	// formerly STAFF
+	"*READIED-WEAPON-ABIL",
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
 	"*",	// formerly TOOL-PAN
@@ -3226,7 +3333,7 @@ const char *extra_bits_inv_flags[] = {
 	"2h",
 	"BoE",
 	"BoP",	// 15
-	"",	// *
+	"",	// ready-weapon-abil
 	"",	// uncollected
 	"keep",
 	"",	// *
@@ -3263,7 +3370,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.8,	// OBJ_TWO_HANDED
 	1.3,	// OBJ_BIND_ON_EQUIP
 	1.4,	// 15, OBJ_BIND_ON_PICKUP
-	1.0,	// unused
+	1.0,	// OBJ_READIED_WEAPON_ABIL
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
 	1.0,	// unused
@@ -3335,7 +3442,8 @@ const char *corpse_flags[] = {
 	"EATEN",	// 0
 	"SKINNED",
 	"HUMAN",
-	"NO-LOOT"
+	"NO-LOOT",
+	"BUTCHERED",
 	"\n"
 };
 
@@ -3508,6 +3616,9 @@ const char *obj_custom_types[] = {
 	"enter-portal-to-room",
 	"exit-portal-to-room",
 	"identify-info",
+	"identify-tutorial",
+	"floating",	// 35
+	"sinking",
 	"\n"
 };
 
@@ -3528,10 +3639,11 @@ const char *obj_custom_type_help =
 "&w Shown when you use it to mine ore: mine-to-char mine-to-room&0\r\n"
 " Shown when you use it to chop trees: chop-to-char chop-to-room\r\n"
 "&w Shown in order when playing it: instrument-to-char instrument-to-room&0\r\n"
-" Shown when using portals: enter-portal-to-char, enter-portal-to-room,\r\n"
+" Shown when using portals: enter-portal-to-char enter-portal-to-room,\r\n"
 "   exit-portal-to-room\r\n"
-"&w Shown when item is identified: identify-info&0\r\n"
-" Available for scripts: script1 script2 script3 script4 script5\r\n";
+"&w Shown when item is identified: identify-info identify-tutorial&0\r\n"
+" Shown when on a water tile: floating\r\n"
+"&w Available for scripts: script1 script2 script3 script4 script5\r\n&0";
 
 
 // basic speed is the theoretical average weapon speed without wits/haste,
@@ -3725,6 +3837,7 @@ const char *quest_flags[] = {
 	"GROUP-COMPLETION",
 	"EVENT",
 	"IN-CITY-ONLY",	// 10
+	"CONFIRM-DROP",
 	"\n"
 };
 
@@ -3761,6 +3874,9 @@ const char *quest_reward_types[] = {
 	"UNLOCK-ARCHETYPE",
 	"BONUS-ABILITY",	// 15
 	"REMOVE-ABILITY",
+	"COMPANION",
+	"REMOVE-COMPANION",
+	"MINIPET",
 	"\n",
 };
 
@@ -3836,7 +3952,7 @@ const bitvector_t bld_on_flags_order[] = {
 };
 
 
-// BLD_x: building flags -- * flags are removed flags
+// BLD_x (1/2): building flags -- * flags are removed flags
 const char *bld_flags[] = {
 	"ROOM",	// 0
 	"ALLOW-MOUNTS",
@@ -3863,9 +3979,9 @@ const char *bld_flags[] = {
 	"NO-ABANDON-WHEN-RUINED",
 	"SHOW-VEHICLES",
 	"IMMUNE-DAMAGE",
-	"*",	// 25
-	"*",
-	"*",
+	"HIDE-STORAGE-UNOWNED",	// 25
+	"LIGHT",
+	"NO-WALKING-NPCS",
 	"*",
 	"SAIL",
 	"*",	// 30
@@ -3886,6 +4002,60 @@ const char *bld_flags[] = {
 	"*",	// 45
 	"*",
 	"*",
+	"\n"
+};
+
+
+// BLD_x (2/2): player-facing version of building flags (map be empty strings)
+const char *bld_flag_notes[] = {
+	"",	// 0 - ROOM
+	"allows mounts",
+	"has a back entrance",
+	"open building",
+	"enclosed building",
+	"interlinkable",	// 5
+	"can herd animals in",
+	"can be dedicated",
+	"",	// IS-RUINS
+	"",	// !NPC
+	"blocks movement",	// 10
+	"only works in-city",
+	"counts as a city in outskirts",
+	"cannot be painted",
+	"",	// ATTACH-ROAD
+	"",	// 15 - BURNABLE
+	"",	// EXIT
+	"",	// OBSCURE-VISION
+	"",	// ROAD-ICON
+	"",	// ROAD-ICON-WIDE
+	"",	// 20 - ATTACH-BARRIER
+	"cannot be customized",
+	"",	// NO-ABANDON-WHEN-RUINED
+	"",	// SHOW-VEHICLES
+	"",	// IMMUNE-DAMAGE
+	"",	// 25 - HIDE-STORAGE-UNOWNED
+	"",	// LIGHT
+	"blocks walking npcs",	// NO-WALKING-NPCS
+	"",
+	"can sail here",
+	"",	// 30
+	"",
+	"",
+	"",	// ITEM-LIMIT
+	"",	// LONG-AUTOSTORE
+	"",	// 35
+	"",
+	"",	// HIGH-DEPLETION
+	"",
+	"",
+	"",	// 40 - !DELETE
+	"",
+	"requires swimming or boat",
+	"",	// LOOK-OUT
+	"",	// 2ND-TERRITORY
+	"",	// 45
+	"",
+	"",
 	"\n"
 };
 
@@ -4050,6 +4220,7 @@ const char *crop_flags[] = {
 // CROP_CUSTOM_x: custom messages
 const char *crop_custom_types[] = {
 	"magic-growth",	// 0
+	"burns-down",
 	"\n"
 };
 
@@ -4332,6 +4503,7 @@ const char *island_bits[] = {
 	"ALWAYS-DARK",
 	"ALWAYS-DAY",
 	"ALWAYS-NIGHT",	// 10
+	"!ADVENTURES",
 	"\n"
 };
 
@@ -4434,43 +4606,60 @@ const char mapout_color_tokens[] = {
 };
 
 
-// this maps a banner color (the 'r' in "&r") to a mapout_color_token character ('1')
-const char banner_to_mapout_token[][2] = {
-	{ '0', '0' },
-	{ 'n', '0' },
+// convert color code e.g. &0: name "gray", mapout code '0'
+const struct color_code_info_t color_code_info[] = {
+	{ '0', "gray", '0' },
+	{ 'n', "gray", '0' },
+	
 	// non-bright colors:
-	{ 'r', 'a' },
-	{ 'g', 'f' },
-	{ 'b', 't' },
-	{ 'y', 'p' },
-	{ 'm', 'v' },
-	{ 'c', 'w' },
-	{ 'w', 'r' },
-	{ 'a', 'u' },
-	{ 'j', 'b' },
-	{ 'l', 'y' },
-	{ 'o', 'z' },
-	{ 'p', 'B' },
-	{ 't', 'q' },
-	{ 'v', 'E' },
+	{ 'r', "red", 'a' },
+	{ 'g', "green", 'f' },
+	{ 'b', "blue", 't' },
+	{ 'y', "yellow", 'p' },
+	{ 'm', "magenta", 'v' },
+	{ 'c', "cyan", 'w' },
+	{ 'w', "dark gray", 'r' },
+	{ 'a', "dark azure", 'u' },
+	{ 'j', "dark jade", 'b' },
+	{ 'l', "dark lime", 'y' },
+	{ 'o', "dark orange", 'z' },
+	{ 'p', "dark pink", 'B' },
+	{ 't', "dark tan", 'q' },
+	{ 'v', "violet", 'E' },
+	
 	// bright colors:
-	{ 'R', '1' },
-	{ 'G', '2' },
-	{ 'B', '4' },
-	{ 'Y', '3' },
-	{ 'M', '5' },
-	{ 'C', '6' },
-	{ 'W', '0' },
-	{ 'A', 'j' },
-	{ 'J', 'd' },
-	{ 'L', 'x' },
-	{ 'O', 'o' },
-	{ 'P', 'A' },
-	{ 'T', 'C' },
-	{ 'V', 'D' },
+	{ 'R', "bright red", '1' },
+	{ 'G', "bright green", '2' },
+	{ 'B', "bright blue", '4' },
+	{ 'Y', "bright yellow", '3' },
+	{ 'M', "bright magenta", '5' },
+	{ 'C', "bright cyan", '6' },
+	{ 'W', "white", '0' },
+	{ 'A', "azure", 'j' },
+	{ 'J', "jade", 'd' },
+	{ 'L', "lime", 'x' },
+	{ 'O', "orange", 'o' },
+	{ 'P', "pink", 'A' },
+	{ 'T', "tan", 'C' },
+	{ 'V', "bright violet", 'D' },
+	
+	// special codes
+	{ 'u', "underline", '0' },
 	
 	// last
-	{ '\n', '\n' }
+	{ '\n', "\n", '\n' }
+};
+
+
+// for mines -- 0-5 relates to 0-100% ore
+const char *mine_levels[] = {
+	"exhausted",	// 0
+	"nearly-exhausted",
+	"low",
+	"half-full",
+	"mostly-full",
+	"full",		// 5
+	"\n"
 };
 
 
@@ -4483,7 +4672,7 @@ const char *road_types[] = {
 };
 
 
-/* ROOM_AFF_x: */
+// ROOM_AFF_x (1/2): room affect flags
 const char *room_aff_bits[] = {
 	"MAGIC-DARKNESS",	// 0
 	"SILENT",
@@ -4512,6 +4701,41 @@ const char *room_aff_bits[] = {
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
 	"PERMANENT-PAINT",
+	"*PRIVATE",
+	"\n"
+};
+
+
+// ROOM_AFF_x (2/2): shown to players on survey (may be empty strings)
+const char *room_aff_notes[] = {
+	"magically dark",	// 0
+	"silent",
+	"",	// *HAS-INSTANCE
+	"chameleon",
+	"",	// *TEMPORARY
+	"",	// 5 - !EVOLVE
+	"",	// UNCLAIMABLE
+	"",	// PUBLIC
+	"being dismantled",
+	"cannot fly here",
+	"",	// 10 - !WEATHER
+	"", // *IN-VEHICLE
+	"",	// *!WORK
+	"",	// !DISREPAIR
+	"",	// *!DISMANTLE
+	"",	// 15 - *INCOMPLETE
+	"cannot teleport here",
+	"", // BRIGHT-PAINT
+	"",	// *FAKE-INSTANCE
+	"",	// !ABANDON
+	"mobs won't enter",	// 20
+	"animals won't enter",
+	"",	// NO-WORKFORCE-EVOS
+	"",	// HIDE-REAL-NAME
+	"",	// MAPOUT-BUILDING
+	"",	// 25 - NO-TRACKS
+	"", // PERMANENT-PAINT
+	"",	// PRIVATE
 	"\n"
 };
 
@@ -4522,7 +4746,7 @@ const char *room_extra_types[] = {
 	"mine amount",
 	"fire remaining",
 	"seed time",
-	"tavern type",	// unused
+	"mine original amount",
 	"tavern brewing time",	// 5		// unused
 	"tavern available time",	// unused
 	"ruins icon",	// unused
@@ -4576,6 +4800,9 @@ const char *sector_flags[] = {
 	"SEPARATE-NOT-NEARS",
 	"INHERIT-BASE-CLIMATE",
 	"IRRIGATES-AREA",
+	"NO-WORKFORCE-AUTOABANDON",
+	"BASIC-CROP",	// 30
+	"HIDE-ON-ISLAND-DESCRIPTION",
 	"\n"
 };
 
@@ -4583,6 +4810,8 @@ const char *sector_flags[] = {
 // SECT_CUSTOM_x: custom messages
 const char *sect_custom_types[] = {
 	"magic-growth",	// 0
+	"burns-down",
+	"was-burned",
 	"\n"
 };
 
@@ -4790,6 +5019,7 @@ const char *skill_flags[] = {
 const char *social_flags[] = {
 	"IN-DEVELOPMENT",
 	"HIDE-IF-INVIS",
+	"NOISY",
 	"\n"
 };
 
@@ -4803,7 +5033,9 @@ const char *social_message_types[NUM_SOCM_MESSAGES][2] = {
 	{ "Targeted to victim", "t2vict" },
 	{ "Target not found", "tnotfound" },	// 5
 	{ "Target-self to character", "s2char" },
-	{ "Target-self to others", "s2other" }
+	{ "Target-self to others", "s2other" },
+	{ "Silent to character", "silent2char" },
+	{ "Silent to others", "silent2others" }
 };
 
 
@@ -4841,6 +5073,7 @@ const char *trig_types[] = {
 	"Allow-Multiple",
 	"Can-Fight",
 	"Pre-Greet-All",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -4875,6 +5108,7 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// allow-multiple
 	NOBITS,	// can-fight
 	TRIG_ARG_PERCENT,	// pre-greet-all
+	NOBITS,	// dead-ok
 };
 
 
@@ -4907,6 +5141,9 @@ const char *otrig_types[] = {
 	"Buy",
 	"Kill",		// 25
 	"Allow-Multiple",
+	"*",
+	"*",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -4939,6 +5176,9 @@ const bitvector_t otrig_argument_types[] = {
 	TRIG_ARG_OBJ_WHERE,	// buy
 	TRIG_ARG_PERCENT,	// 25, kill
 	NOBITS,	// allow-multiple
+	NOBITS,	// 27
+	NOBITS,	// 28
+	NOBITS,	// dead-ok
 };
 
 
@@ -4971,6 +5211,9 @@ const char *vtrig_types[] = {
 	"Buy",
 	"Kill",		// 25
 	"Allow-Multiple",
+	"*",
+	"*",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -5004,6 +5247,9 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// buy
 	TRIG_ARG_PERCENT,	// 25, kill
 	NOBITS,	// allow-multiple
+	NOBITS,	// 27
+	NOBITS,	// 28
+	NOBITS,	// dead-ok
 };
 
 
@@ -5036,6 +5282,9 @@ const char *wtrig_types[] = {
 	"Buy",
 	"*",	// 25
 	"Allow-Multiple",
+	"*",
+	"*",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -5068,6 +5317,9 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// buy
 	NOBITS,	// 25
 	NOBITS,	// allow-multiple
+	NOBITS,	// 27
+	NOBITS,	// 28
+	NOBITS,	// dead-ok
 };
 
 
@@ -5156,6 +5408,8 @@ const char *global_flags[] = {
 	"CUMULATIVE-PRC",
 	"CHOOSE-LAST",
 	"RARE",
+	"NO-NEWBIE",	// 5
+	"NEWBIE-ONLY",
 	"\n"
 };
 
@@ -5260,6 +5514,7 @@ const char *interact_restriction_types[] = {
 	"boss",
 	"depletion",
 	"tool",
+	"region",
 	"\n"
 };
 
@@ -5334,6 +5589,13 @@ const char *requirement_types[] = {
 	"NIGHTTIME",	// 45
 	"DIPLOMACY-OVER",
 	"OWN-ROADS",
+	"NOT-OWN-BUILDING",
+	"EMPIRE-HAS-PROGRESS",
+	"EMPIRE-LACKS-PROGRESS",	// 50
+	"EMPIRE-ON-PROGRESS",
+	"EMPIRE-NOT-ON-PROGRESS",
+	"HAVE-COMPANION",
+	"NOT-HAVE-COMPANION",
 	"\n",
 };
 
@@ -5388,6 +5650,13 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// 45, nighttime
 	REQ_AMT_NUMBER,	// diplomacy-over
 	REQ_AMT_NUMBER,	// own-roads
+	REQ_AMT_NUMBER,	// not own building
+	REQ_AMT_NONE,	// empire-has-progress
+	REQ_AMT_NONE,	// 50, empire-lacks-progress
+	REQ_AMT_NONE,	// empire-on-progress
+	REQ_AMT_NONE,	// empire-not-on-progress
+	REQ_AMT_NONE,	// have-companion
+	REQ_AMT_NONE,	// not-have-companion
 };
 
 
@@ -5441,6 +5710,13 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// 45, nighttime
 	FALSE,	// diplomacy-over
 	FALSE,	// own-roads
+	FALSE,	// not own building
+	FALSE,	// empire-has-progress
+	FALSE,	// 50, empire-lacks-progress
+	FALSE,	// empire-on-progress
+	FALSE,	// empire-not-on-progress
+	FALSE,	// have-companion
+	FALSE,	// not-have-companion
 };
 
 
@@ -5537,6 +5813,8 @@ const char *vehicle_flags[] = {
 	"*INSTANCE",
 	"*TEMPORARY",
 	"TINY",	// 40
+	"HIDE-STORAGE-UNOWNED",
+	"LIGHT",
 	"\n"
 };
 
@@ -5583,7 +5861,9 @@ const char *identify_vehicle_flags[] = {
 	"",	// OBSCURE-VISION
 	"",	// *INSTANCE
 	"",	// *TEMPORARY
-	"",	// TINY
+	"",	// TINY	// 40
+	"",	// HIDE-STORAGE-UNOWNED
+	"provides light",	// LIGHT
 	"\n"
 };
 
@@ -5597,6 +5877,7 @@ const char *veh_custom_types[] = {
 	"exit-to-inside",
 	"exit-to-outside",	// 5
 	"identify-info",
+	"identify-tutorial",
 	"\n"
 };
 

@@ -1,6 +1,6 @@
 #9800
 Generic No Sacrifice~
-1 h 100
+1 h 100 0
 ~
 if %command% == sacrifice
   %send% %actor% @%self% cannot be sacrificed.
@@ -11,7 +11,7 @@ return 1
 ~
 #9801
 Read looks at target~
-1 c 6
+1 c 6 0
 read~
 if %actor.obj_target(%arg%)% == %self%
   %force% %actor% look %arg%
@@ -22,26 +22,36 @@ end
 ~
 #9802
 Give rejection~
-0 j 100
+0 j 100 0
 ~
 %send% %actor% You can't give items to ~%self%.
 return 0
 ~
 #9803
 Companion dies permanently~
-0 f 100
+0 ftA 100 1
+L f 9809
 ~
 * This script deletes a companion's entry when it dies.
+* Pairs with script 9809 to ensure it can detect leader later
 * If the companion comes from an ability (like Bodyguard) the player will
 * get a fresh copy of the companion right away.
 set ch %self.companion%
 if %self.is_npc% && %ch% && !%ch.is_npc%
   %ch.remove_companion(%self.vnum%)%
+elseif %self.is_npc% && %self.var(leader_id)%
+  makeuid leader %self.var(leader_id)%
+  if %leader% && !%leader.is_npc%
+    if %leader.room% == %self.room% && (%leader.fighting% == %self% || %self.is_tagged_by(%leader%)%)
+      nop %leader.remove_companion(%self.vnum%)%
+    end
+  end
 end
 ~
 #9804
 Cancel follow on load (for summons)~
-0 n 100
+0 n 100 1
+L f 9804
 ~
 * Summons enter the game following (silentyl). This cancels that.
 if %self.leader%
@@ -51,7 +61,8 @@ detach 9804 %self.id%
 ~
 #9805
 Summoned mob is charmed~
-0 n 100
+0 n 100 1
+L f 9805
 ~
 * Adds a CHARMED flag to the mob
 if %self.leader%
@@ -61,13 +72,16 @@ detach 9805 %self.id%
 ~
 #9806
 Detect stop command (objects)~
-1 c 7
+1 c 7 0
 stop~
 * Detects that a player has typed 'stop' for the purpose of a script.
 * You must intialize the player's 'stop_command' variable to 0 (use set and remote)
 * If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
-* You can also set 'stop_message_char' for what to show the player.
-* You can also set 'stop_message_room' for what to show the player.
+* Set 'stop_message_char' for what to show the player.
+* Set 'stop_message_room' for what to show the player.
+* Set 'stop_room_lock' to the room's ID, or 0 if it's not restricted.
+* (all those variables should be remoted to the actor)
+*
 * 1. CHECK IF WE ARE JUST CLEARING DATA
 if %arg% == cleardata
   set stop_command 0
@@ -76,14 +90,28 @@ if %arg% == cleardata
   remote needs_stop_command %actor.id%
   rdelete stop_message_char %actor.id%
   rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
   return 1
   halt
 end
 * 2. NORMAL USE OF 'stop'
-if %actor.varexists(needs_stop_command)%
-  set needs_stop %actor.needs_stop_command%
-else
-  set needs_stop 0
+set needs_stop %actor.var(needs_stop_command,0)%
+* basic checks
+if !%needs_stop%
+  * no work
+  return 0
+  halt
+elseif %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(stop_room_lock)%
+  * wrong room, they moved, just cancel
+  set stop_command 1
+  remote stop_command %actor.id%
+  set needs_stop_command 0
+  remote needs_stop_command %actor.id%
+  rdelete stop_message_char %actor.id%
+  rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
+  return 0
+  halt
 end
 * re-set needs_stop_command on the actor (prevents it from silencing repeatedly)
 set needs_stop_command 0
@@ -100,18 +128,12 @@ if %actor.varexists(stop_message_room)%
   %echoaround% %actor% %actor.stop_message_room%
   rdelete stop_message_room %actor.id%
 end
-* prevent basic stop if needed
-if %needs_stop% && !%actor.action%
-  * prevents basic 'stop' output
-  return 1
-else
-  * will show normal 'stop' output
-  return 0
-end
+* prevent basic stop
+return 1
 ~
 #9807
 No pickpocket while unkillable~
-0 c 0
+0 c 0 0
 pickpocket~
 if !%arg% || %actor.char_target(%arg.argument1%)% != %self%
   return 0
@@ -126,13 +148,16 @@ end
 ~
 #9808
 Detect stop command (room)~
-2 c 0
+2 c 0 0
 stop~
 * Detects that a player has typed 'stop' for the purpose of a script.
 * You must intialize the player's 'stop_command' variable to 0 (use set and remote)
 * If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
-* You can also set 'stop_message_char' for what to show the player.
-* You can also set 'stop_message_room' for what to show the player.
+* Set 'stop_message_char' for what to show the player.
+* Set 'stop_message_room' for what to show the player.
+* Set 'stop_room_lock' to the room's ID, or 0 if it's not restricted.
+* (all those variables should be remoted to the actor)
+*
 * 1. CHECK IF WE ARE JUST CLEARING DATA
 if %arg% == cleardata
   set stop_command 0
@@ -141,14 +166,28 @@ if %arg% == cleardata
   remote needs_stop_command %actor.id%
   rdelete stop_message_char %actor.id%
   rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
   return 1
   halt
 end
 * 2. NORMAL USE OF 'stop'
-if %actor.varexists(needs_stop_command)%
-  set needs_stop %actor.needs_stop_command%
-else
-  set needs_stop 0
+set needs_stop %actor.var(needs_stop_command,0)%
+* basic checks
+if !%needs_stop%
+  * no work
+  return 0
+  halt
+elseif %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(stop_room_lock)%
+  * wrong room, they moved, just cancel
+  set stop_command 1
+  remote stop_command %actor.id%
+  set needs_stop_command 0
+  remote needs_stop_command %actor.id%
+  rdelete stop_message_char %actor.id%
+  rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
+  return 0
+  halt
 end
 * re-set needs_stop_command on the actor (prevents it from silencing repeatedly)
 set needs_stop_command 0
@@ -165,18 +204,27 @@ if %actor.varexists(stop_message_room)%
   %echoaround% %actor% %actor.stop_message_room%
   rdelete stop_message_room %actor.id%
 end
-* prevent basic stop if needed
-if %needs_stop% && !%actor.action%
-  * prevents basic 'stop' output
-  return 1
-else
-  * will show normal 'stop' output
-  return 0
+* prevent basic stop
+return 1
+~
+#9809
+Companion initialization for perma-death~
+0 ntA 100 1
+L f 9803
+~
+* permanently store leader ID in order to detect deaths correctly
+* to be used on companions that should permanently die when killed
+* Pairs with scripts 205 and 9803
+wait 0
+if %self.companion%
+  set leader_id %self.companion.id%
+  remote leader_id %self.id%
 end
+detach 9809 %self.id%
 ~
 #9850
 Equip imm-only~
-1 j 0
+1 j 0 0
 ~
 if !%actor.is_immortal%
   %send% %actor% You can't wear ~%self%.
@@ -187,7 +235,7 @@ end
 ~
 #9851
 Obj rescale on load~
-1 n 100
+1 n 100 0
 ~
 %scale% %self% %self.level%
 ~

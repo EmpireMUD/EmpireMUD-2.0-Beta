@@ -7,7 +7,7 @@ Rocks can be used as a primitive weapon, used as a knapper to chip pieces of
 flint, as a crafting component, or as catapult shot. They are also used to lay
 roads and build some buildings.
 ~
-1 il ano e 0 12
+1 il ano e 0 14
 0 2 5
 1 0
 C
@@ -18,6 +18,9 @@ You place $p into $V.~
 M
 7
 $n places $p into $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6050
 R
 4 5117 0
@@ -32,11 +35,14 @@ a lump of clay~
 Some clay is lumped here.~
 You can craft clay into pottery.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 6 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6090
 R
 4 5110 0
@@ -51,7 +57,7 @@ A piece of flint is lying on the ground.~
 potential to be shaped into a powerful primitive weapon. Wield a rock and
 'chip' this flint to work it into a more useful shape.
 ~
-1 il ano 0 0 11
+1 il ano 0 0 12
 0 1 5
 5 0
 C
@@ -63,6 +69,9 @@ You place $p into $V.~
 M
 7
 $n places $p into $V.~
+M
+34
+This is a basic crafting material.~
 O+ 1 6051
 R
 4 5117 0
@@ -77,11 +86,14 @@ a yellow lightning stone~
 A translucent yellow lightning stone is lying here.~
 The lightning stone can be used for certain crafts and enchantments.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 1 0
 C
 1 1
+M
+34
+This gem is an uncommon crafting material.~
 O+ 1 6600
 R
 4 5164 0
@@ -92,11 +104,14 @@ a red bloodstone~
 A red bloodstone is sitting on the ground.~
 The bloodstone can be used for certain crafts and enchantments.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 1 0
 C
 1 1
+M
+34
+This gem is an uncommon crafting material.~
 O+ 1 6600
 R
 4 5164 0
@@ -107,7 +122,7 @@ a huge stone block~
 A huge stone block is sitting here.~
 The stone block is used in monumental architecture.
 ~
-3 el a 0 0 6
+3 el a 0 0 7
 0 0 0
 1 0
 C
@@ -118,6 +133,9 @@ You heave a huge stone block into place.~
 M
 1
 $n heaves a huge stone block into place.~
+M
+34
+This is a common building material.~
 O+ 1 6077
 R
 4 5117 0
@@ -132,7 +150,7 @@ A black piece of obsidian is on the ground.~
 obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
 'chip' to give it a sharp edge.
 ~
-1 hl ano 0 0 11
+1 hl ano 0 0 12
 0 2 5
 8 0
 C
@@ -144,6 +162,9 @@ You place $p into $V.~
 M
 7
 $n places $p into $V.~
+M
+34
+This is an uncommon crafting material.~
 O+ 1 6052
 R
 4 5117 0
@@ -155,11 +176,14 @@ A bag of sand is lying here.~
    This small bag of fine sand can be used to make glass ingots at the glass
 blower. From there, you can blow it into all kinds of useful glassware.
 ~
-3 l a 0 0 12
+3 l a 0 0 13
 0 0 0
 1 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6085
 R
 4 5117 0
@@ -175,11 +199,14 @@ A glass ingot is stacked here.~
    This ingot of glass is rough and raw, but of good quality and mostly
 transparent. You could craft it into various things at a glass blower.
 ~
-3 l a 0 0 9
+3 l a 0 0 10
 0 0 0
 8 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6831
 R
 4 5135 0
@@ -192,11 +219,14 @@ A chunk of rock salt is lying on the ground.~
 rock than seasoning, it still tastes of the sea. It can be milled into loose
 salt for cooking.
 ~
-3 0 a 0 0 18
+3 0 a 0 0 20
 0 0 0
 1 0
 C
 1 1
+M
+34
+Mill it to get salt for cooking.~
 O+ 1 6065
 R
 4 5220 0
@@ -212,11 +242,14 @@ Some sea salt crystals are lying here.~
    These large salt crystals were formed from evaporating seawater. They can be
 milled down into usable salt.
 ~
-3 0 a 0 0 19
+3 0 a 0 0 21
 0 0 0
 1 0
 C
 1 1
+M
+34
+Mill it to get salt for cooking.~
 O+ 1 6065
 R
 4 5219 0
@@ -253,7 +286,7 @@ A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 el a 0 0 8
+3 el a 0 0 9
 0 0 0
 0 0
 C
@@ -276,6 +309,9 @@ $n carves out a tree for $V.~
 M
 6
 You carve out a tree for $V.~
+M
+34
+Scrape or saw the tree to get building materials.~
 O+ 1 6010
 R
 4 5118 0
@@ -287,7 +323,7 @@ Some sticks and leaves are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 0 0 7
+3 l a 0 0 8
 0 0 0
 0 0
 C
@@ -304,7 +340,10 @@ M
 You place $p on $V.~
 M
 7
-You place $p on $V.~
+$n places $p on $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6423
 R
 4 5118 0
@@ -317,19 +356,22 @@ Some rough wood is stacked here.~
 tree. You can saw it into boards, and might even be able to salvage some
 sticks.
 ~
-3 e a 0 0 10
+3 e a 0 0 12
 0 0 0
 0 0
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
 I 17 126 100.00 1  # SAW: rough boards
-I 17 136 5.00 1  # SAW: large shoot
+I 17 148 5.00 1  # SAW: thorny shoot
 I 17 132 20.00 1 s  # SAW: thorny branches
 I 17 132 20.00 2 s  # SAW: thorny branches
 I 17 132 20.00 3 s  # SAW: thorny branches
 I 17 132 20.00 4 s  # SAW: thorny branches
 I 17 132 20.00 5 s  # SAW: thorny branches
+M
+34
+Saw the wood to get building materials.~
 O+ 1 6011
 R
 4 5118 0
@@ -340,9 +382,13 @@ a small flower~
 A small flower has been dropped here.~
 It's a very pretty flower.
 ~
-3 kl a 0 0 1
+3 kl a 0 0 3
 0 0 0
 7 64
+I 25 3090 100.00 1  # SEED: pocketful of wildflower seeds
+M
+33
+Note: This item does not count as the (flowers) component.~
 S
 #124
 heavy-log log logs heavy pillars~
@@ -350,7 +396,7 @@ a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
 ~
-3 el a 0 0 8
+3 el a 0 0 9
 0 0 0
 0 0
 C
@@ -364,6 +410,9 @@ $n hoists a log onto $V.~
 M
 6
 You hoist a log onto $V.~
+M
+34
+This is a common building material.~
 O+ 1 6015
 R
 4 5118 0
@@ -374,7 +423,7 @@ a stack of lumber~
 Some lumber is stacked on the ground.~
 Lumber is used in building construction.
 ~
-3 el a 0 0 6
+3 el a 0 0 7
 0 0 0
 0 0
 C
@@ -392,6 +441,9 @@ You position some lumber on $V.~
 M
 7
 $n positions some lumber on $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6000
 R
 4 5118 0
@@ -404,7 +456,7 @@ some rough boards~
 There are rough boards stacked here.~
 Lumber is used in building construction.
 ~
-3 e a 0 0 7
+3 e a 0 0 8
 0 0 0
 0 0
 C
@@ -422,6 +474,9 @@ You attach some rough boards to $V.~
 M
 7
 $n attaches some rough boards to $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6000
 R
 4 5118 0
@@ -432,10 +487,10 @@ S
 column wooden bound pillars~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
-   This sturdy column is made by several thin saplings bound with rope. It
-could be used in place of logs for building.
+   This sturdy column is made by several thin poles bound with rope. It could
+be used in place of logs for building.
 ~
-3 e a 0 0 9
+3 e a 0 0 11
 0 0 0
 0 0
 C
@@ -453,6 +508,9 @@ You hoist a bound wooden column onto $V.~
 M
 7
 $n hoists a bound wooden column onto $V.~
+M
+34
+This is a building material.~
 O+ 1 6015
 R
 4 5118 0
@@ -464,7 +522,7 @@ A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
 saw it into lumber.
 ~
-3 e a 0 0 8
+3 e a 0 0 10
 0 0 0
 0 0
 C
@@ -473,10 +531,17 @@ I 11 1002 100.00 1  # LIGHT: roaring fire
 I 16 129 100.00 1  # SCRAPE: fine wooden pillar
 I 16 133 50.00 1 s  # SCRAPE: tangle of vines
 I 16 133 25.00 2 s  # SCRAPE: tangle of vines
+I 16 121 25.00 1 t  # SCRAPE: sticks and leaves
+I 16 121 25.00 2 t  # SCRAPE: sticks and leaves
 I 17 130 50.00 1 c  # SAW: fine tropical lumber
 I 17 130 50.00 2 c  # SAW: fine tropical lumber
 I 17 133 50.00 1 s  # SAW: tangle of vines
 I 17 133 25.00 2 s  # SAW: tangle of vines
+I 17 121 25.00 1 t  # SAW: sticks and leaves
+I 17 121 25.00 2 t  # SAW: sticks and leaves
+M
+34
+Scrape or saw the tree to get building materials.~
 O+ 1 6010
 R
 4 5118 0
@@ -487,7 +552,7 @@ a fine wooden pillar~
 A fine wooden pillar is lying here.~
 This pillar can be used in construction, or sawn into lumber.
 ~
-3 e a 0 0 8
+3 e a 0 0 9
 0 0 0
 0 0
 C
@@ -507,6 +572,9 @@ You hoist a fine wooden pillar onto $V.~
 M
 7
 $n hoists a fine wooden pillar onto $V.~
+M
+34
+This is an uncommon building material.~
 O+ 1 6016
 R
 4 5118 0
@@ -520,7 +588,7 @@ Some fine tropical lumber is stacked here.~
    This exotic lumber looks like it was cut from the darkest of jungles. It can
 be used for construction and exquisite crafts.
 ~
-3 e a 0 0 9
+3 e a 0 0 10
 0 0 0
 0 0
 C
@@ -538,6 +606,9 @@ You position some fine lumber on $V.~
 M
 7
 $n positions some fine lumber on $V.~
+M
+34
+This is an uncommon building material.~
 O+ 1 6002
 R
 4 5118 0
@@ -551,7 +622,7 @@ A green sapling has fallen here.~
    This sapling is young, straight, and taller than you are. You could scrape
 it to make a pole for building a hut, making a handle, or fashioning an arrow.
 ~
-1 l an 0 0 4
+1 l an 0 0 5
 0 2 5
 0 0
 C
@@ -559,6 +630,9 @@ C
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
 I 16 121 50.00 1  # SCRAPE: sticks and leaves
+M
+34
+This is a common building and crafting material.~
 O+ 1 6025
 R
 4 5118 0
@@ -570,7 +644,7 @@ Some thorny branches are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 0 0 7
+3 l a 0 0 8
 0 0 0
 0 0
 C
@@ -587,7 +661,10 @@ M
 You place $p on $V.~
 M
 7
-You place $p on $V.~
+$n places $p on $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6422
 R
 4 5118 0
@@ -599,7 +676,7 @@ A tangle of vines is piled on the ground.~
    This tangle of vines must have come from an incredible jungle. It's a small
 pile of plant debris. It might be useful for crafting or building.
 ~
-3 l a 0 0 9
+3 l a 0 0 10
 0 0 0
 0 0
 C
@@ -616,6 +693,9 @@ You lash some vines onto $V.~
 M
 7
 $n lashes some vines onto $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6424
 R
 4 5118 0
@@ -628,7 +708,7 @@ A thorny sapling has fallen here.~
 matters when they're buried in your flesh. Still, you could scrape it to make a
 good pole for crafting and building.
 ~
-1 i an 0 0 5
+1 i an 0 0 6
 0 2 5
 0 0
 C
@@ -636,6 +716,9 @@ C
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
 I 16 132 50.00 1  # SCRAPE: thorny branches
+M
+34
+This is a common building and crafting material.~
 O+ 1 6025
 R
 4 5118 0
@@ -648,13 +731,16 @@ A reaching sapling has fallen here.~
 perhaps reaching for the high canopy of the jungle. It could be scraped to make
 a pole for building or crafting.
 ~
-1 0 an 0 0 4
+1 0 an 0 0 5
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
+M
+34
+This is a common building and crafting material.~
 O+ 1 6025
 R
 4 5118 0
@@ -666,7 +752,7 @@ A large shoot is lying here.~
    This shoot once grew out of a mighty tree. It is long and straight, and
 would be a perfect pole for building or crafting, if you scraped it.
 ~
-1 0 an 0 0 5
+1 0 an 0 0 6
 0 2 5
 0 0
 C
@@ -674,6 +760,9 @@ C
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
 I 16 121 50.00 1  # SCRAPE: sticks and leaves
+M
+34
+This is a common building and crafting material.~
 O+ 1 6025
 R
 4 5118 0
@@ -686,32 +775,35 @@ A massive ancient tree is lying on the ground.~
 taller than you are. It's far too big to carry, but you could saw it up or
 scrape it where it lies.
 ~
-3 E 0 0 0 20
+3 E 0 0 0 22
 0 0 0
 0 34560
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
 I 16 138 100.00 1  # SCRAPE: enormous mast
+I 16 136 5.00 12 p  # SCRAPE: large shoot
 I 16 136 5.00 10 p  # SCRAPE: large shoot
-I 16 136 5.00 7 p  # SCRAPE: large shoot
-I 16 136 10.00 4 p  # SCRAPE: large shoot
-I 16 136 5.00 2 p  # SCRAPE: large shoot
+I 16 136 10.00 7 p  # SCRAPE: large shoot
+I 16 136 5.00 4 p  # SCRAPE: large shoot
 I 16 121 25.00 6 s  # SCRAPE: sticks and leaves
 I 16 121 25.00 8 s  # SCRAPE: sticks and leaves
 I 16 121 25.00 10 s  # SCRAPE: sticks and leaves
 I 16 121 25.00 12 s  # SCRAPE: sticks and leaves
 I 17 125 100.00 12  # SAW: stack of lumber
+I 17 136 5.00 12 p  # SAW: large shoot
 I 17 136 5.00 10 p  # SAW: large shoot
-I 17 136 5.00 7 p  # SAW: large shoot
-I 17 136 10.00 4 p  # SAW: large shoot
-I 17 136 5.00 2 p  # SAW: large shoot
+I 17 136 10.00 7 p  # SAW: large shoot
+I 17 136 5.00 4 p  # SAW: large shoot
 I 17 121 50.00 6 s  # SAW: sticks and leaves
 I 17 121 40.00 10 s  # SAW: sticks and leaves
 I 17 121 10.00 12 s  # SAW: sticks and leaves
 I 26 136 100.00 4  # DECAYS-TO: large shoot
 I 26 121 100.00 8  # DECAYS-TO: sticks and leaves
 I 26 120 100.00 2  # DECAYS-TO: large tree
+M
+34
+Scrape the ancient tree to make a large pillar for a mast.~
 O+ 1 6012
 R
 4 5118 0
@@ -724,7 +816,7 @@ An enormous mast is lying here.~
 withstand the worst winds on the high seas. It could also be used as a pillar
 for other purposes.
 ~
-3 e a 0 0 10
+3 e a 0 0 11
 0 0 0
 0 0
 C
@@ -738,6 +830,9 @@ You stand the mast on $V.~
 M
 7
 $n stands the mast on $V.~
+M
+34
+This is used to make tall ships.~
 O+ 1 6017
 R
 4 5118 0
@@ -751,11 +846,14 @@ A bundle of long leaves is lying here.~
    These long, narrow leaves have toothed edges that cut if you aren't careful.
 The leaves are fibrous and could be used for crafting.
 ~
-3 l a 0 0 8
+3 l a 0 0 9
 0 0 0
 0 0
 C
 1 1
+M
+34
+This is a common building and crafting material.~
 O+ 1 6421
 R
 4 5118 0
@@ -769,11 +867,14 @@ A bundle of long grass is lying on the ground.~
    It's a bundle of long grass, cut roughly at the bottom. You could use it as
 fiber, perhaps for rope making.
 ~
-3 l a 0 0 8
+3 l a 0 0 9
 0 0 0
 0 0
 C
 1 1
+M
+34
+This is a common building and crafting material.~
 O+ 1 6421
 R
 4 5118 0
@@ -786,11 +887,14 @@ a bundle of wheat~
 A bundle of wheat has been left on the ground.~
 Wheat can be milled into flour, or planted.
 ~
-3 bglC a 0 0 7
+3 bglC a 0 0 8
 0 1 0
 7 1344
 C
 1 1
+M
+34
+Wheat can be milled into flour, or planted.~
 O+ 1 6170
 R
 4 5116 0
@@ -802,7 +906,7 @@ A wooden pole is lying on the ground.~
    The pole is long and straight. It could be used to build a simple hut,
 fashioned into an arrow, or used for all manner of other buildings and crafts.
 ~
-1 l an 0 0 7
+1 l an 0 0 8
 0 2 5
 0 0
 C
@@ -820,6 +924,9 @@ You put a pole in place on $V.~
 M
 7
 $n puts a pole in place on $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6035
 R
 4 5118 0
@@ -830,7 +937,7 @@ a bushel of hops~
 A bushel of hops is sitting on the ground.~
 Hops can be made into ale at the tavern.
 ~
-3 blC a 0 0 5
+3 blC a 0 0 6
 0 3 0
 7 1344
 C
@@ -841,6 +948,9 @@ You stock the store room with $p.~
 M
 1
 $n stocks the store room with $p.~
+M
+34
+Hops can be made into ale at the tavern.~
 R
 4 5116 0
 S
@@ -850,11 +960,14 @@ a basket of cotton~
 A basket of cotton has been left here.~
 Weave cotton into cloth.
 ~
-3 bl a 0 0 4
+3 bl a 0 0 5
 0 4 0
 7 0
 C
 1 1
+M
+34
+Weave cotton into cloth.~
 O+ 1 6421
 R
 4 5137 0
@@ -865,7 +978,7 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 bglC a 0 0 7
+3 bglC a 0 0 8
 0 5 0
 7 1344
 C
@@ -876,6 +989,9 @@ You stock the store room with $p.~
 M
 1
 $n stocks the store room with $p.~
+M
+34
+Barley can be made into ale at the tavern.~
 O+ 1 6170
 R
 4 5116 0
@@ -886,13 +1002,156 @@ a fine wooden pole~
 A fine wooden pole is leaning here.~
 The wood is immaculate and looks rather expensive on this tall, straight pole.
 ~
-1 l an 0 0 6
+1 l an 0 0 7
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+M
+34
+This is an uncommon building and crafting material.~
 O+ 1 6036
+R
+4 5118 0
+S
+#147
+thorny-tree tree trees thorny~
+a thorny tree~
+A thorny tree has fallen here.~
+   The rough-barked tree has a sturdy trunk with several major branches.
+Spines cover many of the branches to fend off herbivores -- and unwary loggers.
+You can use a sharp tool to scrape the tree into a log or saw it at a lumber
+yard.
+~
+3 e a 0 0 12
+0 0 0
+0 0
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 124 100.00 1  # SCRAPE: heavy log
+I 16 148 5.00 1  # SCRAPE: thorny shoot
+I 16 132 25.00 2 s  # SCRAPE: thorny branches
+I 16 132 25.00 3 s  # SCRAPE: thorny branches
+I 16 132 25.00 4 s  # SCRAPE: thorny branches
+I 16 132 25.00 5 s  # SCRAPE: thorny branches
+I 17 126 100.00 2  # SAW: rough boards
+I 17 148 5.00 1  # SAW: thorny shoot
+I 17 132 50.00 1 s  # SAW: thorny branches
+I 17 132 40.00 2 s  # SAW: thorny branches
+I 17 132 10.00 3 s  # SAW: thorny branches
+M
+7
+$n carves out a tree for $V.~
+M
+6
+You carve out a tree for $V.~
+M
+34
+Scrape or saw the tree to get building materials.~
+O+ 1 6010
+R
+4 5118 0
+S
+#148
+thorny-shoot shoot shoots thorny~
+a thorny shoot~
+A thorny shoot is lying here.~
+   This long, straight shoot is covered in sharp thorns, but you could still
+scrape it into a sturdy pole for building or crafting.
+~
+1 0 an 0 0 7
+0 2 3
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 132 50.00 1  # SCRAPE: thorny branches
+M
+34
+This is a common building and crafting material.~
+O+ 1 6025
+R
+4 5118 0
+S
+#149
+tremendous-tree jungle tree trees~
+a tremendous jungle tree~
+A tremendous tree, covered in vines, has fallen here.~
+   The tree lies stretched across the jungle floor, its vast trunk draped in
+climbing vines and moss. The bark is rough and weathered, streaked with sap
+where it splintered in the fall. It's far too big to carry, but you could saw
+it up or scrape it where it lies.
+~
+3 E 0 0 0 23
+0 0 0
+0 34560
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 138 100.00 1  # SCRAPE: enormous mast
+I 16 136 5.00 10 p  # SCRAPE: large shoot
+I 16 136 5.00 7 p  # SCRAPE: large shoot
+I 16 136 10.00 4 p  # SCRAPE: large shoot
+I 16 136 5.00 2 p  # SCRAPE: large shoot
+I 16 121 25.00 3 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 4 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 5 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 6 s  # SCRAPE: sticks and leaves
+I 16 133 25.00 3 t  # SCRAPE: tangle of vines
+I 16 133 25.00 4 t  # SCRAPE: tangle of vines
+I 16 133 25.00 5 t  # SCRAPE: tangle of vines
+I 16 133 25.00 6 t  # SCRAPE: tangle of vines
+I 17 130 100.00 12  # SAW: fine tropical lumber
+I 17 136 5.00 10 p  # SAW: large shoot
+I 17 136 5.00 7 p  # SAW: large shoot
+I 17 136 10.00 4 p  # SAW: large shoot
+I 17 136 5.00 2 p  # SAW: large shoot
+I 17 121 50.00 3 s  # SAW: sticks and leaves
+I 17 121 40.00 5 s  # SAW: sticks and leaves
+I 17 121 10.00 6 s  # SAW: sticks and leaves
+I 17 133 50.00 3 t  # SAW: tangle of vines
+I 17 133 40.00 5 t  # SAW: tangle of vines
+I 17 133 10.00 6 t  # SAW: tangle of vines
+I 26 136 100.00 4  # DECAYS-TO: large shoot
+I 26 121 100.00 4  # DECAYS-TO: sticks and leaves
+I 26 133 100.00 4  # DECAYS-TO: tangle of vines
+I 26 128 100.00 2  # DECAYS-TO: massive jungle tree
+M
+34
+Scrape this tree to make a large pillar for a mast.~
+O+ 1 6012
+R
+4 5118 0
+S
+#150
+mangrove-tree tree trees felled~
+a mangrove tree~
+A felled mangrove tree lies here, its tangled roots heavy with mud.~
+   The mangrove tree has been cleanly cut near its base. Its long, twisted
+roots sprawl uselessly across the ground. Chunks of damp bark cling to the
+trunk, with a briny scent from the tide. You can saw it or scrape it to get
+more useful resources.
+~
+3 e a 0 0 10
+0 0 0
+0 0
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 129 100.00 1  # SCRAPE: fine wooden pillar
+I 16 121 50.00 1 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 2 s  # SCRAPE: sticks and leaves
+I 17 130 75.00 1 c  # SAW: fine tropical lumber
+I 17 130 25.00 2 c  # SAW: fine tropical lumber
+I 17 121 50.00 1 s  # SAW: sticks and leaves
+I 17 121 25.00 2 s  # SAW: sticks and leaves
+M
+34
+Scrape or saw the tree to get building materials.~
+O+ 1 6010
 R
 4 5118 0
 S
@@ -902,11 +1161,14 @@ some iron ore~
 A piece of iron ore has fallen to the ground.~
 Iron is used for forging and building.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 2 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 O+ 1 6701
 R
 4 5115 0
@@ -917,11 +1179,14 @@ a silver nugget~
 A silver nugget has fallen to the ground.~
 Silver can be melted down for money.
 ~
-15 l a 0 0 6
+15 l a 0 0 7
 2 0 0
 3 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 R
 4 5611 a
 S
@@ -931,11 +1196,14 @@ a pile of gold dust~
 Some sparkling gold dust is scattered across the ground.~
 Gold can be melted down for money.
 ~
-15 l a 0 0 7
+15 l a 0 0 8
 3 0 0
 4 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 R
 4 5611 a
 S
@@ -945,11 +1213,14 @@ some nocturnium ore~
 A chunk of nocturnium ore has fallen to the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 0 0 8
+3 l a 0 0 9
 0 0 0
 2 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 O+ 1 6701
 R
 4 5115 0
@@ -960,11 +1231,14 @@ some imperium ore~
 A glistening hunk of imperium ore is sitting here.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 2 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 O+ 1 6701
 R
 4 5115 0
@@ -975,11 +1249,14 @@ some copper ore~
 Some copper ore is piled on the ground.~
 Copper ore can be smelted into ingots and bars.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 13 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 O+ 1 6701
 R
 4 5115 0
@@ -990,11 +1267,14 @@ some tin ore~
 Some tin ore is piled on the ground.~
 Tin ore can be smelted into ingots, which are then used to make bronze.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 2 0
 C
 1 1
+M
+34
+You can smelt it into ingots.~
 O+ 1 6701
 R
 4 5115 0
@@ -1006,11 +1286,14 @@ A tin ingot is stacked here.~
    The tin has a bright white color. Tin ingots are primarily smelted with
 copper to make bronze.
 ~
-3 l a 0 0 7
+3 l a 0 0 8
 0 0 0
 2 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6710
 R
 4 5115 0
@@ -1022,11 +1305,14 @@ A bronze ingot is stacked here.~
    The bronze has a rich, brown color and a fine finish. Bronze is used to make
 many different tools and armors.
 ~
-3 l a 0 0 7
+3 l a 0 0 8
 0 0 0
 13 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6720
 R
 4 5115 0
@@ -1038,11 +1324,14 @@ A silver ingot is stacked here.~
    Ingots are used in crafting, but aren't as valuable as the larger silver
 bars. They can be stored in your vault to add to your wealth.
 ~
-15 l a 0 0 9
+15 l a 0 0 10
 4 0 0
 3 0
 C
 1 1
+M
+34
+You can smelt it into bars for wealth or use it as a crafting material.~
 O+ 1 6751
 R
 4 5611 a
@@ -1054,11 +1343,14 @@ A gold ingot is stacked here.~
    Ingots are usually used in crafting, and aren't as valuable as larger bars
 of gold. They can be stored in the vault to add to your wealth.
 ~
-15 l a 0 0 10
+15 l a 0 0 11
 6 0 0
 4 0
 C
 1 1
+M
+34
+You can smelt it into bars for wealth or use it as a crafting material.~
 O+ 1 6751
 R
 4 5611 a
@@ -1070,12 +1362,15 @@ A bar of silver has been left on the ground.~
    Store the silver bar in your vault to gain wealth. You can also separate the
 bar back into ingots for crafting.
 ~
-15 l a 0 0 7
+15 l a 0 0 8
 10 1 0
 3 0
 C
 1 1
 I 15 170 100.00 2 s  # SEPARATE: silver ingot
+M
+34
+This is valuable. Store it in your vault (or see HELP AUTOSTORE).~
 O+ 1 6750
 R
 4 5611 a
@@ -1087,12 +1382,15 @@ A bar of gold is lying on the ground.~
    Store the gold bar in your vault to gain wealth. You can also separate the
 bar back into ingots for crafting.
 ~
-15 l a 0 0 7
+15 l a 0 0 8
 16 1 0
 4 0
 C
 1 1
 I 15 171 100.00 2 s  # SEPARATE: gold ingot
+M
+34
+This is valuable. Store it in your vault (or see HELP AUTOSTORE).~
 O+ 1 6750
 R
 4 5611 a
@@ -1103,11 +1401,14 @@ a small flake of gold~
 A small golden flake is lying here.~
 You can smelt 8 gold flakes into an ingot using 'smelt gold flake ingot'.
 ~
-15 l a 0 0 4
+15 l a 0 0 5
 0 0 0
 4 0
 C
 1 1
+M
+34
+You can smelt 8 gold flakes into an ingot.~
 R
 4 5611 a
 S
@@ -1117,11 +1418,14 @@ an iron ingot~
 An iron ingot is sitting on the ground.~
 Iron is used for forging and building.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 2 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6720
 R
 4 5115 0
@@ -1132,7 +1436,7 @@ an ingot of nocturnium~
 A nocturnium ingot is sitting on the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 0 0 3
+3 l a 0 0 4
 0 0 0
 2 0
 C
@@ -1143,6 +1447,9 @@ You pour molten nocturnium into a ring around the base of the building.~
 M
 1
 $n pours molten nocturnium into a ring around the base of the building.~
+M
+34
+This is a rare crafting material.~
 O+ 1 6730
 R
 4 5115 0
@@ -1153,7 +1460,7 @@ an imperium ingot~
 An imperium ingot is sitting on the ground.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 2 0
 C
@@ -1164,6 +1471,9 @@ You install imperium locks on the doors.~
 M
 1
 $n installs imperium locks on the doors.~
+M
+34
+This is a rare crafting material.~
 O+ 1 6730
 R
 4 5115 0
@@ -1175,11 +1485,14 @@ A copper ingot is sitting here.~
    Copper ingots can be made into bars (to be stored in the vault, for wealth),
 or smelted with tin to make bronze ingots.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 13 0
 C
 1 1
+M
+34
+You can smelt it into bars for wealth or use it as a crafting material.~
 O+ 1 6710
 R
 4 5115 0
@@ -1190,12 +1503,15 @@ a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
 ~
-15 l a 0 0 7
+15 l a 0 0 8
 1 1 0
 13 0
 C
 1 1
 I 15 178 100.00 2 s  # SEPARATE: copper ingot
+M
+34
+This is valuable. Store it in your vault (or see HELP AUTOSTORE).~
 O+ 1 6750
 R
 4 5115 a
@@ -1210,10 +1526,13 @@ A chipped flint is lying on the ground.~
 make a tool -- is one of mankind's oldest techniques. Keep chipping the flint
 until it becomes a useful tool.
 ~
-1 ikl ano 0 0 6
+1 ikl ano 0 0 7
 0 2 5
 1 0
 I 19 181 100.00 1  # CHIP: handaxe
+M
+34
+Chip it again to make it more useful.~
 S
 #181
 handaxe axe~
@@ -1224,12 +1543,15 @@ be used to cut, slice, and scrape. It's still large, and not very sharp, and
 can't be used to chop until it has a handle. From here, you can wield the
 handaxe, use it to mine ore, or craft it into a stone axe.
 ~
-1 hl ano fh 0 6
+1 hl ano fh 0 7
 0 2 5
 1 0
 C
 1 1
 I 19 186 100.00 1  # CHIP: stone spear head
+M
+34
+You can craft this into a stone axe.~
 R
 4 5121 0
 R
@@ -1262,11 +1584,14 @@ striking good steel against a piece of flint to produce sparks, which light the
 tinder and can be used to light a larger fire. Type 'light <object>' to light
 something using this tinderbox.
 ~
-18 0 a 0 0 8
+18 0 a 0 0 9
 25 0 0
 5 0
 C
 50 50
+M
+34
+You can use this to light or burn things.~
 R
 4 5121 0
 R
@@ -1279,9 +1604,12 @@ A torch has been dropped here.~
    A torch is important when you're out at night. You can use 'douse torch' and
 'light torch' to save some of it for later.
 ~
-29 l ao 0 0 7
+29 l ao 0 0 8
 16 1 7
 0 0
+M
+34
+Torches let you see in the dark for a while.~
 S
 #186
 spear head stone spearhead~
@@ -1291,11 +1619,14 @@ A spear head is jabbed into the ground.~
 You can wield this spearhead alone, like a knife, or attach it to a shaft to
 make a full spear.
 ~
-1 il ano f 0 5
+1 il ano f 0 6
 0 1 4
 1 0
 C
 1 1
+M
+34
+You can use this to craft a spear or sickle.~
 R
 4 5121 0
 R
@@ -1310,11 +1641,14 @@ is large with a flat dish in the center, while the other is small and flat for
 grinding by hand. You can 'mill' some items with this, but it will be slower
 than doing it in a proper mill building. 'Use' this item to equip it.
 ~
-3 e a j 0 2
+3 e a j 0 3
 0 0 0
 1 0
 C
 1 1
+M
+34
+You can use this tool for milling.~
 R
 4 5121 0
 R

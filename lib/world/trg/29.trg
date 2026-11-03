@@ -1,6 +1,16 @@
 #2914
 changeling change~
-0 btw 10
+0 btw 10 10
+L s 2900
+L s 2901
+L s 2902
+L s 2903
+L s 2904
+L s 2910
+L s 2911
+L s 2912
+L s 2913
+L s 2914
 ~
 if !%self.leader%
   halt
@@ -28,7 +38,10 @@ end
 ~
 #2916
 Heroic Caravan Setup~
-5 o 100
+5 o 100 3
+L e 2913
+L e 2914
+L e 2915
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -52,7 +65,12 @@ detach 2916 %self.id%
 ~
 #2917
 Heroic Galleon Setup~
-5 o 100
+5 o 100 5
+L e 2911
+L e 2912
+L e 5503
+L e 5504
+L e 5516
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -83,7 +101,7 @@ detach 2917 %self.id%
 ~
 #2926
 Debuff Cleansing Potion~
-1 s 100
+1 s 100 0
 ~
 %heal% %actor% debuffs
 %heal% %actor% dots

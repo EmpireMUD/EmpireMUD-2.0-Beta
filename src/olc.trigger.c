@@ -67,6 +67,8 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 	bool problem = FALSE;
 	bitvector_t bits;
 	int pos;
+	bool links, link_words;
+	struct trig_link *link;
 		
 	if (!str_cmp(GET_TRIG_NAME(trig), default_trig_name)) {
 		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Name not set");
@@ -81,9 +83,40 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 		}
 	}
 	
+	links = FALSE;
+	link_words = FALSE;
+	
 	LL_FOREACH(trig->cmdlist, cmd) {
 		if (strlen(cmd->cmd) > 255) {
 			olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Trigger has a line longer than 255 characters and won't save properly");
+			problem = TRUE;
+		}
+		
+		// check for links: any 3+ digit number
+		for (pos = 0; pos < strlen(cmd->cmd) - 1 && !links; ++pos) {
+			if (isdigit(cmd->cmd[pos]) && isdigit(cmd->cmd[pos+1]) && isdigit(cmd->cmd[pos+2])) {
+				links = TRUE;
+			}
+		}
+		
+		if (strstr(cmd->cmd, ".skill(") || strstr(cmd->cmd, ".affect(") || strstr(cmd->cmd, ".ability(") || strstr(cmd->cmd, ".has_component(") || strstr(cmd->cmd, ".is_component(") || strstr(cmd->cmd, ".charge_component(") || strstr(cmd->cmd, ".component_") || strstr(cmd->cmd, "%component.")) {
+			link_words = TRUE;
+		}
+	}
+	
+	if (links && !GET_TRIG_LINKS(trig)) {
+		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains numbers but has no links");
+		problem = TRUE;
+	}
+	
+	if (link_words && !GET_TRIG_LINKS(trig)) {
+		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains skill, affect, ability, or component but has no links");
+		problem = TRUE;
+	}
+	
+	LL_FOREACH(GET_TRIG_LINKS(trig), link) {
+		if (!str_cmp(get_name_by_olc_type(link->type, link->vnum), "Unknown")) {
+			olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains link to Unknown/missing thing");
 			problem = TRUE;
 		}
 	}
@@ -151,10 +184,46 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_trigger(trig_data *trig, bool detail) {
+	char *attach, types[MAX_STRING_LENGTH];
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		switch (trig->attach_type) {
+			case OBJ_TRIGGER: {
+				attach = "object";
+				sprintbit(GET_TRIG_TYPE(trig), otrig_types, types, TRUE);
+				break;
+			}
+			case WLD_TRIGGER:
+			case RMT_TRIGGER:
+			case BLD_TRIGGER:
+			case ADV_TRIGGER: {
+				attach = "room";
+				sprintbit(GET_TRIG_TYPE(trig), wtrig_types, types, TRUE);
+				break;
+			}
+			case MOB_TRIGGER: {
+				attach = "mobile";
+				sprintbit(GET_TRIG_TYPE(trig), trig_types, types, TRUE);
+				break;
+			}
+			case VEH_TRIGGER: {
+				attach = "vehicle";
+				sprintbit(GET_TRIG_TYPE(trig), vtrig_types, types, TRUE);
+				break;
+			}
+			case EMP_TRIGGER: {
+				attach = "empire";
+				sprintbit(GET_TRIG_TYPE(trig), wtrig_types, types, TRUE);
+				break;
+			}
+			default: {
+				attach = "error";
+				*types = '\0';
+				break;
+			}
+		}
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), attach, types);
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
@@ -304,7 +373,7 @@ bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnu
 * @param trig_vnum vnum The vnum to delete.
 */
 void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
-	trig_data *trig;
+	trig_data *trig, *trig_iter, *next_trig;
 	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	vehicle_data *veh, *next_veh;
@@ -433,6 +502,16 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig_iter, next_trig) {
+		found = trigger_has_link(trig_iter, OLC_TRIGGER, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to trigger [%d] %s", GET_TRIG_VNUM(trig_iter), GET_TRIG_NAME(trig_iter), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// update vehicle protos
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (delete_from_proto_list_by_vnum(&veh->proto_script, vnum)) {
@@ -471,6 +550,12 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 			if (found) {
 				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(dsc)), SHOP_IN_DEVELOPMENT);
 				msg_to_desc(dsc, "A trigger used by the shop you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(dsc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(dsc), OLC_TRIGGER, vnum);
+			if (found) {
+				msg_to_desc(dsc, "Trigger [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 		if (GET_OLC_ROOM_TEMPLATE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_ROOM_TEMPLATE(dsc)->proto_script, vnum)) {
@@ -647,6 +732,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
+	trig_data *trig_iter, *next_trig;
 	int found;
 	bool any;
 	
@@ -747,6 +833,14 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig_iter, next_trig) {
+		if (trigger_has_link(trig_iter, OLC_TRIGGER, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig_iter), GET_TRIG_NAME(trig_iter));
+		}
+	}
+	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
@@ -820,6 +914,9 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		if (live_trig->cmdlist == proto->cmdlist) {
 			live_trig->cmdlist = cmdlist;
 		}
+		if (GET_TRIG_LINKS(live_trig) == GET_TRIG_LINKS(proto)) {
+			GET_TRIG_LINKS(live_trig) = GET_TRIG_LINKS(trig);
+		}
 		
 		// check vars
 		live_trig->attach_type = trig->attach_type;
@@ -850,6 +947,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	if (proto->var_list) {
 		free_varlist(proto->var_list);
 	}
+	free_trigger_links(&GET_TRIG_LINKS(proto));
 	
 	if (!*script_text) {
 		// do not free old script text
@@ -902,6 +1000,7 @@ trig_data *setup_olc_trigger(trig_data *input, char **cmdlist_storage) {
 		
 		new->name = str_dup(NULLSAFE(input->name));
 		new->arglist = input->arglist ? str_dup(input->arglist) : NULL;
+		GET_TRIG_LINKS(new) = copy_trigger_links(GET_TRIG_LINKS(input));
 		
 		// don't copy these things
 		new->cmdlist = NULL;
@@ -980,7 +1079,7 @@ int wordcount_trigger(trig_data *trig) {
 void olc_show_trigger(char_data *ch) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
-	char trgtypes[256];
+	char trgtypes[256], buf[256];
 	
 	if (!trig) {
 		return;
@@ -1010,9 +1109,62 @@ void olc_show_trigger(char_data *ch) {
 		build_page_display(ch, "<%scosts\t0> %d misc coins", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
+	safe_snprintf(buf, sizeof(buf), "<%slinks\t0>", OLC_LABEL_PTR(GET_TRIG_LINKS(trig)));
+	build_trigger_link_page_display(ch, trig, buf);
+	
 	build_page_display(ch, "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
 	
 	send_page_display(ch);
+}
+
+
+/**
+* Builds a list of trigger links into the player's page display.
+*
+* @param char_data *ch The player viewing it.
+* @param trig_data *trig Which trigger's links to show.
+* @param const char *header Optional: A header shown first (may be empty or NULL).
+*/
+void build_trigger_link_page_display(char_data *ch, trig_data *trig, const char *header) {
+	bitvector_t last_type = NOBITS;
+	char buf[MAX_STRING_LENGTH];
+	int count = 0, width;
+	struct page_display *line = NULL;
+	struct trig_link *link;
+	
+	width = (ch && ch->desc && ch->desc->pProtocol->ScreenWidth > 15) ? (ch->desc->pProtocol->ScreenWidth - 1) : 79;
+	
+	LL_SORT(GET_TRIG_LINKS(trig), sort_trigger_links);
+	if (header && *header) {
+		build_page_display_str(ch, header);
+	}
+	
+	LL_FOREACH(GET_TRIG_LINKS(trig), link) {
+		// header
+		if (last_type != link->type || !line) {
+			last_type = link->type;
+			prettier_sprintbit(link->type, olc_type_bits, buf);
+			line = build_page_display(ch, " %s: ", CAP(buf));
+			count = 0;
+		}
+		
+		// build display, check wrap, append
+		safe_snprintf(buf, sizeof(buf), "[%d] %s", link->vnum, get_name_by_olc_type(link->type, link->vnum));
+		if (line->length + strlen(buf) + 2 > width) {
+			if (count++ > 0) {
+				append_page_display_line(line, ",");
+			}
+			line = build_page_display(ch, "  %s", buf);
+		}
+		else {
+			append_page_display_line(line, "%s%s", (count++ > 0 ? ", " : ""), buf); 
+		}
+	}
+	
+	// only show "none" if we show a header
+	if (count == 0 && header && *header) {
+		build_page_display_str(ch, "  none");
+	}
 }
 
 
@@ -1063,6 +1215,110 @@ OLC_MODULE(tedit_costs) {
 	}
 	else {
 		GET_TRIG_NARG(trig) = olc_process_number(ch, argument, "cost", "costs", 0, MAX_INT, GET_TRIG_NARG(trig));
+	}
+}
+
+
+OLC_MODULE(tedit_links) {
+	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
+	any_vnum vnum;
+	bool any;
+	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], one_vnum[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
+	int pos;
+	struct trig_link *link, *next_link;
+	
+	const char *usage = "Usage: links add <type> <vnum(s)>\r\n"
+						"       links remove <type> <vnum | all>\r\n"
+						"       links remove all\r\n";
+	
+	argument = any_one_arg(argument, cmd_arg);
+	argument = any_one_arg(argument, type_arg);
+	argument = trim(argument);
+	strcpy(vnum_arg, argument);	// remainder
+	
+	if (!*cmd_arg || !*type_arg) {
+		msg_to_char(ch, "%s", usage);
+	}
+	else if (is_abbrev(cmd_arg, "add")) {
+		if (!*vnum_arg || !isdigit(*vnum_arg)) {
+			msg_to_char(ch, "%s", usage);
+		}
+		else if ((pos = search_block(type_arg, olc_type_bits, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown type '%s'.\r\n", type_arg);
+		}
+		else {
+			// for messaging
+			prettier_sprintbit(BIT(pos), olc_type_bits, buf);
+			
+			// add mulitple entries
+			while (*vnum_arg) {
+				// accept multiple vnums: peel 1 off
+				half_chop(vnum_arg, one_vnum, temp);
+				strcpy(vnum_arg, temp);
+				if (!isdigit(*one_vnum) || (vnum = atoi(one_vnum)) < 0) {
+					msg_to_char(ch, "Invalid vnum '%s'.\r\n", one_vnum);
+					continue;	// try the rest anyway
+				}
+				
+				// ok to add -- first ensure not already in list
+				any = FALSE;
+				LL_FOREACH(GET_TRIG_LINKS(trig), link) {
+					if (IS_SET(link->type, BIT(pos)) && link->vnum == vnum) {
+						any = TRUE;
+						break;
+					}
+				}
+				
+				if (any) {
+					msg_to_char(ch, "Link already exists to %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
+				}
+				else {
+					CREATE(link, struct trig_link, 1);
+					link->type = BIT(pos);
+					link->vnum = vnum;
+					LL_PREPEND(GET_TRIG_LINKS(trig), link);
+					LL_SORT(GET_TRIG_LINKS(trig), sort_trigger_links);
+					msg_to_char(ch, "Link added for %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
+				}
+			}
+		}
+	}
+	else if (is_abbrev(cmd_arg, "remove")) {
+		if (!str_cmp(type_arg, "all")) {
+			free_trigger_links(&GET_TRIG_LINKS(trig));
+			msg_to_char(ch, "You remove all the links.\r\n");
+		}
+		else if (!*vnum_arg || (!isdigit(*vnum_arg) && str_cmp(vnum_arg, "all")) || (vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "You must specify a vnum to remove (or 'all').\r\n");
+		}
+		else if ((pos = search_block(type_arg, olc_type_bits, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown type '%s'.\r\n", type_arg);
+		}
+		else {
+			// remove by type
+			any = FALSE;
+			LL_FOREACH_SAFE(GET_TRIG_LINKS(trig), link, next_link) {
+				if (IS_SET(link->type, BIT(pos)) && (link->vnum == vnum || !str_cmp(vnum_arg, "all"))) {
+					LL_DELETE(GET_TRIG_LINKS(trig), link);
+					free(link);
+					any = TRUE;
+				}
+			}
+			
+			prettier_sprintbit(BIT(pos), olc_type_bits, buf);
+			if (!any) {
+				msg_to_char(ch, "No matching links found to remove.\r\n");
+			}
+			else if (!str_cmp(vnum_arg, "all")) {
+				msg_to_char(ch, "Removed all %s links.\r\n", buf);
+			}
+			else {
+				msg_to_char(ch, "Removed link to %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "%s", usage);
 	}
 }
 
@@ -1122,7 +1378,7 @@ OLC_MODULE(tedit_types) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);	
 	bitvector_t old = GET_TRIG_TYPE(trig), diff;
 	
-	bitvector_t ignore_changes = MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM | MTRIG_ALLOW_MULTIPLE;	// all types ignore global changes
+	bitvector_t ignore_changes = MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM | MTRIG_ALLOW_MULTIPLE | MTRIG_DEAD_OK;	// all types ignore global changes
 	
 	// mobs also ignore changes to the charmed flag
 	if (trig->attach_type == MOB_TRIGGER) {

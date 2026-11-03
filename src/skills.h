@@ -69,6 +69,7 @@
 #define ABILF_BUFF_SELF_NOT_TARGET	BIT(31)	// F. buff portion of the ability will go on the caster; everything else hits the victim
 #define ABILF_STAY_HIDDEN			BIT(32)	// G. will not automatically un-hide
 #define ABILF_BUFFS_COMMAND		    BIT(33)	// H. appears on the 'buffs' list
+#define ABILF_IGNORE_NO_EXP			BIT(34)	// I. overrides the no-exp flag on mobs
 
 #define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -136,6 +137,7 @@
 #define ATAR_NOT_ENEMY		BIT(29)	// D. cannot target an enemy
 #define ATAR_DEAD_OK		BIT(30)	// E. can target dead people
 #define ATAR_ROOM_RANDOM_CAN_USE	BIT(31)	// F. similar to ROOM-RANDOM but checks use permission
+#define ATAR_NOT_STOLEN		BIT(32)	// G. object targeted cannot be stolen
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST | ATAR_SELF_ONLY)
 #define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ANY_MULTI | ATAR_ENEMIES_MULTI)
@@ -234,6 +236,7 @@
 #define ADL_RANGE			BIT(7)	// some abilities can control range
 #define ADL_PARENT			BIT(8)	// indicates this ability comes free with that one
 #define ADL_SUPERCEDED_BY	BIT(9)	// if player has that ability, use it instead of this one
+#define ADL_REQUIRES_ABIL	BIT(10)	// cannot use this ability unless you have another
 
 
 // AGH_x: ability gain hooks
@@ -536,6 +539,7 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer, bool
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool has_ability_data_any(ability_data *abil, int type);
 bool has_ability_hook(ability_data *abil, bitvector_t hook_type, int hook_value);
+bool has_required_abilities(char_data *ch, ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void read_ability_requirements();
@@ -568,6 +572,7 @@ void remove_class_from_table(class_data *cls);
 
 // class.c prototypes
 void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role);
+void auto_assign_role(char_data *ch, bool notify);
 bool is_class_ability(ability_data *abil);
 bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 void update_class_and_abilities(char_data *ch);
@@ -592,7 +597,7 @@ void remove_skill_from_table(skill_data *skill);
 char *ability_color(char_data *ch, ability_data *abil);
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-bool can_gain_exp_from(char_data *ch, char_data *vict);
+bool can_gain_exp_from(char_data *ch, char_data *vict, ability_data *abil);
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
@@ -621,7 +626,7 @@ bool has_cooking_fire(char_data *ch);
 int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
-void perform_swap_skill_sets(char_data *ch);
+void perform_swap_skill_sets(char_data *ch, int which_swap);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
@@ -691,6 +696,33 @@ static inline bool has_ability_in_set(char_data *ch, any_vnum abil_id, int skill
 	
 	data = get_ability_data(ch, abil_id, 0);
 	return data && data->purchased[skill_set];
+}
+
+
+/**
+* Variant of has_ability_in_set() and has_ability() that checks ANY set.
+* 
+* @param char_data *ch The player to check.
+* @param any_vnum abil_id Any valid ability.
+* @return bool TRUE if the player has the ability in any skill set; FALSE if not.
+*/
+static inline bool has_ability_in_any_set(char_data *ch, any_vnum abil_id) {
+	struct player_ability_data *data;
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	data = get_ability_data(ch, abil_id, 0);
+	if (data) {
+		for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+			if (data->purchased[iter]) {
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
 }
 
 

@@ -1,6 +1,8 @@
 #18300
 Pharaoh Neferkare Combat~
-0 k 100
+0 k 100 2
+L b 18301
+L b 18302
 ~
 set heroic_mode %self.mob_flagged(GROUP)%
 * Count combat script cycles until enrage
@@ -186,7 +188,7 @@ done
 ~
 #18301
 Pyramid boss summon timer~
-0 n 100
+0 n 100 0
 ~
 wait 30 sec
 switch %self.vnum%
@@ -198,7 +200,7 @@ done
 ~
 #18302
 Enrage Buff/Counter Reset~
-0 bw 25
+0 bw 25 0
 ~
 if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.enrage_counter% == 0
@@ -214,7 +216,7 @@ end
 ~
 #18303
 Detect swim~
-0 c 0
+0 c 0 0
 swim~
 if !%self.varexists(running)%
   set running 0
@@ -233,7 +235,11 @@ remote swimming_%actor.id% %self.id%
 ~
 #18304
 Pyramid difficulty selector~
-1 c 4
+1 c 4 4
+L b 18300
+L b 18309
+L j 18300
+L j 18302
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty.
@@ -300,20 +306,30 @@ otimer 24
 ~
 #18305
 Pyramid delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #18306
 Pharaoh: Block flee~
-0 c 0
+0 c 0 0
 flee~
 %send% %actor% You can't flee from ~%self%!
 return 1
 ~
 #18307
 Pyramid bonus loot replacer~
-1 n 100
+1 n 100 10
+L c 18300
+L c 18301
+L c 18302
+L c 18303
+L c 18322
+L c 18325
+L c 18326
+L c 18327
+L c 18328
+L c 18329
 ~
 set actor %self.carried_by%
 if %actor%
@@ -402,14 +418,14 @@ end
 ~
 #18308
 Scarab special attack~
-0 k 100
+0 k 100 0
 ~
 %echo% &&rEveryone is bitten and stung by ~%self%!
 %aoe% 75 physical
 ~
 #18309
 Wander Mummy~
-0 n 100
+0 n 100 0
 ~
 if (!%instance.location%)
   halt
@@ -419,7 +435,7 @@ nop %self.unlink_instance%
 ~
 #18310
 Wandering Mummy despawn~
-0 ab 1
+0 ab 1 0
 ~
 if %random.100% == 1
   if !%self.fighting%
@@ -429,7 +445,8 @@ end
 ~
 #18311
 Neferkare Start Progression~
-2 g 100
+2 g 100 1
+L y 18300
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(18300)%

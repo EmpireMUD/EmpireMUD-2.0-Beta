@@ -1,0 +1,36 @@
+#12250
+Trampled Land~
+A Field of Trampled Soil~
+'.' 37 l 2 0 bp
+D0
+....~
+&t~
+E
+2 32 10.00 243
+E
+2 57 10.00 230
+E
+2 5 10.00 240
+E
+4 0 10.00 200
+E
+8 0 100.00 202
+E
+9 0 100.00 200
+I 6 3082 100.00 25  # FORAGE: succulent root
+M
+12252 10.00 0
+M
+12254 5.00 0
+X
+soil trampled field fertile ground plains around grass~
+   The land has been trampled by the enormous feet of elephants, leaving
+devastation and no small amount of feces. But traces of life abound: all
+around, grass has begun to spring up. Soon, this will be a lush grassland.
+~
+X
+feces poop dung shit~
+You don't really want to get too close to that.
+~
+S
+$

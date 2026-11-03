@@ -243,7 +243,7 @@ SHOW(show_resource) {
 	
 	// ok now build the data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 			continue;	// skip imms
 		}
 		
@@ -321,8 +321,11 @@ SHOW(show_account) {
 	char empart[MAX_STRING_LENGTH], skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr, color;
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
-	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
 	account_data *acc_ptr;
+	
+	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
+	int total_playtime = 0;
+	time_t earliest_birth = time(0);
 	
 	#define ONLINE_NOW  -2
 	
@@ -385,6 +388,9 @@ SHOW(show_account) {
 				*empart = '\0';
 			}
 			
+			SAFE_ADD(total_playtime, loaded->player.time.played, 0, INT_MAX, FALSE);
+			earliest_birth = MIN(earliest_birth, loaded->player.time.birth);
+			
 			if (!loaded_file) {
 				msg_to_char(ch, " &c[%d %s] %s  (online)&0%s\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), empart);
 				last_online = ONLINE_NOW;
@@ -408,6 +414,8 @@ SHOW(show_account) {
 				}
 				
 				msg_to_char(ch, " [%d %s] %s - \t%c%s ago\t0%s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), color, ago_ptr, empart);
+				
+				// records
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, GET_PREV_LOGON(loaded));
 				}
@@ -426,10 +434,12 @@ SHOW(show_account) {
 		}
 	}
 	
+	msg_to_char(ch, "Total playtime: %s\r\n", colon_time(total_playtime, FALSE, NULL));
+	msg_to_char(ch, "Oldest creation time: %-24.24s\r\n", ctime(&earliest_birth));
 	if (last_online > 0) {
 		ago_ptr = strcpy(ago_buf, simple_time_since(last_online));
 		skip_spaces(&ago_ptr);
-		msg_to_char(ch, " (last online: %-24.24s, %s ago)\r\n", ctime(&last_online), ago_ptr);
+		msg_to_char(ch, "Last online: %-24.24s, %s ago\r\n", ctime(&last_online), ago_ptr);
 	}
 	
 	if (plr && file) {
@@ -614,6 +624,41 @@ SHOW(show_buildings) {
 		
 		send_page_display(ch);
 	}
+}
+
+
+SHOW(show_builtwith) {
+	vehicle_data *veh = NULL;
+	struct resource_data *list, *res;
+	
+	// may target vehicle in room, vehicle you're in, or current room
+	one_argument(argument, arg);
+	if (*arg && !(veh = get_vehicle_in_room_vis(ch, arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !multi_isname(argument, VEH_KEYWORDS(veh)))) {
+		msg_to_char(ch, "You don't see a vehicle called '%s' here.\r\n", arg);
+		return;
+	}
+	
+	// header
+	if (veh) {
+		build_page_display(ch, "Built-with list for %s:", VEH_SHORT_DESC(veh));
+		list = VEH_BUILT_WITH(veh);
+	}
+	else {
+		build_page_display(ch, "Built-with list for this room:");
+		list = GET_BUILT_WITH(IN_ROOM(ch));
+	}
+	
+	// list
+	LL_FOREACH(list, res) {
+		build_page_display(ch, " %s", get_resource_name(res));
+	}
+	
+	// empty?
+	if (!list) {
+		build_page_display(ch, " nothing");
+	}
+	
+	send_page_display(ch);
 }
 
 
@@ -1150,7 +1195,7 @@ SHOW(show_factions) {
 SHOW(show_fmessages) {
 	int count, iter;
 	char_data *plr = NULL;
-	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	bool on, file = FALSE;
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
@@ -1167,15 +1212,15 @@ SHOW(show_fmessages) {
 		count = 0;
 		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
 			on = (IS_SET(GET_FIGHT_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
-			if (screenreader) {
-				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, "%s: %s%s", combat_message_types[iter], on ? "on" : "off", ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 		}
 		
-		if (count % 2 && !screenreader) {
+		if (count % 2 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 			send_to_char("\r\n", ch);
 		}
 	}
@@ -1718,6 +1763,33 @@ SHOW(show_lost_books) {
 }
 
 
+SHOW(show_lost_mobs) {
+	int count;
+	char_data *iter;
+	
+	build_page_display_str(ch, "Mobs with bad adventure instance links:");
+	
+	count = 0;
+	DL_FOREACH(character_list, iter) {
+		if (!IS_NPC(iter) || GET_MOB_VNUM(iter) < 10000) {
+			continue;	// ignore mobs from basic non-adventure vnums
+		}
+		if (MOB_INSTANCE_ID(iter) == NOTHING || get_instance_by_id(MOB_INSTANCE_ID(iter))) {
+			continue;	// ignore mobs not linked to an instance, or linked to a live instance
+		}
+		
+		// found
+		build_page_display(ch, "%2d. [%5d] %s: %s\r\n", ++count, GET_MOB_VNUM(iter), GET_SHORT_DESC(iter), room_log_identifier(IN_ROOM(iter)));
+	}
+	
+	if (!count) {
+		build_page_display_str(ch, "  none");
+	}
+	
+	send_page_display(ch);
+}
+
+
 SHOW(show_minipets) {
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *plr = NULL;
@@ -2241,20 +2313,66 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
+	any_vnum vnum;
 	char name[MAX_INPUT_LENGTH], *arg2, when[256];
+	unsigned long long timer;
 	struct player_completed_quest *pcq, *next_pcq;
-	bool file = FALSE, found = FALSE;
+	bool file = FALSE, found = FALSE, on_q, completed_q;
 	struct player_quest *pq;
 	int count, total, diff;
 	quest_data *qst;
 	char_data *vict = NULL;
+	player_index_data *index, *next_index;
 	
 	arg2 = any_one_arg(argument, name);
 	skip_spaces(&arg2);
 	
 	if (!*name) {
-		msg_to_char(ch, "Show quests: Which player?\r\n");
+		msg_to_char(ch, "Show quests: Which player name or quest vnum?\r\n");
 	}
+	else if (isdigit(*name)) {	
+		// show quest by vnum
+		if ((vnum = atoi(name)) < 0 || !(qst = quest_proto(vnum))) {
+			msg_to_char(ch, "Invalid quest vnum %d.\r\n", vnum);
+			return;
+		}
+		
+		timer = microtime();
+		build_page_display(ch, "Searching players for quest %d %s:", vnum, QUEST_NAME(qst));
+		count = 0;
+		
+		// players
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			// determine if we should load them
+			if ((time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
+				continue;	// skip due to timeout
+			}
+			if (!(vict = find_or_load_player(index->name, &file))) {
+				continue;	// no player
+			}
+			
+			// determine if they are on the quest
+			check_delayed_load(vict);
+			on_q = is_on_quest(vict, vnum) ? TRUE : FALSE;
+			completed_q = has_completed_quest_any(vict, vnum) ? TRUE : FALSE;
+			
+			if (file) {
+				free_char(vict);
+				file = FALSE;
+			}
+			
+			// ok?
+			if (on_q || completed_q) {
+				build_page_display(ch, "%s: %s", index->fullname, (on_q ? "on quest" : "completed"));
+				++count;
+			}
+		}
+		
+		build_page_display(ch, "(%d player%s, %.2f seconds for search)", count, PLURAL(count), (microtime() - timer) / 1000000.0);
+		send_page_display(ch);
+		return;
+	}
+	// otherwise, show quest by player name
 	else if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "Show quests: No player by that name.\r\n");
 	}
@@ -2420,6 +2538,7 @@ SHOW(show_skills) {
 	char_data *vict;
 	bool found, is_file = FALSE;
 	int set;
+	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 	
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -2494,6 +2613,21 @@ SHOW(show_skills) {
 	}
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
 	
+	if (GET_BONUS_ABILITIES(vict)) {
+		msg_to_char(ch, "&yBonus abilities&0: &g");
+		found = FALSE;
+		HASH_ITER(hh, GET_BONUS_ABILITIES(vict), bonus_abil, next_bonus_abil) {
+			if (!(abil = ability_proto(bonus_abil->vnum))) {
+				continue;	// no ability?
+			}
+			
+			// show it
+			msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+			found = TRUE;
+		}
+		msg_to_char(ch, "&0\r\n");
+	}
+	
 	msg_to_char(ch, "&yOther&0: &g");
 	found = FALSE;
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
@@ -2523,7 +2657,7 @@ SHOW(show_skills) {
 SHOW(show_smessages) {
 	int count, iter;
 	char_data *plr = NULL;
-	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	bool on, file = FALSE;
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
@@ -2540,15 +2674,15 @@ SHOW(show_smessages) {
 		count = 0;
 		for (iter = 0; *status_message_types[iter] != '\n'; ++iter) {
 			on = (IS_SET(GET_STATUS_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
-			if (screenreader) {
-				msg_to_char(ch, "%s: %s\r\n", status_message_types[iter], on ? "on" : "off");
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, "%s: %s%s", status_message_types[iter], on ? "on" : "off", ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 3)) ? "\r\n" : ""));
 			}
 		}
 		
-		if (count % 2 && !screenreader) {
+		if (count % 2 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 			send_to_char("\r\n", ch);
 		}
 	}
@@ -3411,18 +3545,12 @@ struct show_struct {
 } show_command_fields[] = {
 	{ "nothing",		0,		NULL },		// this is skipped
 	
-	// privileged options
-	{ "account",		LVL_TO_SEE_ACCOUNTS,	show_account },
-	{ "cropregions",	LVL_CIMPL,				show_crop_regions },
-	{ "data",			LVL_CIMPL,				show_data },
-	{ "piles",			LVL_CIMPL,				show_piles },
-	{ "stats",			LVL_GOD,				show_stats },
-	
 	// basic options
 	{ "ammotypes",		LVL_START_IMM,		show_ammotypes },
 	{ "author",			LVL_START_IMM,		show_author },
 	{ "bonusabilities",	LVL_START_IMM,		show_bonus_abilities },
 	{ "buildings",		LVL_START_IMM,		show_buildings },
+	{ "builtwith",		LVL_START_IMM,		show_builtwith },
 	{ "commons",		LVL_START_IMM,		show_commons },
 	{ "companions",		LVL_START_IMM,		show_companions },
 	{ "components",		LVL_START_IMM,		show_components },
@@ -3444,6 +3572,7 @@ struct show_struct {
 	{ "learned",		LVL_START_IMM,		show_learned },
 	{ "libraries",		LVL_START_IMM,		show_libraries },
 	{ "lostbooks",		LVL_START_IMM,		show_lost_books },
+	{ "lostmobs",		LVL_START_IMM,		show_lost_mobs },
 	{ "minipets",		LVL_START_IMM,		show_minipets },
 	{ "moons",			LVL_START_IMM,		show_moons },
 	{ "mounts",			LVL_START_IMM,		show_mounts },
@@ -3477,6 +3606,13 @@ struct show_struct {
 	{ "variables",		LVL_START_IMM,		show_variables },
 	{ "workforce",		LVL_START_IMM,		show_workforce },
 	
+	// privileged options
+	{ "account",		LVL_TO_SEE_ACCOUNTS,	show_account },
+	{ "cropregions",	LVL_CIMPL,				show_crop_regions },
+	{ "data",			LVL_CIMPL,				show_data },
+	{ "piles",			LVL_CIMPL,				show_piles },
+	{ "stats",			LVL_GOD,				show_stats },
+	
 	// last
 	{ "\n",		0,		NULL }
 };
@@ -3501,10 +3637,10 @@ ACMD(do_show) {
 		strcpy(buf, "Show options:\r\n");
 		for (count = 0, iter = 1; show_command_fields[iter].level; ++iter) {
 			if (show_command_fields[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				sprintf(buf + strlen(buf), " %-18.18s%s", show_command_fields[iter].cmd, ((!(++count % 4) || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
+				sprintf(buf + strlen(buf), " %-18.18s%s", show_command_fields[iter].cmd, ((!(++count % 4) || PRF_FLAGGED(ch, PRF_NO_COLUMNS)) ? "\r\n" : ""));
 			}
 		}
-		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 4) != 0) {
+		if (!PRF_FLAGGED(ch, PRF_NO_COLUMNS) && (count % 4) != 0) {
 			strcat(buf, "\r\n");
 		}
 		send_to_char(buf, ch);

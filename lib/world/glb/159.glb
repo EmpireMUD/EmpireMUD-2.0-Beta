@@ -1,0 +1,52 @@
+#15900
+Shipwrecked Goblin Horde pickpocket items~
+0 b a 0 75-175 0
+E
+-1 100.00
+0 0 0
+I 12 162 1.00 1 a  # PICKPOCKET: pile of gold dust
+I 12 2036 2.00 1 a  # PICKPOCKET: collapsed tent
+I 12 15906 2.00 1 a  # PICKPOCKET: goblin mess tent
+I 12 15907 2.00 1 a  # PICKPOCKET: goblin construction tent
+I 12 15938 2.00 1 a  # PICKPOCKET: goblin hoard tent
+I 12 806 1.00 1 a  # PICKPOCKET: silver looking glass
+I 12 15936 1.00 1 a  # PICKPOCKET: frenzy fish on a stick
+I 12 184 8.00 1 a  # PICKPOCKET: torch
+I 12 100 1.00 1 a  # PICKPOCKET: rock
+I 12 100 2.00 2 a  # PICKPOCKET: rock
+I 12 100 4.00 3 a  # PICKPOCKET: rock
+I 12 15903 4.00 1 a  # PICKPOCKET: heap of crude lumber
+I 12 15904 4.00 1 a  # PICKPOCKET: bag of bent nails
+I 12 15905 4.00 1 a  # PICKPOCKET: round stone block
+I 12 15939 0.50 1 a  # PICKPOCKET: True Fragment of Waur
+I 12 15940 1.00 1 a  # PICKPOCKET: cracked ceramic gnome
+I 12 15941 0.50 1 a  # PICKPOCKET: calendar stick
+I 12 15942 2.00 1 a  # PICKPOCKET: up-market brass doorknob
+I 12 15943 1.00 1 a  # PICKPOCKET: goblin art bone
+I 12 15944 0.50 1 a  # PICKPOCKET: modified brass chamberpot
+I 12 15945 0.25 1 a  # PICKPOCKET: chest of silver
+I 12 15915 1.25 1 a  # PICKPOCKET: deck-rat privateer minipet whistle
+I 12 15916 0.50 1 a  # PICKPOCKET: manatee aquatic mount whistle
+I 12 15918 0.50 1 a  # PICKPOCKET: hovering jade trinket in the shape of a dirigible
+I 12 144 1.00 2 a  # PICKPOCKET: basket of cotton
+I 12 3010 1.00 2 a  # PICKPOCKET: sack of oranges
+I 12 3019 1.00 2 a  # PICKPOCKET: basket of olives
+I 12 3030 1.00 2 a  # PICKPOCKET: bunch of coconuts
+I 12 3034 1.00 2 a  # PICKPOCKET: basket of peppers
+I 12 3072 1.00 2 a  # PICKPOCKET: bundle of sugarcane
+I 12 12106 1.00 2 a  # PICKPOCKET: basket of round pea-sized peppercorn berries
+I 12 12125 1.00 2 a  # PICKPOCKET: basket of vanilla beans
+I 12 12128 1.00 2 a  # PICKPOCKET: basket of cocoa beans
+I 12 15914 8.00 1 a  # PICKPOCKET: crabby patty
+I 12 3842 4.00 1 a  # PICKPOCKET: jar of honeyed fruit
+I 12 3836 4.00 1 a  # PICKPOCKET: smoked fish
+I 12 3805 4.00 1 a  # PICKPOCKET: pickled village vegetables
+I 12 3824 4.00 1 a  # PICKPOCKET: salt-cured fish
+I 12 3812 4.00 1 a  # PICKPOCKET: fillet of grilled fish
+I 12 3369 4.00 1 a  # PICKPOCKET: baked potato
+I 12 3365 4.00 1 a  # PICKPOCKET: dried shark meat
+I 12 3350 4.00 1 a  # PICKPOCKET: black sausage
+I 12 3351 4.00 1 a  # PICKPOCKET: jellied eels
+I 12 1362 1.00 1 a  # PICKPOCKET: bolt of llama wool cloth
+S
+$

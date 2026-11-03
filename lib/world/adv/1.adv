@@ -59,7 +59,7 @@ magi-netically modified crops into our world.
 (This adventure contains only the magical crops on the map.)
 ~
 10500 10549 5-0
-1 60 dglm 0
+1 60 dglmp 0
 L
 1 0
 10500 -1 -1 -1
@@ -68,6 +68,14 @@ L
 5 0
 43920 -1 -1 -1
 -1 0 0
+L
+20 0
+-1 -1 -1 -1
+-1 kl 0
+L
+19 0
+-1 -1 -1 -1
+-1 j 0
 T 10507
 S
 #103
@@ -233,26 +241,20 @@ L
 -1 0 0
 S
 #126
-Mountain Cave: Flame Dragon~
+Mountain Cave: Flame Dragon (replaced by 10300)~
 Paul Clarke~
    A flame dragon has made its nest in a mountain cave and is terrorizing the
 countryside! Can you hunt it down and kill it? Just follow the swath of
 scorched earth. The dragon is tough -- you might want to bring a partner.
+
+This adventure has been renumbered to 10300.
 ~
-10300 10329 100-150
+0 0 100-150
 5 0 n 0
 L
 5 0
-43200 -1 -1 -1
+1 -1 -1 -1
 -1 0 0
-L
-6 0
-75 -1 -1 -1
--1 0 0
-L
-1 0
-10300 -1 -1 -1
-14 c bdegkln
 S
 #127
 Wandering Dragon~
@@ -344,7 +346,7 @@ Paul Clarke~
 The mountain has opened up and lava is flowing forth at the surface!
 ~
 10190 10199 0-0
-1 0 dgl 0
+1 0 dglp 0
 L
 4 0
 10190 10190 10190 -1
@@ -470,6 +472,9 @@ Paul Clarke~
 the items have gone missing. If you find what the characters are looking for,
 surely they'll be grateful. Nursery rhyme items can be found on low-level mobs
 all over the world.
+   Each adventure has its own goals and activities. For this one, fight mobs
+around the newbie island to find lost items, start the quest for each item, and
+seek out their original owners.
 
 Notes for implementors:
 - This adventure uses fixed-location instances.
@@ -498,6 +503,9 @@ Paul Clarke~
 Venture into the goblin mines and see what sends even goblins running for their
 lives! And maybe if you can find those goblins running around outside, they'll
 be willing to reward you for clearing out the mine.
+   Each adventure has its own goals and activities. In Goblin Mines, fight
+creatures inside the mine. Then, try 'where goblin' to find one of the goblins
+outside to trade with.
 
 Directions for implementors:
 - Increase the instance limit to the number of newbie islands in your game.

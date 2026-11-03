@@ -1,0 +1,14 @@
+#9506
+helper cut net~
+the cut net helper~
+The cut net helper is here.
+~
+0 0 bdho kln 3
+0 0 0 0 -1 -1
+D
+   This mob helps with trig 9506's net immobilize, allowing the player to cut
+themselves free.
+~
+T 9507
+S
+$

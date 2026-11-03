@@ -216,7 +216,13 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(room)) && !vehicle_allows_climate(make_veh, room, NULL)) {
 		if (ch) {
-			msg_to_char(ch, "You can't %s %s here.\r\n", command, get_vehicle_short_desc(make_veh, ch));
+			if (VEH_REQUIRES_CLIMATE(make_veh)) {
+				ordered_sprintbit(VEH_REQUIRES_CLIMATE(make_veh), climate_flags, climate_flags_order, FALSE, buf);
+				msg_to_char(ch, "You can't %s %s here due to the climate or terrain (requires %s).\r\n", command, get_vehicle_short_desc(make_veh, ch), buf);
+			}
+			else {
+				msg_to_char(ch, "You can't %s %s here due to the climate or terrain.\r\n", command, get_vehicle_short_desc(make_veh, ch));
+			}
 		}
 		return FALSE;
 	}
@@ -320,6 +326,7 @@ struct resource_data *combine_resources(struct resource_data *combine_a, struct 
 void complete_building(room_data *room) {
 	char_data *ch;
 	empire_data *emp;
+	struct empire_territory_data *ter;
 	
 	// nothing to do if no building data
 	if (!COMPLEX_DATA(room)) {
@@ -363,6 +370,11 @@ void complete_building(room_data *room) {
 		if (GET_BUILDING(room)) {
 			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 			et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
+		}
+		
+		// reset population timer
+		if ((ter = find_territory_entry(emp, room))) {
+			ter->population_timer = config_get_int("building_population_timer");
 		}
 	}
 	
@@ -637,7 +649,7 @@ void disassociate_building(room_data *room) {
 		
 	// also check for missing crop data
 	if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
-		crop_data *new_crop = get_potential_crop_for_location(room, NOTHING);
+		crop_data *new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 		set_crop_type(room, new_crop ? new_crop : crop_table);
 	}
 	
@@ -964,7 +976,7 @@ void herd_animals_out(room_data *location) {
 		found_any = FALSE;
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(location), ch_iter, next_ch, next_in_room) {
-			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !GET_LEADER(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !MOB_FLAGGED(ch_iter, MOB_AGGRESSIVE | MOB_SENTINEL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
+			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !GET_LEADER(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !MOB_FLAGGED(ch_iter, MOB_AGGRESSIVE | MOB_SENTINEL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED) && !GET_FED_ON_BY(ch_iter) && (!GET_LED_BY(ch_iter) || IN_ROOM(GET_LED_BY(ch_iter)) != IN_ROOM(ch_iter))) {
 				if (!herd_msg) {
 					act("The animals are herded out of the building...", FALSE, ROOM_PEOPLE(location), NULL, NULL, TO_CHAR | TO_ROOM);
 					herd_msg = TRUE;
@@ -1550,6 +1562,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	bitvector_t set_bits;
 	char_data *temp_ch;
 	int original_builder, veh_level = 0;
+	empire_data *owner;
 	
 	// for moving data
 	int private_owner = NOBODY, dedicated_to = 0;
@@ -1771,6 +1784,16 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 				
 				if (deleted) {
 					check_all_exits();
+				}
+			}
+			
+			// cancel previous techs/stats
+			if ((owner = ROOM_OWNER(from_room))) {
+				adjust_building_tech(owner, from_room, FALSE);
+				
+				if (GET_BUILDING(from_room)) {
+					qt_empire_players(owner, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(from_room)));
+					et_lose_building(owner, GET_BLD_VNUM(GET_BUILDING(from_room)));
 				}
 			}
 			
@@ -3079,7 +3102,7 @@ ACMD(do_paint) {
 		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);
 		return;
 	}
-	if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
+	if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL, 1)) {
 		return;	// check trigger
 	}
 	

@@ -104,7 +104,7 @@ const struct action_data_struct action_data[] = {
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
 	{ "harvesting", "is harvesting the crop.", ACTF_HASTE | ACTF_FAST_CHORES, process_harvesting, NULL },	// ACT_HARVESTING
-	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
+	{ "planting", "is planting seeds.", ACTF_SHOVEL | ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_ALWAYS_FAST | ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", ACTF_SITTING, process_gen_interact_room, NULL },	// ACT_FISHING
@@ -129,10 +129,10 @@ const struct action_data_struct action_data[] = {
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
-	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
+	{ "tanning", "is tanning leather.", ACTF_HASTE | ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", ACTF_SITTING | ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_IGNORE_COND, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
-	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
+	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT: note this one gains ACTF_HASTE | ACTF_FAST_CHORES in some cases, below
 	{ "sailing", "is sailing the ship.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
 	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skill-swapping", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
@@ -224,7 +224,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	{ INTERACT_GATHER, ACT_GATHERING, "gather", "gathering", "gather_base_timer", 4,
 		PTECH_GATHER_COMMAND, "gather_approval",
 		NO_TOOL, GI_NO_SPEC, NOBITS,
-		{ /* start msg */ { "You begin looking around for material.", "$n starts looking for something to on the ground." },
+		{ /* start msg */ { "You begin looking around for material.", "$n starts looking for something on the ground." },
 		/* pre-finish */ NULL,
 		/* finish msg */ { "You gather $p!", "$n gathers $p!" },
 		/* empty msg */ "There's no good material left for you to gather here.",
@@ -392,7 +392,8 @@ void stop_room_action(room_data *room, int action) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_), once per second.
+* This is the main processor for periodic actions (ACT_), called 5 times per
+* second.
 */
 void update_actions(void) {
 	// prevent running multiple action rounds during a catch-up cycle
@@ -463,6 +464,11 @@ void update_actions(void) {
 			continue;
 		}
 		
+		// Crafts boost only specific types -- add act flags if they apply
+		if (GET_ACTION(ch) == ACT_GEN_CRAFT && (craft = craft_proto(GET_ACTION_VNUM(ch, 0))) && (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft))) {
+			act_flags |= ACTF_HASTE | ACTF_FAST_CHORES;
+		}
+		
 		// action-cycle is time remaining -- compute how fast we go through it
 		speed = ACTION_CYCLE_SECOND;	// makes it a full second
 		
@@ -474,13 +480,13 @@ void update_actions(void) {
 			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_HASTE) && IS_HASTENED(ch)) {
-			speed += ACTION_CYCLE_HALF_SEC;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += ACTION_CYCLE_HALF_SEC;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FASTER_BONUS) && HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
-			speed += ACTION_CYCLE_HALF_SEC;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_PROSPECT) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_PROSPECT)) {
 			speed += ACTION_CYCLE_SECOND;
@@ -660,15 +666,26 @@ obj_data *has_all_tools(char_data *ch, bitvector_t flags) {
 * @param room_data *room The room to prospect.
 */
 void show_prospect_result(char_data *ch, room_data *room) {
+	char full_buff[256];
+	int fullness;
+	
 	if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM))) {
 		msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
 	}
 	else {
-		if (is_deep_mine(room)) {
-			msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(room));
+		if (get_room_extra_data(room, ROOM_EXTRA_MINE_ORIGINAL_AMOUNT) > 0) {
+			fullness = (int) ceil(((double) get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT)) / get_room_extra_data(room, ROOM_EXTRA_MINE_ORIGINAL_AMOUNT) * 5.0);
+			safe_snprintf(full_buff, sizeof(full_buff), "%s ", mine_levels[fullness]);
 		}
 		else {
-			msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(room)), get_mine_type_name(room));
+			*full_buff = '\0';
+		}
+		
+		if (is_deep_mine(room)) {
+			msg_to_char(ch, "You discover that this area is %s %sdeep %s.\r\n", AN(*full_buff ? full_buff : "deep"), full_buff, get_mine_type_name(room));
+		}
+		else {
+			msg_to_char(ch, "You discover that this area is %s %s%s.\r\n", AN(*full_buff ? full_buff : get_mine_type_name(room)), full_buff, get_mine_type_name(room));
 		}
 	}
 }
@@ -679,8 +696,9 @@ void show_prospect_result(char_data *ch, room_data *room) {
 *
 * @param char_data *ch The player.
 * @return bool TRUE if safe, FALSE if they cannot burn it.
+* @param bool confirmed If TRUE, player typed CONFIRM as the last arg. FALSE if not.
 */
-bool validate_burn_area(char_data *ch) {
+bool validate_burn_area(char_data *ch, bool confirmed) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	obj_data *lighter = NULL;
 	bool kept = FALSE;
@@ -697,6 +715,9 @@ bool validate_burn_area(char_data *ch) {
 	}
 	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
+	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !confirmed) {
+		msg_to_char(ch, "You must type 'burn <area> CONFIRM' to burn a building you own.\r\n");
 	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
@@ -1178,7 +1199,7 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	if (!validate_burn_area(ch)) {
+	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
 		// sends own message
 		cancel_action(ch);
 		return;
@@ -1295,7 +1316,8 @@ void process_chop(char_data *ch) {
 	obj_data *axe;
 	int amt;
 	
-	const int min_progress_per_chop = 4;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
+	// updated in b5.218 (previously just = 4) -- setting this to the action cycle time makes the chop_timer essentially be "seconds to chop a tree at the lowest speed"
+	const int min_progress_per_chop = ACTION_CYCLE_TIME;
 	
 	if (!(axe = has_tool(ch, TOOL_AXE))) {
 		send_to_char("You need to be using an axe to chop.\r\n", ch);
@@ -1655,7 +1677,9 @@ void process_hunting(char_data *ch) {
 		end_action(ch);
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
 		run_ability_hooks_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL, NULL, NULL);
-		add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
+		if (SHARED_DATA(IN_ROOM(ch)) != &ocean_shared_data) {
+			add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
+		}
 	}
 	else {
 		// tick messaging
@@ -1664,7 +1688,7 @@ void process_hunting(char_data *ch) {
 		}
 		
 		// chance to raise depletion anyway (the hunter is scaring off game)
-		if (!number(0, 5)) {
+		if (!number(0, 5) && SHARED_DATA(IN_ROOM(ch)) != &ocean_shared_data) {
 			add_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE);
 		}
 	}
@@ -2261,10 +2285,10 @@ void process_swap_skill_sets(char_data *ch) {
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		msg_to_char(ch, "You swap skill sets.\r\n");
+		msg_to_char(ch, "You swap to skill set %d.\r\n", (GET_ACTION_VNUM(ch, 0) + 1));
 		act("$n swaps skill sets.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		perform_swap_skill_sets(ch);
+		perform_swap_skill_sets(ch, GET_ACTION_VNUM(ch, 0));
 		end_action(ch);
 		
 		set_move(ch, MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4));
@@ -2385,6 +2409,9 @@ ACMD(do_chip) {
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(target), INTERACT_CHIP)) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
+	else if (IS_STOLEN(target)) {
+		act("$p: you can't chip stolen items.", FALSE, ch, target, NULL, TO_CHAR);
+	}
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
 		msg_to_char(ch, "You need to be wielding some kind of knapper (or basic rock) to chip it.\r\n");
 	}
@@ -2461,8 +2488,9 @@ ACMD(do_chop) {
 * This is a timed action that triggers a room evolution.
 *
 * @param char_data *ch The character doing the action.
+* @param bool confirmed If TRUE, player typed CONFIRM as the last arg. FALSE if not.
 */
-void do_burn_area(char_data *ch) {
+void do_burn_area(char_data *ch, bool confirmed) {
 	obj_data *lighter = NULL;
 	bool kept;
 	
@@ -2475,7 +2503,7 @@ void do_burn_area(char_data *ch) {
 			msg_to_char(ch, "You don't seem to have a lighter%s.\r\n", (kept ? " that isn't marked (keep)" : ""));
 		}
 		else {
-			do_burn_building(ch, IN_ROOM(ch), lighter);
+			do_burn_building(ch, IN_ROOM(ch), lighter, confirmed);
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
@@ -2484,11 +2512,12 @@ void do_burn_area(char_data *ch) {
 	else if (GET_POS(ch) != POS_STANDING) {
 		send_low_pos_msg(ch);
 	}
-	else if (!validate_burn_area(ch)) {
+	else if (!validate_burn_area(ch, confirmed)) {
 		// sends its own message
 	}
 	else {
 		start_action(ch, ACT_BURN_AREA, 5);
+		GET_ACTION_VNUM(ch, 0) = (confirmed ? 1 : 0);
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
 		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
@@ -2723,7 +2752,15 @@ ACMD(do_mine) {
 		msg_to_char(ch, "You don't have permission to mine here.\r\n");
 	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
-		msg_to_char(ch, "This isn't a mine.\r\n");
+		if (IS_DISMANTLING(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't mine here.\r\n");
+		}
+		else if (!IS_COMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "The building isn't finished.\r\n");
+		}
+		else {
+			msg_to_char(ch, "This isn't a mine.\r\n");
+		}
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This mine only works in a city.\r\n");
@@ -2792,6 +2829,9 @@ ACMD(do_mint) {
 	}
 	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0 || IS_MINT_FLAGGED(obj, MINT_FLAG_NO_MINT)) {
 		msg_to_char(ch, "You can't mint that into coins.\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't mint stolen items into coins.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
@@ -2880,7 +2920,7 @@ ACMD(do_plant) {
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_flag(ch, arg, NULL, ch->carrying, OBJ_PLANTABLE))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -3034,6 +3074,9 @@ ACMD(do_saw) {
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
 		msg_to_char(ch, "You can't saw that!\r\n");
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't saw stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
@@ -3089,6 +3132,9 @@ ACMD(do_scrape) {
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
 		msg_to_char(ch, "You can't scrape that!\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't scrape stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to be using a good axe or knife to scrape anything.\r\n");
@@ -3163,6 +3209,9 @@ ACMD(do_tan) {
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {
 		msg_to_char(ch, "You can't tan that!\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't tan stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to tan here.\r\n");
@@ -3330,6 +3379,9 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 	else if (IS_SET(data->flags, GI_ATTEMPT_WITHOUT_INTERACT)) {
 		// allow it if we got here and have this flag
 		return TRUE;
+	}
+	else if (room == IN_ROOM(ch) && IS_SET(data->flags, GI_ALLOW_DIRECTION)) {
+		msg_to_char(ch, "You can't %s here (try %s in a direction to %s an adjacent %s).\r\n", data->command, data->verb, data->command, (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) ? "tile" : "room");
 	}
 	else {
 		msg_to_char(ch, "You can't %s %s.\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"));
@@ -3501,8 +3553,9 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 * @param int dir Which direction the player is doing it toward (may be NO_DIR for "this room").
 * @param room_data *room Which room the player is doing it to (may be same as current room).
 * @param const struct gen_interact_data_t *data A pointer to the gen_interact_data[].
+* @param bool is_repeat If TRUE, this was an automatic repeat; FALSE means the character is just starting.
 */
-void start_gen_interact_room(char_data *ch, int dir, room_data *room, const struct gen_interact_data_t *data) {
+void start_gen_interact_room(char_data *ch, int dir, room_data *room, const struct gen_interact_data_t *data, bool is_repeat) {
 	int timer;
 	
 	if (!data || !can_gen_interact_room(ch, room, data)) {
@@ -3521,11 +3574,14 @@ void start_gen_interact_room(char_data *ch, int dir, room_data *room, const stru
 		GET_ACTION_TIMER(ch) /= 2;
 	}
 	
-	if (data->msg.start[0]) {
-		act(data->msg.start[0], FALSE, ch, NULL, NULL, TO_CHAR);
-	}
-	if (data->msg.start[1]) {
-		act(data->msg.start[1], FALSE, ch, NULL, NULL, TO_ROOM);
+	// message on the initial start only
+	if (!is_repeat) {
+		if (data->msg.start[0]) {
+			act(data->msg.start[0], FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+		if (data->msg.start[1]) {
+			act(data->msg.start[1], FALSE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 }
 
@@ -3545,7 +3601,7 @@ bool try_gen_interact_local_crops(char_data *ch, room_data *room, const struct g
 		return FALSE;	// must be outdoor
 	}
 	
-	if ((crop = get_potential_crop_for_location(room, data->interact))) {
+	if ((crop = get_potential_crop_for_location(room, data->interact, NULL))) {
 		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), data->interact, room, NULL, NULL, NULL, finish_gen_interact_room);
 	}
 	else {
@@ -3626,7 +3682,7 @@ void process_gen_interact_room(char_data *ch) {
 			
 			// character is still there? repeat
 			if (IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
-				start_gen_interact_room(ch, dir, to_room, data);
+				start_gen_interact_room(ch, dir, to_room, data, TRUE);
 			}
 		}
 		else {
@@ -3644,14 +3700,14 @@ void process_gen_interact_room(char_data *ch) {
 		
 				// check if we failed to repeat but should repeat anyway:
 				if (IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED) && IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
-					start_gen_interact_room(ch, dir, to_room, data);
+					start_gen_interact_room(ch, dir, to_room, data, TRUE);
 				}
 			}
 			else {
-				// TODO should this have a message like "You find nothing" ? Player currently just sees the start message again.
+				// TODO should this have a message like "You find nothing" ? Player currently sees no message
 				
 				// not depleted, just came up empty: auto-repeat
-				start_gen_interact_room(ch, dir, to_room, data);
+				start_gen_interact_room(ch, dir, to_room, data, TRUE);
 			}
 		}
 	}
@@ -3698,6 +3754,6 @@ ACMD(do_gen_interact_room) {
 		// sends own message
 	}
 	else {
-		start_gen_interact_room(ch, dir, room, data);
+		start_gen_interact_room(ch, dir, room, data, FALSE);
 	}
 }

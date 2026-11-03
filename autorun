@@ -97,6 +97,7 @@ while ( : ) do
   fgrep "OLC:" syslog >> log/olc
   fgrep "WAR:" syslog >> log/war
   fgrep "SCRIPT ERR:" syslog >> log/scripterr
+  fgrep "EMPIRE:" syslog >> log/empires
   rm log/syslog.old
   mv syslog log/syslog.old
   touch syslog

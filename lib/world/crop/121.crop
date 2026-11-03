@@ -213,7 +213,7 @@ S
 #12128
 cacao~
 A Cacao Orchard~
-41 l b
+41 l bh
 99 26 0 51
 D0
 ^&oo&?^^~
@@ -297,10 +297,10 @@ D0
 &R??&W??~
 &W~
 I 6 12147 100.00 10  # FORAGE: handful of minty smelling red and white-striped seeds
-I 8 12148 25.00 3  # HARVEST: bundle of candy cane
-I 8 12148 25.00 4  # HARVEST: bundle of candy cane
-I 8 12148 25.00 5  # HARVEST: bundle of candy cane
-I 8 12148 25.00 6  # HARVEST: bundle of candy cane
+I 8 12148 25.00 3 h  # HARVEST: bundle of candy canes
+I 8 12148 25.00 4 h  # HARVEST: bundle of candy canes
+I 8 12148 25.00 5 h  # HARVEST: bundle of candy canes
+I 8 12148 25.00 6 h  # HARVEST: bundle of candy canes
 U
 0
 The air is suddenly filled with rattling an the scent of mint as candy canes burst from the ground!~

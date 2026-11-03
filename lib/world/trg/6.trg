@@ -1,6 +1,9 @@
 #600
 Seed enchantment~
-1 c 2
+1 c 2 3
+L c 601
+L c 602
+L o 185
 enchant~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -39,7 +42,11 @@ set obj %actor.inventory()%
 ~
 #601
 Enchanted seed plant - desert~
-1 c 2
+1 c 2 4
+L h 26
+L h 71
+L h 72
+L h 610
 plant~
 * optional desert-only script for obj 601: can only make enchanted forests in the desert
 set allow_sectors 26 71 72
@@ -79,7 +86,27 @@ end
 ~
 #602
 Enchanted forest unclaimed chop~
-0 ab 100
+0 ab 100 20
+L h 21
+L h 601
+L h 602
+L h 603
+L h 604
+L h 605
+L h 606
+L h 607
+L h 608
+L h 611
+L h 612
+L h 613
+L h 614
+L h 615
+L h 616
+L h 617
+L h 618
+L h 621
+L h 622
+L h 623
 ~
 * sector lists
 set starwood 601 602 603 604 606 607 608
@@ -143,7 +170,20 @@ done
 ~
 #603
 Enchanted seed plant - desert AND plains (default)~
-1 c 2
+1 c 2 13
+L h 1
+L h 2
+L h 3
+L h 4
+L h 26
+L h 44
+L h 45
+L h 54
+L h 71
+L h 72
+L h 90
+L h 600
+L h 610
 plant~
 * optional script for obj 601 allowing enchanted forests in temperate or arid regions
 set desert_sectors 26 71 72
@@ -195,7 +235,16 @@ end
 ~
 #604
 Enchanted seed plant - Temperate Only~
-1 c 2
+1 c 2 9
+L h 1
+L h 2
+L h 3
+L h 4
+L h 44
+L h 45
+L h 54
+L h 90
+L h 600
 plant~
 * optional script for obj 601: allows planting ONLY on temperate tiles
 set allow_sectors 1 2 3 4 44 45 54 90
@@ -234,8 +283,10 @@ end
 %purge% %self%
 ~
 #605
-Enchanted Forests: Start progress goals~
-1 g 100
+Enchanted Forests: Start progress goals on get~
+1 g 100 2
+L y 4010
+L y 4030
 ~
 return 1
 if %actor.is_pc% && %actor.empire%
@@ -243,9 +294,23 @@ if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(4030)%
 end
 ~
+#606
+Enchanted Forests: Start progress goals on load~
+1 n 100 2
+L y 4010
+L y 4030
+~
+set actor %self.carried_by%
+if %actor%
+  if %actor.is_pc% && %actor.empire%
+    nop %actor.empire.start_progress(4010)%
+    nop %actor.empire.start_progress(4030)%
+  end
+end
+~
 #610
 Talking Horse script~
-0 bw 10
+0 bw 10 0
 ~
 * This script is no longer in use, and has been replaced with custom messages.
 if %self.disabled%
@@ -268,7 +333,7 @@ done
 ~
 #611
 Talking Warhorse script~
-0 bw 10
+0 bw 10 0
 ~
 if %self.disabled%
   halt
@@ -292,7 +357,8 @@ done
 ~
 #612
 Talking Bunny script~
-0 bw 10
+0 bw 10 1
+L b 612
 ~
 if %self.disabled%
   halt
@@ -335,7 +401,7 @@ done
 ~
 #613
 Singing Bear script~
-0 bw 10
+0 bw 10 0
 ~
 * This is deprecated, replaced by mob custom strings.
 if %self.disabled%
@@ -358,7 +424,7 @@ done
 ~
 #614
 Walking Tree script~
-0 bw 10
+0 bw 10 0
 ~
 if %self.disabled% || %self.fighting%
   halt
@@ -390,7 +456,7 @@ done
 ~
 #615
 Feral Pixy script~
-0 bw 10
+0 bw 10 0
 ~
 if %self.disabled%
   halt
@@ -419,7 +485,7 @@ done
 ~
 #616
 Pixy Queen script~
-0 bw 10
+0 bw 10 0
 ~
 if %self.disabled%
   halt
@@ -446,7 +512,8 @@ done
 ~
 #617
 Free genie load~
-0 n 100
+0 n 100 1
+L f 617
 ~
 wait 1
 * only allows 1 copy of the genie here
@@ -466,7 +533,7 @@ detach 617 %self.id%
 ~
 #618
 Genie trigger phrase~
-0 d 1
+0 d 1 0
 wish~
 if %actor.is_npc% || %actor.nohassle%
   halt
@@ -482,7 +549,7 @@ dg_affect %self% !ATTACK off
 ~
 #619
 Genie death~
-0 f 100
+0 f 100 0
 ~
 say No! Noooo! I won't go back in the bottle!
 %echo% ~%self% screams as he's sucked into a brass bottle, expelling all his power trying in vain to get free.
@@ -490,7 +557,16 @@ return 0
 ~
 #621
 Enchanted Forest: Awaken seed to disenchant forest~
-1 c 2
+1 c 2 9
+L c 600
+L h 600
+L h 604
+L h 605
+L h 614
+L h 615
+L h 616
+L h 618
+L h 623
 awaken~
 set room %actor.room%
 return 1

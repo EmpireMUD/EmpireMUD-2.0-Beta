@@ -416,6 +416,49 @@ bool building_counts_as(bld_data *bld, bld_vnum which_bld, veh_vnum which_veh) {
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
 /**
+* May upgrade an empire to imm-only status, but does not downgrade them. This
+* is based on the presence of only immortals in the empire. It will only warn
+* if there's a mix.
+*
+* @param empire_data *emp The empire to check.
+*/
+void check_empire_imm_only(empire_data *emp) {
+	int imms, morts;
+	player_index_data *index, *next_index;
+	
+	if (!emp || EMPIRE_IMM_ONLY(emp)) {
+		return;	// no work
+	}
+	
+	// gather data
+	imms = morts = 0;
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		if (index->loyalty == emp) {
+			if (index->access_level >= LVL_GOD) {
+				++imms;
+			}
+			else {
+				++morts;
+			}
+		}
+	}
+	
+	if (imms > 0) {
+		// flag
+		syslog(SYS_EMPIRE, LVL_START_IMM, TRUE, "EMPIRE: %s is now an immortal empire", EMPIRE_NAME(emp));
+		SET_BIT(EMPIRE_ADMIN_FLAGS(emp), config_get_bitvector("immortal_empire_default_flags"));
+		EMPIRE_IMM_ONLY(emp) = TRUE;
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
+		// warn
+		if (morts > 0 && config_get_bool("immortal_empire_restrictions")) {
+			syslog(SYS_EMPIRE, LVL_START_IMM, TRUE, "EMPIRE: %s contains both mortals and immortals", EMPIRE_NAME(emp));
+		}
+	}
+}
+
+
+/**
 * Cancels a requested refresh on 1 or more empires.
 *
 * @param empire_data *only_emp Optional: Only remove from one empire (default: NULL = all)
@@ -538,6 +581,9 @@ void run_delayed_refresh(void) {
 					}
 				}
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_CHECK_ELIGIBLE_GOALS)) {
+				check_for_eligible_goals(emp);
+			}
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
 				read_empire_members(emp, FALSE);
 			}
@@ -550,9 +596,25 @@ void run_delayed_refresh(void) {
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_ALL)) {
 				update_MSDP_empire_data_all(emp, FALSE, FALSE);
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_VAULT)) {
+				read_vault(emp);
+			}
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
+			
+			// saves?
+			if (!block_all_saves_due_to_shutdown) {
+				if (EMPIRE_NEEDS_SAVE(emp)) {
+					save_empire(emp, FALSE);
+				}
+				if (EMPIRE_NEEDS_STORAGE_SAVE(emp)) {
+					save_empire_storage(emp);
+				}
+				if (EMPIRE_NEEDS_LOGS_SAVE(emp)) {
+					save_empire_logs(emp);
+				}
+			}
 		}
 		
 		check_empire_refresh = FALSE;
@@ -928,7 +990,7 @@ bool process_import_one(empire_data *emp) {
 				// items
 				orn = obj_proto(trade->vnum);
 				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt, orn ? GET_OBJ_TIMER(orn) : 0);
-				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt, TRUE);
+				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt, STORAGE_TIMERS_OLDEST);
 				
 				// mark gather trackers
 				add_production_total(emp, trade->vnum, trade_amt);
@@ -948,6 +1010,9 @@ bool process_import_one(empire_data *emp) {
 				// log
 				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(pair->emp), cost);
 				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(emp), gain);
+				
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
+				TRIGGER_DELAYED_REFRESH(pair->emp, DELAY_REFRESH_VAULT);
 			}
 		}
 		
@@ -971,12 +1036,11 @@ bool process_import_one(empire_data *emp) {
 // runs daily imports
 void process_imports(void) {
 	empire_data *emp, *next_emp;
-	int amount;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 			continue;
 		}
 		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
@@ -987,11 +1051,7 @@ void process_imports(void) {
 		}
 		
 		// ok go
-		amount = process_import_one(emp);
-		
-		if (amount > 0) {
-			read_vault(emp);
-		}
+		process_import_one(emp);
 	}
 }
 
@@ -1294,7 +1354,7 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 		return FALSE;
 	}
 	// neither can be imm-only
-	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrictions")) {
+	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrict_trade")) {
 		return FALSE;
 	}
 	// both must have trade routes
@@ -1405,7 +1465,7 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 		return TRUE;
 	}
 	// check allies if not a private room
-	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && !ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PRIVATE) && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1439,7 +1499,7 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 		return TRUE;
 	}
 	// check allies
-	if (mode != MEMBERS_ONLY && emp && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && emp && !VEH_IS_PRIVATE(veh) && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -2236,6 +2296,44 @@ int is_abbrev(const char *arg1, const char *arg2) {
 
 
 /**
+* Determines if 'arg' is an abbrev of 'string' without regard to hyphens in
+* 'string'. For example, lets you accept 'no-tell' or 'notell' equally, and
+* the player might have typed 'no-t' or 'not' for this abbrev.
+*
+* @param const char *arg The argument typed by the player.
+* @param const char *string The string to compare to.
+* @preturn bool TRUE if 
+*/
+bool is_abbrev_ignore_hyphen(const char *arg, const char *string) {
+	bool ok;
+	char *copied;
+	int iter, pos;
+	
+	// basic abbrev
+	if (is_abbrev(arg, string)) {
+		return TRUE;
+	}
+	
+	// duplicate the string with no -
+	CREATE(copied, char, strlen(string)+1);
+	for (iter = 0, pos = 0; iter < strlen(string); ++iter) {
+		if (string[iter] != '-') {
+			copied[pos++] = string[iter];
+		}
+	}
+	copied[pos++] = '\0';
+	
+	// test, save result for later
+	ok = is_abbrev(arg, copied);
+	
+	// cleanup copy
+	free(copied);
+	
+	return ok;
+}
+
+
+/**
 * similar to is_abbrev() but compares abbreviations of multiple words, e.g.
 * "cl br" would be a multi-abbrev of "clay bricks".
 *
@@ -2651,7 +2749,7 @@ void change_look_desc(char_data *ch, char *str, bool format) {
 		
 		// update companion data
 		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
-			add_companion_mod(cd, CMOD_LOOK_DESC, 0, str);
+			add_companion_mod(cd, CMOD_LOOK_DESC, 0, NULLSAFE(GET_LOOK_DESC(ch)));
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
@@ -2708,7 +2806,7 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 		
 		// update companion data
 		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
-			add_companion_mod(cd, CMOD_LOOK_DESC, 0, str);
+			add_companion_mod(cd, CMOD_LOOK_DESC, 0, NULLSAFE(GET_LOOK_DESC(ch)));
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
@@ -2913,8 +3011,8 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_BLOOD_UPKEEP: {
 			return GET_BLOOD_UPKEEP(ch);
 		}
-		case APPLY_NIGHT_VISION: {
-			return GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
+		case APPLY_LIGHT_RADIUS: {
+			return GET_EXTRA_ATT(ch, ATT_LIGHT_RADIUS);
 		}
 		case APPLY_NEARBY_RANGE: {
 			return GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
@@ -2968,6 +3066,11 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 		// #a empire adjective
 		if (strstr(GET_SHORT_DESC(proto), "#a")) {
 			tmp = str_replace("#a", "<empire>", output);
+			strcpy(output, tmp);
+			free(tmp);
+		}
+		if (strstr(GET_SHORT_DESC(proto), "#A")) {
+			tmp = str_replace("#A", "<empire>", output);
 			strcpy(output, tmp);
 			free(tmp);
 		}
@@ -3507,7 +3610,7 @@ char *how_drunk(char_data *ch) {
 		return "drunk";
 	}
 	else if (GET_COND(ch, DRUNK) >= (REAL_UPDATES_PER_MUD_HOUR * 12)) {
-		return "getting drunk";
+		return "tipsy";
 	}
 	else {
 		return NULL;	// no report when sober
@@ -4034,6 +4137,24 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 
 
 /**
+* Counts how many things appear in a resource list, by amount. For example if
+* the list has 2 sticks and 3 logs, the total is 5.
+*
+* @param struct resource_data *list A list of resources.
+* @return int The sum of the amounts of all entries in the list.
+*/
+int count_resource_list_quantity(struct resource_data *list) {
+	struct resource_data *iter;
+	int num = 0;
+	 
+	LL_FOREACH(list, iter) {
+		num += iter->amount;
+	}
+	return num;
+}
+
+
+/**
 * Extract resources from the list, hopefully having checked has_resources, as
 * this function does not error if it runs out -- it just keeps extracting
 * until it's out of items, or hits its required limit.
@@ -4090,6 +4211,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 						DL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
 							// skip keeps
 							if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+								continue;
+							}
+							if (IS_STOLEN(obj)) {
 								continue;
 							}
 							if (!CAN_SEE_OBJ(ch, obj)) {
@@ -4640,6 +4764,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 							else if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 								continue;	// skip keeps
 							}
+							else if (IS_STOLEN(obj)) {
+								continue;
+							}
 							else if (!CAN_SEE_OBJ(ch, obj)) {
 								continue;	// skip can't-see
 							}
@@ -4744,7 +4871,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				}
 				case RES_TOOL: {
 					prettier_sprintbit(res->vnum, tool_flags, buf);
-					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? prefix : ","), res->amount, buf, PLURAL(res->amount));
+					msg_to_char(ch, "%s %d more %s (tool%s, not equipped/kept)", (ok ? prefix : ","), res->amount, buf, PLURAL(res->amount));
 					break;
 				}
 				case RES_COINS: {
@@ -4778,7 +4905,8 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 
 
 /**
-* Gets the resources-needed list for display to mortals.
+* Gets the resources-needed list for display to mortals. Immortals generally
+* use show_resource_display() instead.
 *
 * @param struct resource_data *list The list to show.
 * @param char *save_buffer A string to write the output to.
@@ -4836,8 +4964,8 @@ void unmark_items_for_char(char_data *ch, bool ground) {
 * This function finds a sector that has (or doesn't have) certain flags, and
 * returns the first matching sector.
 *
-* @param bitvector_t with_flags Find a sect that has these flags.
-* @param bitvector_t without_flags Find a sect that doesn't have these flags.
+* @param bitvector_t with_flags Find a sect that has these flags (all flags must be present).
+* @param bitvector_t without_flags Find a sect that doesn't have these flags (none may be present).
 * @param bitvector_t prefer_climate Will attempt to find a good match for this climate (but will return without it if not).
 * @return sector_data* A sector, or NULL if none matches.
 */
@@ -4845,7 +4973,7 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 	sector_data *sect, *next_sect, *low_climate = NULL, *no_climate = NULL;
 	
 	HASH_ITER(hh, sector_table, sect, next_sect) {
-		if (with_flags && !SECT_FLAGGED(sect, with_flags)) {
+		if (with_flags && (GET_SECT_FLAGS(sect) & with_flags) != with_flags) {
 			continue;
 		}
 		if (without_flags && SECT_FLAGGED(sect, without_flags)) {
@@ -4984,6 +5112,25 @@ char *delete_doubledollar(char *string) {
 	*write = '\0';
 
 	return (string);
+}
+
+
+/**
+* Determines if a string ends in punctuation, ignoring color codes.
+*
+* @param const char *string The string.
+* @return bool TRUE if the string ends in punctuation, FALSE if not.
+*/
+bool ends_in_punct(const char *string) {
+	char buf[MAX_STRING_LENGTH];
+	int pos;
+	
+	strcpy(buf, strip_color(NULLSAFE(string)));
+	
+	// search backwards for the true end
+	for (pos = strlen(buf) - 1; pos > 0 && (isspace(buf[pos]) || buf[pos] == '\r' || buf[pos] == '\n'); --pos);
+	
+	return ispunct(buf[pos]) ? TRUE : FALSE;
 }
 
 
@@ -5914,10 +6061,10 @@ char *str_replace(const char *search, const char *replace, const char *subject) 
 /**
 * Strips out the color codes and returns the string.
 *
-* @param char *input
+* @param const char *input
 * @return char *result (no memory allocated, so str_dup if you want to keep it)
 */
-char *strip_color(char *input) {
+char *strip_color(const char *input) {
 	static char lbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	int iter, pos;
@@ -6608,6 +6755,33 @@ int get_depletion_max(room_data *room, int depletion_type) {
 
 
 /**
+* Determines the maximum depletion amount the interactions on a certain vehicle
+* allow.
+*
+* @param vehicle_data *veh Which vehicle (to find interactions on).
+* @param int depletion_type Which depletion we're looking for.
+* @return int Detected deletion cap if any; -1 if not detected.
+*/
+int get_depletion_max_vehicle(vehicle_data *veh, int depletion_type) {
+	int max, best = -1;
+	struct interaction_item *interact;
+	
+	if (!veh) {
+		return best;
+	}
+	
+	LL_FOREACH(VEH_INTERACTIONS(veh), interact) {
+		if (determine_depletion_type(interact) == depletion_type) {
+			max = interact_data[interact->type].one_at_a_time ? interact->quantity : config_get_int("common_depletion");
+			best = MAX(best, max);
+		}
+	}
+	
+	return best;
+}
+
+
+/**
 * This finds the ultimate map point for a given room, resolving any number of
 * layers of boats and home rooms.
 *
@@ -6716,15 +6890,21 @@ int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
 * Find an optimal place to start upon new login or death.
 *
 * @param char_data *ch The player to find a loadroom for.
+* @param int *load_room_type Optional: If not NULL, will be set to a LOAD_ROOM_ const based on what kind of load room we find.
 * @return room_data* The location of a place to start.
 */
-room_data *find_load_room(char_data *ch) {
+room_data *find_load_room(char_data *ch, int *load_room_type) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_vehicle_data *vter, *next_vter;
 	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
 	sh_int island;
 	bool veh_ok;
+	
+	if (load_room_type) {
+		// init to default
+		*load_room_type = LOAD_ROOM_START_LOC;
+	}
 	
 	// preferred graveyard?
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(GET_LOYALTY(ch), rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
@@ -6733,7 +6913,10 @@ room_data *find_load_room(char_data *ch) {
 		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room))) {
+		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room) || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), rl) <= config_get_int("tomb_off_island_distance")))) {
+			if (load_room_type) {
+				*load_room_type = LOAD_ROOM_MY_TOMB;
+			}
 			return rl;
 		}
 	}
@@ -6744,10 +6927,13 @@ room_data *find_load_room(char_data *ch) {
 		found = NULL;
 		// room territory
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
-			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && (GET_ISLAND_ID(ter->room) == island || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), ter->room) <= config_get_int("tomb_off_island_distance"))) && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
+					if (load_room_type) {
+						*load_room_type = LOAD_ROOM_ANY_TOMB;
+					}
 				}
 			}
 		}
@@ -6763,6 +6949,9 @@ room_data *find_load_room(char_data *ch) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = IN_ROOM(vter->veh);
+					if (load_room_type) {
+						*load_room_type = LOAD_ROOM_ANY_TOMB;
+					}
 				}
 			}
 		}
@@ -7357,7 +7546,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			if (!(target = to_room)) {
-				target = find_load_room(ch);
+				target = find_load_room(ch, NULL);
 			}
 			// absolute chaos
 			if (target == room) {
@@ -7366,12 +7555,12 @@ void relocate_players(room_data *room, room_data *to_room) {
 			}
 			
 			char_to_room(ch, target);
-			enter_triggers(ch, NO_DIR, "system", FALSE);
+			enter_triggers(ch, NO_DIR, "system", FALSE, NULL);
 			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
-			greet_triggers(ch, NO_DIR, "system", FALSE);
+			greet_triggers(ch, NO_DIR, "system", FALSE, NULL);
 			msdp_update_room(ch);
 		}
 	}
@@ -7388,15 +7577,20 @@ void relocate_players(room_data *room, room_data *to_room) {
 * @return bool TRUE if the room is light, FALSE if not.
 */
 bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {
+	vehicle_data *veh;
+	
 	if (!ignore_magic_darkness && MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
 	// 1. things that make the room light
+	if (IS_BURNING(room)) {
+		return TRUE;
+	}
 	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room) && !NO_LOCATION(room)) {
 		return TRUE;
 	}
-	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || ROOM_BLD_FLAGGED(room, BLD_LIGHT)) {
 		return TRUE;	// not dark: has a light source
 	}
 	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
@@ -7407,6 +7601,11 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 	}
 	if (count_adjacent_light && adjacent_room_is_light(room, ignore_magic_darkness)) {
 		return TRUE;	// not dark: adjacent room is light
+	}
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_FLAGGED(veh, VEH_LIGHT | VEH_ON_FIRE)) {
+			return TRUE;
+		}
 	}
 	
 	// 2. things that make the room dark
@@ -7782,6 +7981,51 @@ void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t
 			break;
 		}
 	}
+}
+
+
+/**
+* Accepts a color code string like "&r" and reports on the first color code it
+* finds in there. The & is optional; it will also accept "r".
+*
+* @param const char *color_code_string The input string such as "&r" or "&L&u".
+* @param bool include_underline If TRUE, will prepend "underlined" on the color name; if FALSE ignores underline.
+* @return const char* The first color found, as a text name like "red".
+*/
+const char *color_name_by_code(const char *color_code_string, bool include_underline) {
+	static char output[256];
+	int iter, pos;
+	bool underline;
+	
+	if (!color_code_string || !*color_code_string) {
+		return "none";
+	}
+	
+	*output = '\0';
+	underline = (include_underline && strstr(color_code_string, "&u")) ? TRUE : FALSE;
+	
+	for (iter = 0; color_code_string[iter] != '\0'; ++iter) {
+		if (color_code_string[iter] == '&' || color_code_string[iter] == 'u' || isspace(color_code_string[iter])) {
+			// skip &, u, and space
+			continue;
+		}
+		
+		// is this a valid color code?
+		for (pos = 0; color_code_info[pos].code != '\n'; ++pos) {
+			if (strchr(color_code_string, color_code_info[pos].code)) {
+				// found!
+				if (underline) {
+					safe_snprintf(output, sizeof(output), "underlined %s", color_code_info[pos].name); 
+					return output;
+				}
+				else {
+					return color_code_info[pos].name;
+				}
+			}
+		}
+	}
+	
+	return *output ? output : "none";
 }
 
 

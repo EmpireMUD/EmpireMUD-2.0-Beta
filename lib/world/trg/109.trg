@@ -1,14 +1,91 @@
 #10900
 Red Dragon Start Progression~
-2 g 100
+2 g 100 1
+L y 10900
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10900)%
 end
 ~
+#10901
+Colossal Red Dragon and Sir Vivor difficulty selector~
+0 c 0 2
+L b 10900
+L b 10901
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+elseif %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
+end
+if normal /= %arg%
+  set difficulty 1
+  set str normal
+elseif hard /= %arg%
+  set difficulty 2
+  set str hard
+elseif group /= %arg%
+  set difficulty 3
+  set str group
+elseif boss /= %arg%
+  set difficulty 4
+  set str boss
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  halt
+  return 1
+end
+* messaging
+set old_diff %self.var(difficulty,4)%
+%send% %actor% You set the difficulty to %str%...
+%echoaround% %actor% ~%actor% sets the difficulty to %str%...
+* Clear existing difficulty flags and set new ones.
+nop %self.remove_mob_flag(HARD)%
+nop %self.remove_mob_flag(GROUP)%
+if %difficulty% == 1
+  * Then we don't need to do anything
+elseif %difficulty% == 2
+  nop %self.add_mob_flag(HARD)%
+elseif %difficulty% == 3
+  nop %self.add_mob_flag(GROUP)%
+elseif %difficulty% == 4
+  nop %self.add_mob_flag(HARD)%
+  nop %self.add_mob_flag(GROUP)%
+end
+remote difficulty %self.id%
+%restore% %self%
+wait 1
+* in case
+dg_affect %self% !ATTACK off
+* alert
+switch %self.vnum%
+  case 10900
+    * colossal red dragon
+    if %old_diff% > %difficulty%
+      %echo% ... &%self%'s on the small side, as colossal dragons go.
+    elseif %old_diff% < %difficulty%
+      %echo% ~%self% opens ^%self% mouth wide...
+      %regionecho% %self.room% 10 A colossal roar rattles across the land!
+    end
+  break
+  case 10901
+    * Sir Vivor
+    say Oh, is that how it's going to be? Alright, have at me, then!
+  break
+done
+~
 #10902
 Colossal Dragon knight/thief random move~
-0 n 100
+0 n 100 1
+L j 10900
 ~
 set room %self.room%
 if (!%instance.location% || %room.template% != 10900)
@@ -31,7 +108,8 @@ mmove
 ~
 #10903
 Colossal Dragon knight/thief limit wander~
-0 i 100
+0 i 100 1
+L f 10903
 ~
 set start_room %instance.location%
 if !%start_room%
@@ -55,7 +133,7 @@ end
 ~
 #10904
 Dragon loot load boe/bop~
-1 n 100
+1 n 100 0
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -85,53 +163,60 @@ else
 end
 ~
 #10905
-Colossal red dragon combat + enrage~
-0 k 100
+Colossal red dragon combat~
+0 k 10 2
+L w 10905
+L w 10906
 ~
-set soft_enrage_rounds 140
-set hard_enrage_rounds 300
-* Count attacks until enrage
-set enrage_counter 0
-set enraged 0
-if %self.varexists(enrage_counter)%
-  set enrage_counter %self.enrage_counter%
+* Enrage removed in patch b5.217 -- if re-added, it will also need something to reset it
+* This formerly ran at 100% and included this section:
+if 0
+  set soft_enrage_rounds 140
+  set hard_enrage_rounds 300
+  * Count attacks until enrage
+  set enrage_counter 0
+  set enraged 0
+  if %self.varexists(enrage_counter)%
+    set enrage_counter %self.enrage_counter%
+  end
+  eval enrage_counter %enrage_counter%+1
+  if %enrage_counter% > %soft_enrage_rounds%
+    * Start increasing damage
+    set enraged 1
+    if %enrage_counter% > %hard_enrage_rounds%
+      set enraged 2
+    end
+    * Enrage messages
+    if %enrage_counter% == %soft_enrage_rounds%
+      %echo% |%self% eyes glow with fury! You'd better hurry up and kill *%self%!
+    end
+    if %enrage_counter% == %hard_enrage_rounds%
+      %echo% ~%self% takes to the air, letting out a fearsome roar!
+      %regionecho% %self.room% 5 |%self% roar shakes the ground!
+    end
+  end
+  remote enrage_counter %self.id%
+  * Enrage effects:
+  if %enraged%
+    if %enraged% == 2
+      * This should wipe out even a pretty determined party in a couple of shots
+      %echo% ~%self% unleashes a torrent of flame upon ^%self% foes from above!
+      %aoe% 1000 direct
+    end
+    * Don't always show the message or it would be even spammier
+    if %random.4% == 4
+      %echo% |%self% eyes glow with white-hot rage!
+    end
+    dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
+  end
+  * Check chance (this was a percent on the script but the enrage counter needs to always work)
+  if %random.10%!=10
+    halt
+  end
 end
-eval enrage_counter %enrage_counter%+1
-if %enrage_counter% > %soft_enrage_rounds%
-  * Start increasing damage
-  set enraged 1
-  if %enrage_counter% > %hard_enrage_rounds%
-    set enraged 2
-  end
-  * Enrage messages
-  if %enrage_counter% == %soft_enrage_rounds%
-    %echo% |%self% eyes glow with fury! You'd better hurry up and kill *%self%!
-  end
-  if %enrage_counter% == %hard_enrage_rounds%
-    %echo% ~%self% takes to the air, letting out a fearsome roar!
-    %regionecho% %self.room% 5 |%self% roar shakes the ground!
-  end
-end
-remote enrage_counter %self.id%
-* Enrage effects:
-if %enraged%
-  if %enraged% == 2
-    * This should wipe out even a pretty determined party in a couple of shots
-    %echo% ~%self% unleashes a torrent of flame upon ^%self% foes from above!
-    %aoe% 1000 direct
-  end
-  * Don't always show the message or it would be even spammier
-  if %random.4% == 4
-    %echo% |%self% eyes glow with white-hot rage!
-  end
-  dg_affect %self% BONUS-PHYSICAL 5 3600
-end
+*
 * Start of regular combat script:
-* Check chance (this was a percent on the script but the enrage counter needs to always work)
-if %random.10%!=10
-  halt
-  * Pick an attack:
-end
+* Pick an attack:
 switch %random.4%
   * Searing burns on tank
   case 1
@@ -161,7 +246,7 @@ switch %random.4%
     if (%target%)
       %send% %target% &&r~%self% uses ^%self% tail to hurl a rock at you, stunning you momentarily!&&0
       %echoaround% %target% ~%self% hurls a rock at ~%target% with ^%self% tail, stunning *%target% momentarily!
-      dg_affect %target% STUNNED on 10
+      dg_affect #10906 %target% STUNNED on 10
       %damage% %target% 150 physical
     end
   break
@@ -169,7 +254,9 @@ done
 ~
 #10906
 Colossal crimson dragon death~
-0 f 100
+0 f 100 2
+L b 10901
+L c 10930
 ~
 * Make the other NPC no longer killable
 set mob %instance.mob(10901)%
@@ -186,7 +273,7 @@ end
 ~
 #10907
 Colossal Red Dragon environmental~
-0 bw 10
+0 bw 10 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 if %self.fighting%
@@ -208,27 +295,22 @@ switch %random.4%
 done
 ~
 #10908
-Enrage Buff/Counter Reset~
-0 b 25
+Colossal Red Dragon: Boss reset~
+0 b 25 0
 ~
-if !%self.fighting% && %self.varexists(enrage_counter)%
-  if %self.enrage_counter% == 0
-    halt
-  end
-  if %self.aff_flagged(!ATTACK)%
-    halt
-  end
-  if %self.aff_flagged(!SEE)%
+if !%self.fighting% && !%self.aff_flagged(!ATTACK)%
+  if %self.aff_flagged(NO-SEE-IN-ROOM)%
+    dg_affect %self% NO-SEE-IN-ROOM off
     %echo% ~%self% returns.
   end
-  %load% mob %self.vnum%
   %echo% ~%self% settles down to rest.
-  %purge% %self%
+  %restore% %self%
+  nop %self.unscale_and_reset%
 end
 ~
 #10909
 No Leave During Combat - must fight~
-0 s 100
+0 s 100 0
 ~
 if %self.fighting%
   %send% %actor% You cannot flee during the combat with ~%actor%!
@@ -238,60 +320,66 @@ end
 return 1
 ~
 #10910
-Sir Vivor Combat + Enrage~
-0 k 100
+Sir Vivor Combat~
+0 k 10 1
+L w 10910
 ~
-set soft_enrage_rounds 140
-set hard_enrage_rounds 300
-* Count attacks until enrage
-set enrage_counter 0
-set enraged 0
-if %self.varexists(enrage_counter)%
-  set enrage_counter %self.enrage_counter%
-end
-eval enrage_counter %enrage_counter%+1
-if %enrage_counter% > %soft_enrage_rounds%
-  * Start increasing damage
-  set enraged 1
-  if %enrage_counter% > %hard_enrage_rounds%
-    set enraged 2
+* Enrage removed in patch b5.217 -- if re-added, it will also need something to reset it
+* This formerly ran at 100% and included this section:
+if 0
+  set soft_enrage_rounds 140
+  set hard_enrage_rounds 300
+  * Count attacks until enrage
+  set enrage_counter 0
+  set enraged 0
+  if %self.varexists(enrage_counter)%
+    set enrage_counter %self.enrage_counter%
   end
-  * Enrage messages
-  if %enrage_counter% == %soft_enrage_rounds%
-    %echo% |%self% screams and attacks with great ferocity! You'd better hurry up and kill *%self%!
-  end
-  if %enrage_counter% == %hard_enrage_rounds%
-    %echo% ~%self%, seeing that nothing is working, looks for an escape route!
-  end
-end
-remote enrage_counter %self.id%
-* Enrage effects:
-if %enraged%
-  if %enraged% == 2
-    * Pretend to flee
-    if %self.aff_flagged(HARD-STUNNED)%
-      %echo% ~%self% shakes his head and recovers from stunning!
+  eval enrage_counter %enrage_counter%+1
+  if %enrage_counter% > %soft_enrage_rounds%
+    * Start increasing damage
+    set enraged 1
+    if %enrage_counter% > %hard_enrage_rounds%
+      set enraged 2
     end
-    if %self.aff_flagged(IMMOBILIZED)%
-      %echo% ~%self% breaks free of the vines entangling him!
+    * Enrage messages
+    if %enrage_counter% == %soft_enrage_rounds%
+      %echo% |%self% screams and attacks with great ferocity! You'd better hurry up and kill *%self%!
     end
-    %echo% ~%self% tries to flee...
-    %echo% ~%self% runs behind a large stalagmite and disappears!
-    %restore% %self%
-    dg_affect %self% !ATTACK on 300
-    dg_affect %self% !SEE on -1
+    if %enrage_counter% == %hard_enrage_rounds%
+      %echo% ~%self%, seeing that nothing is working, looks for an escape route!
+    end
   end
-  * Don't always show the message or it would be even spammier
-  if %random.4% == 4
-    %echo% ~%self% swings his sword with strength born of terror!
+  remote enrage_counter %self.id%
+  * Enrage effects:
+  if %enraged%
+    if %enraged% == 2
+      * Pretend to flee
+      if %self.aff_flagged(HARD-STUNNED)%
+        %echo% ~%self% shakes his head and recovers from stunning!
+      end
+      if %self.aff_flagged(IMMOBILIZED)%
+        %echo% ~%self% breaks free of the vines entangling him!
+      end
+      %echo% ~%self% tries to flee...
+      %echo% ~%self% runs behind a large stalagmite and disappears!
+      %restore% %self%
+      dg_affect %self% !ATTACK on 300
+      dg_affect %self% NO-SEE-IN-ROOM on -1
+    end
+    * Don't always show the message or it would be even spammier
+    if %random.4% == 4
+      %echo% ~%self% swings his sword with strength born of terror!
+    end
+    dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
   end
-  dg_affect %self% BONUS-PHYSICAL 5 3600
+  * Check chance (this was a percent on the script but the enrage counter needs to always work)
+  if %random.10%!=10
+    halt
+  end
 end
+*
 * Start of regular combat script:
-* Check chance (this was a percent on the script but the enrage counter needs to always work)
-if %random.10%!=10
-  halt
-end
 * Pick an attack:
 switch %random.4%
   * Disarm dps (whoever has most tohit)
@@ -323,7 +411,7 @@ switch %random.4%
     set target %actor%
     %send% %target% ~%self% trips you and bashes you with the pommel of ^%self% sword, stunning you!
     %echoaround% %target% ~%self% trips ~%target% and bashes *%target% with the pommel of ^%self% sword, stunning *%target% momentarily!
-    dg_affect %target% HARD-STUNNED on 15
+    dg_affect #10910 %target% HARD-STUNNED on 15
     %damage% %target% 75 physical
   break
   * Blind on healer (whoever has the most max mana at least)
@@ -346,7 +434,9 @@ done
 ~
 #10911
 Sir Vivor death~
-0 f 100
+0 f 100 2
+L b 10900
+L c 10930
 ~
 * Make the other NPC no longer killable
 set mob %instance.mob(10900)%
@@ -363,7 +453,7 @@ end
 ~
 #10912
 Sir Vivor environmental~
-0 bw 10
+0 bw 10 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 if %self.fighting%
@@ -386,7 +476,7 @@ done
 ~
 #10913
 Bangles the thief environmental~
-0 bw 10
+0 bw 10 0
 ~
 switch %random.4%
   case 1
@@ -405,14 +495,16 @@ done
 ~
 #10914
 Delayed spawn announcement~
-0 n 100
+0 n 100 0
 ~
 wait 2
 %echo% ~%self% arrives!
 ~
 #10915
 Colossal crimson dragon fake pickpocket~
-0 p 100
+0 p 100 2
+L c 10945
+L t 10902
 ~
 if !(%abilityname%==pickpocket)
   halt
@@ -438,7 +530,8 @@ end
 ~
 #10919
 Colossal Dragon must-fight~
-0 q 100
+0 q 100 1
+L t 10900
 ~
 if (%actor.is_npc% || %actor.nohassle% || %actor.on_quest(10900)% || %self.aff_flagged(!ATTACK)%)
   halt
@@ -452,7 +545,8 @@ return 0
 ~
 #10920
 Detach must-fight~
-2 v 100
+2 v 100 1
+L b 10900
 ~
 set dragon %instance.mob(10900)%
 if %dragon%
@@ -461,7 +555,11 @@ end
 ~
 #10921
 Dragon quest spawn shopkeeper~
-2 v 100
+2 v 100 4
+L b 10903
+L t 10900
+L t 10901
+L t 10902
 ~
 if %questvnum% < 10900 || %questvnum% > 10902
   halt
@@ -478,7 +576,7 @@ done
 ~
 #10925
 Dragonslayer Statue~
-2 bw 15
+2 bw 15 0
 ~
 switch %random.4%
   case 1
@@ -497,7 +595,8 @@ done
 ~
 #10926
 Add Laboratory on Build~
-2 o 100
+2 o 100 1
+L e 5618
 ~
 eval lab %%room.%room.enter_dir%(room)%%
 * Add laboratry
@@ -508,19 +607,20 @@ detach 10926 %room.id%
 ~
 #10930
 Crimson dragon despawn timer~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #10950
 Muck Dragon delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #10951
 Muck Dragon load~
-0 n 100
+0 n 100 1
+L c 10950
 ~
 if %instance.location%
   mgoto %instance.location%
@@ -529,10 +629,18 @@ end
 ~
 #10952
 Muck Dragon updater + leash~
-0 i 100
+0 i 100 6
+L h 5
+L h 32
+L h 250
+L h 251
+L h 252
+L h 253
 ~
+set valid_sects 5 32 250 251 252 253
+*
 eval room %self.room%
-if (%room.sector% != Swamp && %room.sector% != Marsh && %room.sector% != River && %room.sector% != Lake)
+if !(%valid_sects% ~= %room.sector_vnum%)
   return 0
   halt
 end
@@ -540,7 +648,10 @@ nop %instance.set_location(%room%)%
 ~
 #10953
 Muck Dragon death~
-0 f 100
+0 f 100 3
+L c 10950
+L c 10959
+L y 10950
 ~
 nop %instance.set_location(%instance.real_location%)%
 set char %self.room.people%
@@ -562,9 +673,75 @@ if %instance.real_location%
   done
 end
 ~
+#10954
+Muck Dragon: Difficulty selector~
+0 c 0 0
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+elseif %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
+end
+if normal /= %arg%
+  set difficulty 1
+  set str normal
+elseif hard /= %arg%
+  set difficulty 2
+  set str hard
+elseif group /= %arg%
+  set difficulty 3
+  set str group
+elseif boss /= %arg%
+  set difficulty 4
+  set str boss
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  halt
+  return 1
+end
+* messaging
+set old_diff %self.var(difficulty,3)%
+%send% %actor% You set the difficulty to %str%...
+%echoaround% %actor% ~%actor% sets the difficulty to %str%...
+* Clear existing difficulty flags and set new ones.
+nop %self.remove_mob_flag(HARD)%
+nop %self.remove_mob_flag(GROUP)%
+if %difficulty% == 1
+  * Then we don't need to do anything
+elseif %difficulty% == 2
+  nop %self.add_mob_flag(HARD)%
+elseif %difficulty% == 3
+  nop %self.add_mob_flag(GROUP)%
+elseif %difficulty% == 4
+  nop %self.add_mob_flag(HARD)%
+  nop %self.add_mob_flag(GROUP)%
+end
+remote difficulty %self.id%
+%restore% %self%
+wait 1
+* in case
+dg_affect %self% !ATTACK off
+* alert
+if %old_diff% > %difficulty%
+  %echo% ... now that you're closer, ~%self% isn't as big as you feared.
+elseif %old_diff% < %difficulty%
+  %echo% ~%self% opens its mouth wide...
+  %regionecho% %self.room% 10 A gurgling roar shakes the entire landscape!
+end
+~
 #10956
 Muck Dragon: Muck Rake~
-0 k 33
+0 k 33 2
+L w 10950
+L w 10956
 ~
 if %self.cooldown(10950)%
   halt
@@ -581,7 +758,10 @@ done
 ~
 #10957
 Muck Dragon: Burrow Charge~
-0 k 50
+0 k 50 3
+L w 10950
+L w 10957
+L w 10959
 ~
 if %self.cooldown(10950)%
   halt
@@ -625,7 +805,9 @@ dg_affect #10959 %self% off
 ~
 #10958
 Muck Dragon: Swamp Breath~
-0 k 100
+0 k 100 2
+L w 10950
+L w 10958
 ~
 if %self.cooldown(10950)%
   halt
@@ -643,7 +825,7 @@ done
 ~
 #10959
 Muck dragon burrow charge leap command~
-0 c 0
+0 c 0 0
 leap~
 if %self.varexists(target)%
   set target %self.target%
@@ -663,13 +845,14 @@ remote success %self.id%
 ~
 #10965
 Hill Giant delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #10966
 Hill Giant load~
-0 n 100
+0 n 100 1
+L c 10965
 ~
 if %instance.location%
   mgoto %instance.location%
@@ -680,13 +863,16 @@ end
 ~
 #10967
 Hill Giant updater~
-0 i 100
+0 i 100 0
 ~
 nop %instance.set_location(%self.room%)%
 ~
 #10968
 Hill Giant death~
-0 f 100
+0 f 100 3
+L c 10965
+L c 10966
+L y 10965
 ~
 nop %instance.set_location(%instance.real_location%)%
 set char %self.room.people%
@@ -708,9 +894,72 @@ if %instance.real_location%
   done
 end
 ~
+#10969
+Giant: Difficulty selector~
+0 c 0 0
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+elseif %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
+end
+if normal /= %arg%
+  set difficulty 1
+  set str normal
+elseif hard /= %arg%
+  set difficulty 2
+  set str hard
+elseif group /= %arg%
+  set difficulty 3
+  set str group
+elseif boss /= %arg%
+  set difficulty 4
+  set str boss
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  halt
+  return 1
+end
+* messaging
+set old_diff %self.var(difficulty,2)%
+%send% %actor% You set the difficulty to %str%...
+%echoaround% %actor% ~%actor% sets the difficulty to %str%...
+* Clear existing difficulty flags and set new ones.
+nop %self.remove_mob_flag(HARD)%
+nop %self.remove_mob_flag(GROUP)%
+if %difficulty% == 1
+  * Then we don't need to do anything
+elseif %difficulty% == 2
+  nop %self.add_mob_flag(HARD)%
+elseif %difficulty% == 3
+  nop %self.add_mob_flag(GROUP)%
+elseif %difficulty% == 4
+  nop %self.add_mob_flag(HARD)%
+  nop %self.add_mob_flag(GROUP)%
+end
+remote difficulty %self.id%
+%restore% %self%
+wait 1
+* in case
+dg_affect %self% !ATTACK off
+* alert
+if %old_diff% > %difficulty%
+  %echo% ... now that you see *%self% up close, &%self%'s smaller than &%self% looked.
+elseif %old_diff% < %difficulty%
+  %echo% ... ~%self% is a lot bigger than &%self% looked!
+end
+~
 #10970
 Golden Harp plays self~
-1 bw 12
+1 bw 12 0
 ~
 if %self.carried_by%
   halt
@@ -729,7 +978,9 @@ done
 ~
 #10971
 Hill Giant fight: Throw Boulder (duck)~
-0 k 33
+0 k 33 2
+L w 10966
+L w 10967
 ~
 if %self.cooldown(10966)%
   halt
@@ -772,7 +1023,9 @@ done
 ~
 #10972
 Hill Giant fight: Club Smash (dive)~
-0 k 50
+0 k 50 2
+L w 10966
+L w 10967
 ~
 if %self.cooldown(10966)%
   halt
@@ -814,7 +1067,10 @@ done
 ~
 #10973
 Hill Giant fight: Quake Stomp (jump)~
-0 k 100
+0 k 100 3
+L w 10966
+L w 10967
+L w 10968
 ~
 if %self.cooldown(10966)%
   halt
@@ -856,7 +1112,7 @@ done
 ~
 #10974
 Hill Giant fight commands~
-0 c 0
+0 c 0 0
 duck dive jump~
 if !%self.var(running)%
   %send% %actor% You don't need to do that right now.
@@ -887,7 +1143,12 @@ remote command_%actor.id% %self.id%
 ~
 #10980
 Renegade Caster spawner~
-0 n 100
+0 n 100 5
+L b 10981
+L b 10982
+L b 10983
+L b 10984
+L e 10983
 ~
 if %instance.location%
   mgoto %instance.location%
@@ -901,19 +1162,25 @@ end
 ~
 #10981
 Renegade Spellcaster movement~
-0 i 100
+0 i 100 0
 ~
 nop %instance.set_location(%self.room%)%
 ~
 #10982
 Spellcaster delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #10983
 Renegade Spellcaster death~
-0 f 100
+0 f 100 6
+L b 10983
+L b 10984
+L c 10980
+L s 10992
+L w 10992
+L y 10980
 ~
 * Teen Witch stuff
 if %self.vnum% == 10983 || %self.vnum% == 10984
@@ -953,7 +1220,11 @@ done
 ~
 #10984
 Hostile Spellcaster Reaction~
-0 e 1
+0 e 1 4
+L b 10981
+L b 10982
+L b 10983
+L b 10984
 you~
 if %actor.is_npc%
   halt
@@ -989,7 +1260,11 @@ end
 ~
 #10985
 Rogue Wizard: Portal Attack~
-0 k 33
+0 k 33 4
+L w 3021
+L w 10981
+L w 10984
+L w 10985
 ~
 if %self.cooldown(10981)%
   halt
@@ -1041,7 +1316,10 @@ done
 ~
 #10986
 Rogue Wizard: Energy Drain~
-0 k 50
+0 k 50 3
+L w 3021
+L w 10981
+L w 10986
 ~
 if %self.cooldown(10981)%
   halt
@@ -1072,7 +1350,10 @@ end
 ~
 #10987
 Rogue Wizard: Fire Ritual~
-0 k 100
+0 k 100 3
+L w 3021
+L w 10981
+L w 10984
 ~
 if %self.cooldown(10981)%
   halt
@@ -1113,7 +1394,7 @@ dg_affect #10984 %actor% HARD-STUNNED on 5
 ~
 #10988
 Rogue Wizard: Interrupt Ritual~
-0 c 0
+0 c 0 0
 interrupt~
 if !%self.varexists(ritual_active)%
   %send% %actor% You don't need to do that right now.
@@ -1128,7 +1409,10 @@ remote ritual_active %self.id%
 ~
 #10989
 Rogue Manaweaver: Morph Attack~
-0 k 33
+0 k 33 3
+L s 10988
+L w 3021
+L w 10981
 ~
 if %self.cooldown(10981)%
   halt
@@ -1149,14 +1433,18 @@ if !%self.morph%
   wait 1 sec
 end
 %echo% &&r~%self% goes berserk, claws flailing in all directions!
-if %verify_target% != %actor.id%
+if %verify_target% == %actor.id%
   %damage% %actor% 75 physical
 end
 %aoe% 25 physical
 ~
 #10990
 Rogue Manaweaver: Dust Devil~
-0 k 50
+0 k 50 4
+L w 3021
+L w 10981
+L w 10982
+L w 10990
 ~
 if %self.cooldown(10981)%
   halt
@@ -1205,7 +1493,10 @@ end
 ~
 #10991
 Rogue Manaweaver: Dust Cloud~
-0 k 100
+0 k 100 3
+L w 3021
+L w 10981
+L w 10991
 ~
 if %self.cooldown(10981)%
   halt
@@ -1245,7 +1536,10 @@ done
 ~
 #10992
 Teen Witch: Baleful Polymorph~
-0 k 33
+0 k 33 3
+L s 10992
+L w 3021
+L w 10981
 ~
 if %self.cooldown(10981)%
   halt
@@ -1289,7 +1583,11 @@ end
 ~
 #10993
 Teen Witch: Ugly Stick~
-0 k 50
+0 k 50 4
+L w 3021
+L w 10981
+L w 10993
+L w 10994
 ~
 if %self.cooldown(10981)%
   halt
@@ -1319,7 +1617,10 @@ dg_affect #10994 %actor% CHARISMA -3 15
 ~
 #10994
 Teen Witch: Expelliarmus~
-0 k 100
+0 k 100 3
+L w 3021
+L w 10981
+L w 10995
 ~
 if %self.cooldown(10981)%
   halt
@@ -1358,7 +1659,9 @@ end
 ~
 #10995
 Teen Witch: Kiss Frog~
-0 e 0
+0 e 0 2
+L s 10992
+L w 10992
 kisses~
 if %victim.morph% != 10992
   halt
@@ -1375,7 +1678,8 @@ end
 ~
 #10998
 Mother's grimoire emotes~
-0 btw 10
+0 btw 10 1
+L c 10998
 ~
 if !%self.leader%
   halt

@@ -48,6 +48,9 @@ int active_accounts = 0;	// not timed out (at least 1 char)
 int active_accounts_week = 0;	// just this week (at least 1 char)
 int max_players_this_uptime = 0;
 
+// local functions
+void update_account_stats();
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// STATS DISPLAYS //////////////////////////////////////////////////////////
@@ -220,6 +223,9 @@ void mudstats_configs(char_data *ch, char *argument) {
 		append_page_display_line(line, ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
 	}
 	
+	// world size
+	build_page_display(ch, "World size: %d x %d", MAP_WIDTH, MAP_HEIGHT);
+	
 	// time
 	build_page_display(ch, "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
 	
@@ -234,7 +240,12 @@ void mudstats_configs(char_data *ch, char *argument) {
 	build_page_display(ch, "Player-killing: %s", config_get_bitvector("pk_mode") ? part : "forbidden");
 	
 	// war
-	build_page_display(ch, "War: %d offense%s required%s", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	if (config_get_bool("mutual_war_only")) {
+		build_page_display(ch, "War: wars must be mutual, no unilateral wars");
+	}
+	else {
+		build_page_display(ch, "War: %d offense%s required", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")));
+	}
 	
 	// city
 	build_page_display(ch, "Cities: %d minutes to establish, %d tiles apart (%d for allies)", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
@@ -352,6 +363,82 @@ void mudstats_time(char_data *ch, char *argument) {
 	else {
 		build_page_display(ch, "World reset (maintenance and depletion): imminent");
 	}
+	
+	send_page_display(ch);
+}
+
+
+/**
+* do_mudstats: world population stats
+*
+* @param char_data *ch Person to show it to.
+* @param char *argument In case some stats have sub-categories.
+*/
+void mudstats_world(char_data *ch, char *argument) {
+	int count;
+	int active_max = 0, active_min = 0, cities = 0, claimed = 0, homeless = 0, members = 0, population = 0, wealth = 0;
+	empire_data *emp, *next_emp;
+	struct empire_city_data *city;
+	struct empire_homeless_citizen *ehc;
+	
+	// build stats
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_MEMBERS(emp) > 0) {
+			// count members even if timed out
+			++active_max;
+		}
+		
+		if (EMPIRE_IS_TIMED_OUT(emp)) {
+			continue;
+		}
+		
+		// various counts:
+		++active_min;
+		LL_COUNT(EMPIRE_CITY_LIST(emp), city, count);
+		SAFE_ADD(cities, count, 0, INT_MAX, FALSE);
+		
+		LL_COUNT(EMPIRE_HOMELESS_CITIZENS(emp), ehc, count);
+		SAFE_ADD(homeless, count, 0, INT_MAX, FALSE);
+		
+		SAFE_ADD(claimed, EMPIRE_TERRITORY(emp, TER_TOTAL), 0, INT_MAX, FALSE);
+		SAFE_ADD(members, EMPIRE_MEMBERS(emp), 0, INT_MAX, FALSE);
+		SAFE_ADD(population, EMPIRE_POPULATION(emp), 0, INT_MAX, FALSE);
+		SAFE_ADD(wealth, GET_TOTAL_WEALTH(emp), 0, INT_MAX, FALSE);
+	}
+	
+	// start display
+	build_page_display_str(ch, "World stats:");
+	
+	// active players
+	update_account_stats();
+	if (active_accounts_week == active_accounts) {
+		build_page_display(ch, "Active players: %d", active_accounts);
+	}
+	else if (active_accounts_week > active_accounts) {
+		build_page_display(ch, "Active players: %d-%d", active_accounts, active_accounts_week);
+	}
+	else {
+		build_page_display(ch, "Active players: %d-%d", active_accounts_week, active_accounts);
+	}
+	
+	// active empires
+	if (active_min == active_max) {
+		build_page_display(ch, "Active empires: %d", active_min);
+	}
+	else if (active_max > active_min) {
+		build_page_display(ch, "Active empires: %d-%d", active_min, active_max);
+	}
+	else {
+		build_page_display(ch, "Active empires: %d-%d", active_max, active_min);
+	}
+	
+	// basic empire stats
+	build_page_display(ch, "World cities: %d", cities);
+	build_page_display(ch, "Claimed land: %d", claimed);
+	build_page_display(ch, "Empire members: %d", members);
+	build_page_display(ch, "Empire citizens: %d", population);
+	build_page_display(ch, "Homeless citizens: %d", homeless);
+	build_page_display(ch, "Global Wealth: %d", wealth);
 	
 	send_page_display(ch);
 }

@@ -66,15 +66,15 @@ void adventure_unsummon(char_data *ch) {
 	}
 	else {
 		// nowhere safe to send back to
-		char_to_room(ch, find_load_room(ch));
+		char_to_room(ch, find_load_room(ch, FALSE));
 		reloc = TRUE;
 	}
 	
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
 	GET_LAST_DIR(ch) = NO_DIR;
 	qt_visit_room(ch, IN_ROOM(ch));
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
-	enter_triggers(ch, NO_DIR, "summon", FALSE);
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon", was_in);	// cannot pre-greet for summon
+	enter_triggers(ch, NO_DIR, "summon", FALSE, was_in);
 	
 	look_at_room(ch);
 	if (reloc) {
@@ -84,7 +84,7 @@ void adventure_unsummon(char_data *ch) {
 		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
 	}
 	
-	greet_triggers(ch, NO_DIR, "summon", FALSE);
+	greet_triggers(ch, NO_DIR, "summon", FALSE, was_in);
 	msdp_update_room(ch);
 	
 	// followers?
@@ -93,12 +93,12 @@ void adventure_unsummon(char_data *ch) {
 			act("$n vanishes in a wisp of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
 			char_to_room(fol->follower, IN_ROOM(ch));
 			GET_LAST_DIR(fol->follower) = NO_DIR;
-			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
-			enter_triggers(fol->follower, NO_DIR, "summon", FALSE);
+			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon", was_in);	// cannot pre-greet for summon
+			enter_triggers(fol->follower, NO_DIR, "summon", FALSE, was_in);
 			look_at_room(fol->follower);
 			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
 			
-			greet_triggers(fol->follower, NO_DIR, "summon", FALSE);
+			greet_triggers(fol->follower, NO_DIR, "summon", FALSE, was_in);
 		}
 	}
 }
@@ -393,7 +393,7 @@ void do_summon_materials(char_data *ch, char *argument) {
 		// save the empire
 		if (found) {
 			set_mana(ch, GET_MANA(ch) - (cost * count));	// charge only the amount retrieved
-			read_vault(emp);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 			gain_player_tech_exp(ch, PTECH_SUMMON_MATERIALS, 1);
 			run_ability_hooks_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL, NULL, NULL);
 		}

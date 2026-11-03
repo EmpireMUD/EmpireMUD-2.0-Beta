@@ -220,6 +220,32 @@ in your empire and 'craft giant straw goat'.
 0 0
 Q 16660
 S
+#16617
+winds winter~
+the winds of winter~
+The winds of winter blow in the air.~
+   It's all quite ethereal, this. It's a gust of wind you can pick up and carry
+with you, an ephemeral reminder of winters past. A pleasant chill runs from
+your toes to your nose as you touch the wind.
+   Type 'use winds' to teleport to the nearest North Portal, if the season is
+right. When you're done there, use it again to return home. But it will only
+work in a city.
+~
+3 p a 0 0 5
+0 0 0
+10 0
+M
+17
+$p blow away.~
+M
+18
+$p blow away.~
+M
+33
+'Use' the winds of winter to teleport into and out of the North Portal for the holiday event. This item expires about 11 days after its first use.~
+T 16654
+T 16662
+S
 #16618
 outfit reindeer set~
 a reindeer outfit set~
@@ -271,9 +297,9 @@ Silver, gold, and green strands of garland are artfully draped about the room.~
 back of the empire's storage barns.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 0 8
+3 v 0 0 0 9
 0 0 0
-11 576
+11 1152
 T 16627
 S
 #16622
@@ -284,9 +310,9 @@ An artful hanging made up of candy canes dangles down in the middle of the area.
 an abstract winter scene.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 0 10
+3 v 0 0 0 11
 0 0 0
-7 576
+7 1152
 T 16627
 S
 #16623
@@ -298,9 +324,9 @@ comes from within, but the design of the metal makes it impossible to see what
 causes it.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-29 v 0 0 0 11
+29 v 0 0 0 12
 -1 1 0
-2 576
+2 1152
 T 16627
 S
 #16624
@@ -311,9 +337,9 @@ A set of reindeer hoofprints are clearly visible in the ground.~
 hoofprints in the ground.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 0 9
+3 v 0 0 0 10
 0 0 0
-10 576
+10 1152
 T 16627
 S
 #16625
@@ -716,9 +742,9 @@ A
 5 1 6
 S
 #16664
-whistle pet mini-grinchy grinchy~
-a mini-grinchy pet whistle~
-A mini-grinchy pet whistle is lying here.~
+whistle minipet mini-grinchy grinchy~
+a mini-grinchy minipet whistle~
+A mini-grinchy minipet whistle is lying here.~
    This whistle will teach you the tiny grinchy demon minipet. Type 'use
 whistle'.
 ~
@@ -1109,9 +1135,9 @@ event ends.
 T 16678
 S
 #16679
-whistle krampus tiny~
-a tiny krampus whistle~
-A tiny krampus whistle is lying here.~
+whistle krampus tiny minipet~
+a tiny krampus minipet whistle~
+A tiny krampus minipet whistle is lying here.~
 This whistle will teach you the tiny krampus minipet. Type 'use whistle'.
 ~
 19 p a 0 0 8
@@ -1142,6 +1168,17 @@ the evil as you read it.
 Q 16680
 T 16680
 S
+#16681
+whistle minipet wicked little automaton~
+a wicked little automaton minipet whistle~
+A wicked little automaton minipet whistle is dangling here.~
+   This festive clockwork whistle will grant you the wicket little automaton
+minipet. Type 'use whistle' to add it to your list.
+~
+19 p a 0 0 10
+16681 0 0
+10 0
+S
 #16683
 object new~
 snow cube~
@@ -1151,10 +1188,21 @@ A new object is sitting here.~
 0 0 0
 0 0
 S
+#16684
+Charlie-in-the-box box minipet~
+a Charlie-in-the-box minipet~
+A Charlie-in-the-box is closed on the ground.~
+   It's a violet box with a crank on the side. Type 'use Charlie-in-the-box' to
+add it to your minipet list.
+~
+19 p a 0 0 11
+16684 0 0
+10 0
+S
 #16685
-whistle burning straw goat~
-a burning straw goat whistle~
-A burning straw goat whistle is lying here.~
+whistle burning straw goat minipet~
+a burning straw goat minipet whistle~
+A burning straw goat minipet whistle is lying here.~
    This whistle will teach you the burning straw goat minipet. Type 'use
 whistle'.
 ~
@@ -1166,13 +1214,33 @@ S
 tester boss winter wonderland~
 the Winter Wonderland boss tester~
 The Winter Wonderland boss tester is here.~
-This item will summon a grinchy demon or krampus demon for testing.
-Usage: test <grinch | krampus> <normal | hard | group | boss>
+This item will summon a grinchy demon, krampus demon, or clockwork santa for testing.
+Usage: test <grinch | krampus | santa> <normal | hard | group | boss>
 ~
 3 p a 0 0 1
 0 0 0
 0 0
 T 16686
+S
+#16687
+sack bulging bright brightly wrapped presents undelivered~
+a sack of undelivered presents~
+A bulging sack of brightly wrapped presents has been dropped here.~
+   Santa has given you a sack of presents to spread out among both your
+citizens and the citizens of other empires. It looks like a normal sack, but
+when you touch it, it feels like it's covered in feathers although there are
+none to be seen.
+   You can deliver from inside any house by typing 'deliver' or from outside by
+typing 'deliver <direction>'. Deliver to 4 of your own houses and 2 houses each
+for 3 other empires.
+~
+3 p a 0 0 8
+0 0 0
+10 0
+C
+1 1
+Q 16687
+T 16687
 S
 #16690
 vortex polar miniature constantly-spinning spinning~

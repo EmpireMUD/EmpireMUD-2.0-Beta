@@ -53,6 +53,34 @@ W
 Z
 1 18219
 S
+#18202
+Guild of Adventurers: Build a New Guildhall~
+   It seems you've lost your guildhall. The guild is willing to issue you a new
+charter -- this time. Do take care of this next guildhall. See your
+Superintendant after building the new hall.
+~
+   The Superintendant thanks you for rebuilding the guildhall. See that you
+don't lose it this time.
+~
+6 0 0 0 10080
+A
+1 18211
+P
+48 18216 0 1 a
+P
+0 18200 0 1 a
+P
+48 18216 0 1 b
+P
+0 18201 0 1 b
+R
+7 18200 200
+T 18217
+W
+7 18216 0 1 a
+Z
+1 18219
+S
 #18208
 Guild of Adventurers: Seek Out Fame and Adventure~
    The barkeep takes you aside and leans over to say, 'You have the look of an

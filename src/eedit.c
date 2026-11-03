@@ -42,9 +42,11 @@ EEDIT(eedit_description);
 EEDIT(eedit_frontiertraits);
 EEDIT(eedit_motd);
 EEDIT(eedit_name);
+EEDIT(eedit_num_ranks);
 EEDIT(eedit_privilege);
 EEDIT(eedit_rank);
-EEDIT(eedit_num_ranks);
+EEDIT(eedit_rescan);
+EEDIT(eedit_toggles);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -132,14 +134,14 @@ char empire_banner_to_mapout_token(const char *banner) {
 	int num, color;
 	
 	color = -1;
-	for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
-		if (banner && strchr(banner, banner_to_mapout_token[num][0])) {
+	for (num = 0; color_code_info[num].code != '\n'; ++num) {
+		if (banner && strchr(banner, color_code_info[num].code)) {
 			color = num;
 			break;
 		}
 	}
 	
-	return (color != -1 ? banner_to_mapout_token[color][1] : '?');
+	return (color != -1 ? color_code_info[color].mapout : '?');
 }
 
 
@@ -317,6 +319,8 @@ const struct {
 	{ "privilege", eedit_privilege, NOBITS },
 	{ "rank", eedit_rank, NOBITS },
 	{ "ranks", eedit_num_ranks, NOBITS },
+	{ "toggles", eedit_toggles, NOBITS },
+	{ "rescan", eedit_rescan, EEDIT_FLAG_IMM_ONLY },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS }
@@ -451,31 +455,84 @@ EEDIT(eedit_admin_flags) {
 
 
 EEDIT(eedit_banner) {
+	bool found, underline = FALSE;
+	char banner[256], *temp;
+	int iter;
 	room_data *room, *next_room;
 	
+	// clean trailing spaces
+	argument = trim(argument);
+	
+	// just in case
+	strcpy(banner, "&0");
+	
 	if (!*argument) {
-		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
+		msg_to_char(ch, "Set the empire banner to what? Available banners are:\r\n");
+		// NOTE: this starts at 1 because 0 and 1 are &0 and &n, which are the same
+		for (iter = 1; color_code_info[iter].code != '\n'; ++iter) {
+			msg_to_char(ch, " \t%c%s\t0\r\n", color_code_info[iter].code, color_code_info[iter].name);
+		}
+		return;
 	}
-	else if (!check_banner_color_string(argument, FALSE, FALSE)) {
-		msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
+	
+	// validate color and prepare "banner" string
+	if (*argument == '&') {
+		// provided color codes
+		if (!check_banner_color_string(argument, FALSE, FALSE)) {
+			msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
+			return;
+		}
+		else {
+			// valid
+			strcpy(banner, argument);
+		}
 	}
-	else if (!strcmp(argument, NULLSAFE(EMPIRE_BANNER(emp)))) {
+	else {
+		// detect underline
+		temp = any_one_arg(argument, arg);
+		if (is_abbrev(arg, "underlined")) {
+			skip_spaces(&temp);
+			argument = temp;
+			underline = TRUE;
+		}
+		
+		// detect name in list
+		found = FALSE;
+		for (iter = 0; color_code_info[iter].code != '\n' && !found; ++iter) {
+			if (is_abbrev(argument, color_code_info[iter].name)) {
+				found = TRUE;
+				safe_snprintf(banner, sizeof(banner), "%s&%c", (underline ? "&u" : ""), color_code_info[iter].code);
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "Invalid banner color. Available banners are:\r\n");
+			// NOTE: this starts at 1 because 0 and 1 are &0 and &n, which are the same
+			for (iter = 1; color_code_info[iter].code != '\n'; ++iter) {
+				msg_to_char(ch, " \t%c%s\t0\r\n", color_code_info[iter].code, color_code_info[iter].name);
+			}
+			return;
+		}
+	}
+	
+	// ok, ready!
+	if (!strcmp(banner, NULLSAFE(EMPIRE_BANNER(emp)))) {
 		msg_to_char(ch, "That is already your current banner.\r\n");
 	}
 	else {
 		if (EMPIRE_BANNER(emp)) {
 			free(EMPIRE_BANNER(emp));
 		}
-		EMPIRE_BANNER(emp) = str_dup(argument);
+		EMPIRE_BANNER(emp) = str_dup(banner);
 		
 		EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
 		EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));
 
-		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
-		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color to %s", PERS(ch, ch, TRUE), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
+		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
 		
 		if (emp != GET_LOYALTY(ch)) {
-			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0 %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
 		}
 		
 		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
@@ -907,5 +964,136 @@ EEDIT(eedit_num_ranks) {
 		}
 		
 		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
+	}
+}
+
+
+// immortal-only, accepts 'eedit <empire> rescan' and 'eedit rescan <empire | all>'
+EEDIT(eedit_rescan) {
+	bool all = FALSE;
+	empire_data *which = NULL;
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
+		msg_to_char(ch, "You don't have permission to rescan empires.\r\n");
+		return;
+	}
+	
+	// determine target empire
+	if (emp != GET_LOYALTY(ch)) {
+		which = emp;	// immortal using targeted rescan
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Rescan which empire (or 'all')?\r\n");
+		return;
+	}
+	else if (!str_cmp(argument, "all")) {
+		all = TRUE;
+	}
+	else if (!(which = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire.\r\n");
+		return;
+	}
+	else {
+		// in all other cases we set 'which'
+	}
+	
+	if (all) {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has rescanned all empires", GET_NAME(ch));
+		reread_empire_tech(NULL);
+		refresh_empire_dropped_items(NULL);
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has rescanned empire: %s", GET_NAME(ch), EMPIRE_NAME(which));
+		reread_empire_tech(which);
+		refresh_empire_goals(which, NOTHING);
+		refresh_empire_dropped_items(which);
+		check_ruined_cities(which);
+		send_config_msg(ch, "ok_string");
+	}
+}
+
+
+EEDIT(eedit_toggles) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	bool on = FALSE, off = FALSE;
+	char part_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
+	int cmd, iter;
+	
+	// based on admin flags; different types of toggles might have different definitions of active in the future
+	#define EEDIT_TOGGLE_ACTIVE(emp, pos)  (eedit_toggle_data[(pos)].admin_flag == NOBITS || ((EMPIRE_ADMIN_FLAGS(emp) & eedit_toggle_data[(pos)].admin_flag) == eedit_toggle_data[(pos)].admin_flag))
+	
+	if (!*argument) {
+		// display only
+		build_page_display(ch, "Toggles for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		
+		for (iter = 0; *eedit_toggle_data[iter].name != '\n'; ++iter) {
+			build_page_display_col(ch, 2, FALSE, "%s: %s\t0", eedit_toggle_data[iter].name, (EEDIT_TOGGLE_ACTIVE(emp, iter) ? "&gon" : "&roff"));
+		}
+		
+		send_page_display(ch);
+		return;
+	}
+	
+	// check for on/off arg
+	chop_last_arg(argument, part_arg, last_arg);
+	if (!str_cmp(last_arg, "on")) {
+		on = TRUE;
+		argument = part_arg;
+	}
+	else if (!str_cmp(last_arg, "off")) {
+		off = TRUE;
+		argument = part_arg;
+	}
+	
+	// find which toggle
+	cmd = -1;
+	for (iter = 0; *eedit_toggle_data[iter].name != '\n'; ++iter) {
+		if (is_multiword_abbrev(argument, eedit_toggle_data[iter].name)) {
+			// found!
+			cmd = iter;
+			break;
+		}
+	}
+	
+	// logic chain
+	if (cmd == -1) {
+		msg_to_char(ch, "Unknown eedit toggle '%s'.\r\n", argument);
+	}
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
+		msg_to_char(ch, "Your rank is too low to change empire toggles.\r\n");
+	}
+	else if (eedit_toggle_data[cmd].tech_required != NO_TECH && !EMPIRE_HAS_TECH(emp, eedit_toggle_data[cmd].tech_required)) {
+		msg_to_char(ch, "The empire does not meet the requirements to set that toggle.\r\n");
+	}
+	else if (on && EEDIT_TOGGLE_ACTIVE(emp, cmd)) {
+		msg_to_char(ch, "The %s toggle is already on.\r\n", eedit_toggle_data[cmd].name);
+	}
+	else if (off && !EEDIT_TOGGLE_ACTIVE(emp, cmd)) {
+		msg_to_char(ch, "The %s toggle is already off.\r\n", eedit_toggle_data[cmd].name);
+	}
+	else {
+		// ok to change it
+		if (eedit_toggle_data[cmd].admin_flag != NOBITS) {
+			if (on || (!off && !EEDIT_TOGGLE_ACTIVE(emp, cmd))) {
+				on = TRUE;
+				SET_BIT(EMPIRE_ADMIN_FLAGS(emp), eedit_toggle_data[cmd].admin_flag);
+			}
+			else if (off || (!on && EEDIT_TOGGLE_ACTIVE(emp, cmd))) {
+				off = TRUE;
+				REMOVE_BIT(EMPIRE_ADMIN_FLAGS(emp), eedit_toggle_data[cmd].admin_flag);
+			}
+		}
+		
+		// log
+		if (emp == GET_LOYALTY(ch)) {
+			log_to_empire(emp, ELOG_ADMIN, "%s has toggled %s %s", PERS(ch, ch, TRUE), eedit_toggle_data[cmd].name, (on ? "on" : "off"));
+			msg_to_char(ch, "You toggle %s %s for the empire.\r\n", eedit_toggle_data[cmd].name, (on ? "on" : "off"));
+		}
+		else {
+			log_to_empire(emp, ELOG_ADMIN, "%s has been toggled %s", eedit_toggle_data[cmd].name, (on ? "on" : "off"));
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has toggled %s %s for %s", GET_NAME(ch), eedit_toggle_data[cmd].name, (on ? "on" : "off"), EMPIRE_NAME(emp));
+			msg_to_char(ch, "You toggle %s %s for %s%s\t0.\r\n", eedit_toggle_data[cmd].name, (on ? "on" : "off"), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
 	}
 }

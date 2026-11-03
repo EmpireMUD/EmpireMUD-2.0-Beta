@@ -1,6 +1,7 @@
 #5511
 Sorcery Tower: Study Sorcery~
-2 c 0
+2 c 0 1
+L c 5511
 study~
 if !%arg%
   %send% %actor% Study what? (try 'study sorcery')
@@ -32,7 +33,9 @@ set item %actor.inventory(5511)%
 ~
 #5512
 High Sorcery skillbook~
-1 t 100
+1 t 100 2
+L e 5511
+L q 2
 ~
 set room %actor.room%
 if !%self.is_flagged(ENCHANTED)%
@@ -55,7 +58,8 @@ end
 ~
 #5513
 Block disenchant~
-1 p 100
+1 p 100 1
+L o 180
 ~
 if %ability% == 180
   %send% %actor% You can't disenchant that.

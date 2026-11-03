@@ -157,9 +157,9 @@ C
 0 25
 S
 #12612
-whistle rock rolling~
-a rolling rock whistle~
-A rolling rock whistle is lying here.~
+whistle rock rolling minipet~
+a rolling rock minipet whistle~
+A rolling rock minipet whistle is lying here.~
    This whistle can summon a noncombat pet! These pets don't help you in
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
@@ -169,9 +169,9 @@ to summon it.
 2 0
 S
 #12613
-whistle ball fire~
-a ball of fire whistle~
-A ball of fire whistle is lying here.~
+whistle ball fire minipet~
+a ball of fire minipet whistle~
+A ball of fire minipet whistle is lying here.~
    This whistle can summon a noncombat pet! These pets don't help you in
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
@@ -181,9 +181,9 @@ to summon it.
 2 0
 S
 #12614
-whistle light breeze~
-a light breeze whistle~
-A light breeze whistle is lying here.~
+whistle light breeze minipet~
+a light breeze minipet whistle~
+A light breeze minipet whistle is lying here.~
    This whistle can summon a noncombat pet! These pets don't help you in
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
@@ -193,9 +193,9 @@ to summon it.
 2 0
 S
 #12615
-whistle puddle little~
-a little puddle whistle~
-A little puddle whistle is lying here.~
+whistle puddle little minipet~
+a little puddle minipet whistle~
+A little puddle minipet whistle is lying here.~
    This whistle can summon a noncombat pet! These pets don't help you in
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
@@ -205,9 +205,9 @@ to summon it.
 2 0
 S
 #12616
-whistle broom tiny~
-a tiny broom whistle~
-A tiny broom whistle is lying here.~
+whistle broom tiny minipet~
+a tiny broom minipet whistle~
+A tiny broom minipet whistle is lying here.~
    This whistle can summon a noncombat pet! These pets don't help you in
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
@@ -231,6 +231,306 @@ A
 9 1 0
 C
 25 25
+S
+#12625
+plant bulbous strange~
+the bulbous plant~
+There's a strange plant growing in a pit in the ground.~
+   The jungle floor dips into a shadowed hollow, slick with dewy moss. A vast,
+bulbous plant fills much of the depression. A large hole in the top of the
+plant is rimmed with gleaming beads of sweet water. From here, above it, it
+almost looks like a pond down inside.
+~
+8 B 0 0 0 5
+-1 0 0
+0 0
+E
+hole~
+   The large hole at the top of the plant has a ridged, waxy rim dotted with
+beads of water.
+~
+E
+rim rimmed~
+   The rim of the hole is ridged and waxy, almost like the lip of a flower
+petal, and sparkling with beads of sweet water that have formed on its surface.
+~
+M
+18
+The plant wilts and dies.~
+S
+#12626
+remains sundew plant strange~
+the remains of the sundew~
+The strange plant lies flattened against the ground.~
+   The plant is a ruined mat of broken leaves. What's left of its glistening
+sap is stuck to the ground, binding its twisted tendrils to the jungle floor.
+The plant gives off a faint sour smell as it withers and rots.
+~
+3 0 0 0 0 5
+0 0 0
+0 24
+M
+18
+What's left of the sundew plant rots away on the ground.~
+T 12636
+S
+#12627
+plant strange remains charred ashy vines burnt pods~
+the charred remains~
+Ashy vines and burnt pods are scattered through the jungle.~
+   The lantern vines are nothing but ash and brittle vines now. The pods are
+blackened and shattered, and crumble at the slightest touch.
+~
+3 0 0 0 0 4
+0 0 0
+0 24
+M
+18
+What's left of the burnt plant crumbles to ash and blows away in the breeze.~
+T 12636
+S
+#12628
+debris~
+the debris~
+There's debris floating in the muck.~
+Looks like stray plant parts floating on the muck.
+~
+3 0 0 0 0 3
+0 0 0
+0 24
+T 12636
+S
+#12629
+plant strange large remains~
+the remains of the strange plant~
+A large, strange plant has been cut open and is wilting in the pit.~
+   The massive pitcher lies split open. Its once-slick walls, now torn, droop
+over the pit. Whatever liquid was inside the plant has now spilled out and
+seeped into the soil, leaving only a sticky, greenish film.
+~
+3 0 0 0 0 3
+0 0 0
+0 24
+M
+18
+The strange plant rots away.~
+T 12636
+S
+#12630
+cassava roots sack~
+a sack of cassava roots~
+A sack bulging with cassava roots lies here.~
+   The sack is stuffed full of thick, brown-skinned tubers, each one long and
+slightly twisted. They still have a faint earthy smell as their rough skins are
+dusted with soil.
+~
+3 gC a 0 0 17
+0 0 0
+7 4320
+C
+1 1
+O+ 1 6153
+R
+4 5215 0
+S
+#12631
+stems cassava bundle cuttings~
+a bundle of cassava stem cuttings~
+A bundle of cassava stems lies here, neatly cut and tied for planting.~
+   The bundle consists of several thick, woody sections of cassava stem, each
+about a foot long and still faintly green at the tips. The bark is rough and
+fibrous, showing marks where it was freshly cut.
+~
+3 bgC a 0 0 20
+0 12630 0
+0 4320
+C
+1 1
+M
+33
+Note: This is a single-use item so if it's used for construction, it won't be refunded when dismantled.~
+O+ 1 12633
+R
+4 5215 0
+S
+#12632
+seedling unknown~
+an unknown seedling~
+An unknown seedling has been left here.~
+   This seedling, nestled in its own clump of dirt, has only just sprouted.
+You can't tell what it is yet, but it looks like you could separate a few stems
+and see what grows. It looks tropical, so be sure to plant it somewhere hot and
+humid.
+~
+3 be a 0 0 4
+0 12632 0
+0 0
+M
+33
+Plant it in the jungle and see what grows.~
+R
+4 5193 0
+T 12627
+S
+#12633
+yams large bundle~
+a bundle of yams~
+A bundle of large yams rests here.~
+   The bundle is tied together with rough vines, holding several bulky,
+brown-skinned tubers. The yams are elongated, knobbly, and uneven. Their skins
+are streaked with dirt from the field.
+~
+3 bgC a 0 0 18
+0 12633 0
+7 4320
+C
+1 1
+I 15 12634 100.00 1  # SEPARATE: knobbly yam
+O+ 1 6153
+R
+4 5215 0
+S
+#12634
+yam knobbly large~
+a knobbly yam~
+A large, knobbly yam is lying here.~
+   The yam is thick and knobbly, and still covered in traces of earth. It may
+be heavy and plain, but it promises a filling meal once properly cooked. One
+yam isn't enough to plant but combining it with a few more should do.
+~
+3 g a 0 0 5
+0 0 0
+0 336
+I 14 12633 100.00 4  # COMBINE: bundle of yams
+O+ 1 6143
+R
+4 5619 0
+R
+4 5215 0
+S
+#12635
+plant strange large remains burnt husk~
+the burnt remains of the strange plant~
+The burnt husk of a large, strange plant is sitting in the pit.~
+   The massive pitcher is blackened and sagging, its walls charred into brittle
+husks. The soil of the pit beneath is damp; something protected it from the
+fire.
+~
+3 0 0 0 0 4
+0 0 0
+0 24
+M
+18
+The strange plant rots away.~
+T 12636
+S
+#12636
+design jungle tree complex interesting~
+the jungle tree complex design~
+An interesting design is lying on the ground -- looks like a jungle complex.~
+   This old scrap of paper looks half-dissolved, but you can still make out the
+design for a tree complex that could be built in the jungle. Of course, you'll
+need an architect to build it.
+This design will teach you to build: jungle tree complex.
+~
+7 0 a 0 0 1
+12636 0 0
+0 0
+C
+25 25
+S
+#12637
+object helper strange plant~
+a strange plant helper object~
+A strange plant helper object is here.~
+This is used to help trap players in the strange plant.
+~
+3 0 0 0 0 2
+0 0 0
+0 12
+T 12637
+S
+#12639
+clothes vine dandy~
+some vine and dandy clothes~
+Some vine and dandy clothes are crumpled on the ground.~
+   A clever weave of supple green fibers and trailing vines give the outfit a
+whimsical look. Thin tendrils drape like decorative cords, some curling into
+loose spirals, while broader leaves have been pressed and stitched to form
+panels that resemble fabric. The whole ensemble has a faint sheen like a plant
+covered in morning dew, giving the impression it was freshly gathered from the
+jungle.
+~
+2 p ad 0 0 9
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+A strange flowering stalk is growing here... on second glance, it's $n!~
+M
+12
+A tall plant with curling crimson frills is rooted here... wait, that's $n!~
+M
+12
+A bright red blossom sways gently here... no, it's actually $n!~
+M
+12
+A flare of scarlet petals seems to rise from the ground... until you notice it's just $n.~
+M
+12
+A strange shrub is growing here... no, wait, it's just $n.~
+M
+12
+A cluster of vines sways lightly, and then you realize it's $n.~
+M
+12
+$n stands here, looking more like a tangle of moss and leaves than a person.~
+S
+#12642
+death impending~
+impending death~
+Impending death is here.~
+This item kills the player on a brief delay.
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+T 12642
+S
+#12644
+trapped helper object~
+trapped~
+The trapped helper object is here.~
+This triggers a trap on the target.
+~
+3 0 a 0 0 5
+0 0 0
+0 0
+T 12644
+S
+#12645
+struggle~
+the struggle~
+The remains of a struggle are evident all around.~
+Sometimes it's necessary to 'struggle' to get free.
+~
+3 0 0 0 0 12
+0 0 0
+0 5
+C
+1 1
+M
+17
+Your struggle ends.~
+M
+18
+The signs of struggle fade.~
+T 12646
+T 12645
 S
 #12650
 portal strange green~
@@ -487,9 +787,9 @@ Type 'use trap' to summon it.
 2 0
 S
 #12669
-whistle wildling~
-a wildling whistle~
-A wildling whistle is dangling here.~
+whistle wildling mount~
+a wildling mount whistle~
+A wildling mount whistle is dangling here.~
 This whistle can be used to summon a wildling mount.
 ~
 3 p a 0 0 6
@@ -637,13 +937,13 @@ A golden seedling is sitting here.~
    It looks like a tiny plant, but made from solid gold. Still, you swear it
 blows in the wind when you put it down.
 ~
-15 0 a 0 0 1
+15 0 a 0 0 2
 1 0 0
 4 0
 C
 1 1
 R
-4 5611 0
+4 5611 a
 S
 #12685
 lint pocket magiterranean~

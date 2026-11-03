@@ -1,17 +1,62 @@
 #12800
 #n smith starsmith~
 Starsmith #n~
-Starsmith #n is tending the forge.
+Starsmith #n is tending the forge. (donate <shard>)
 ~
 100 150 bdqvI 0 3
-0 0 0 6 -1 -1
+0 4 0 6 -1 -1
 D
    The starsmith is dressed in a leather robe embossed with constellations both
 known and unknown. You can donate shards to open a portal to one of the great
 celestial forges: donate <which forge>
  Iron / Lodestone Forge
+ Imperium / Victory Forge
+ Eventide / Echo Forge
+ Meteorite / Terminus Forge
 ~
 I 4 2105 100.00 1  # LOOT: hammer
+M
+0
+$n looks upward.~
+M
+0
+Steel rings out as $n hammers at the anvil.~
+M
+0
+$n checks the balance of $s sword.~
+M
+0
+$n hammers away at a sword.~
+M
+0
+$n wipes $s brow.~
+M
+0
+$n pounds the anvil with a CLANG CLANG CLANG.~
+M
+0
+$n places the sword in the fire for a moment.~
+M
+1
+Donate one of your shards to visit one of the great Celestial Forges.~
+M
+1
+I've been training with a Ptahite smith, in the Egyptian style.~
+M
+1
+All the Celestial Forges are lovely, but I've always been particularly drawn to Lodestone Forge.~
+M
+1
+I've put in a shift at Victory Forge. Now that's hard work.~
+M
+1
+If you visit Echo Forge, it is critical you observe the Silence Rule and speak not a word.~
+M
+1
+The hottest flames are found at Terminus Forge, or thereabouts.~
+M
+1
+Each morning, I dream of visiting the Dawnforge.~
 T 12800
 S
 #12811
@@ -29,22 +74,55 @@ soot from the forge.
 ~
 M
 7
-say Testing once-ever greeting 1~
+say It is my immense pleasure to welcome you to Lodestone Forge.~
 M
 7
-say once-ever 2~
+say The finest smiths under the stars reside within.~
 M
 7
-say once-ever 3~
+say All are welcome here.~
 M
 8
-say testing repeat visit greet 1~
+say What a pleasure to see you again.~
 M
-8
-say testing repeat visit greet 2~
+0
+$n folds $s hands.~
 M
-8
-say testing repeat visit greet 3~
+0
+$n brushes off $s tunic.~
+M
+0
+$n smiles at you.~
+M
+0
+$n's eyes gleam in the light of the forge.~
+M
+1
+Feel free to look around.~
+M
+1
+A lot of great smiths find inspiration here.~
+M
+1
+Lodestones were the first compasses.~
+M
+1
+In China, lodestone was believed to be the mother of iron, and that was why iron clings to it.~
+M
+1
+In Greece, sailors believed in magnetic islands that pulled iron nails from ships, causing them to sink.~
+M
+1
+They say Cleopatra slept on a lodestone to maintain youthful skin.~
+M
+0
+The stars twinkle above you.~
+M
+0
+Warm incense wafts past your nose.~
+M
+1
+Have you challenged the Lodestone Colossus yet today?~
 T 12807
 S
 #12812
@@ -60,6 +138,40 @@ delicate craftwork, are folded in front of his waist as he greets you. His dark
 black hair is short and tousled, falling just above his brown eyes, which
 shimmer in the starlight.
 ~
+M
+7
+say Oho, a new face!~
+M
+7
+say It's rings over here, if you're interested.~
+M
+7
+say Don't forget to see Bo for a lodestone.~
+M
+8
+say Did ye make one of the rings?~
+M
+8
+say Never too late for greatness.~
+M
+0
+Hammers tap in the distance.~
+M
+0
+The stars twinkle above you.~
+M
+0
+The forge crackles and sizzles.~
+M
+0
+$n rubs one of $s rings against $s apron to polish it.~
+M
+0
+The aroma of incense warms your nose and lungs.~
+M
+1
+All that hammering has a nice ring to it.~
+T 12807
 S
 #12813
 Laila Brigidine~
@@ -74,6 +186,52 @@ stacks of patterns and designs. Her dark brown hair is loosely braided and
 hangs over her left shoulder. Above her brown eyes, the red dot of a bindi
 marks the spot between her eyebrows.
 ~
+M
+7
+say Don't think I've seen you here before.~
+M
+7
+say Your ears look a bit red.~
+M
+7
+say Best use some iron to cool them down.~
+M
+8
+say Lovely to see you.~
+M
+8
+say I've still got more earring designs.~
+M
+8
+say Be sure to stop by from time to time.~
+M
+0
+$n picks up a pattern and moves it to another stack.~
+M
+0
+$n picks up a design and examines it, then puts it in a new pile.~
+M
+0
+$n studies a pattern and then puts it in the right stack.~
+M
+1
+Now where did I put it...~
+M
+1
+I simply have too many of these designs.~
+M
+1
+Be with you in a moment.~
+M
+0
+$n scratches $s head as $e shuffles through a stack of designs.~
+M
+0
+The forge crackles and spits.~
+M
+0
+$n glances up at the stars for a moment.~
+T 12807
 S
 #12814
 Aulia Thorian~
@@ -89,6 +247,49 @@ cheekbones and stern face wrapped in a red scarf that covers her hair. Her
 white blouse and red dress are covered with a leather apron that shows the
 marks of many years of use.
 ~
+M
+7
+say Oh!~
+M
+7
+emote $n wraps a scarf around a swollen finger.~
+M
+7
+say Didn't mean to do that.~
+M
+7
+say Oh, didn't see you there.~
+M
+7
+say I've got some ideas you might like. Have a look.~
+M
+8
+say Glad you came back for more.~
+M
+8
+say Have you tried the elemental companion?~
+M
+8
+say This might be my best work.~
+M
+0
+$n tosses a spoonful of incense into the smelting pit, where it crackles and sizzles.~
+M
+0
+The smelting pit sizzles.~
+M
+0
+The warm, earthy aroma of incense comes from the smelting pit.~
+M
+0
+The warm, earthy aroma of incense comes from the smelting pit.~
+M
+0
+The warm, earthy aroma of incense comes from the smelting pit.~
+M
+0
+$n adjusts $s scarf.~
+T 12807
 S
 #12815
 Bo Ptahite~
@@ -105,5 +306,1166 @@ and straightens his shiny red jacket as you approach.
 M
 0
 Some supplies appear from thin air and $n places them in a barrel.~
+M
+7
+say Overstocked again...~
+M
+7
+say Oh! A new face. I was just saying we don't see enough new smiths these days.~
+M
+7
+say How wonderful that you're carrying on the tradition.~
+M
+8
+say Long time, no see.~
+M
+8
+say We just got new poles.~
+M
+8
+say Not sure who's sacrificing so many poles to the forge.~
+M
+0
+Some poles appear from thin air and $n places them in a barrel.~
+M
+0
+A shipment of nails appears from thin air and $n stacks it in the corner.~
+M
+0
+$n rearranges some of the supplies.~
+M
+0
+Stacks of leather appear from thin air and $n piles them in the corner.~
+M
+0
+$n pries lodestones off a larger stone, one by one.~
+M
+0
+$n steps aside as a small lodestone flies through the air and attaches it to a larger lodestone at $s feet.~
+M
+0
+$n carefully arranges panes of glass in a rack.~
+T 12807
+S
+#12817
+colossus lodestone stone form shape center~
+the Lodestone Colossus~
+A Lodestone Colossus towers above the field. (difficulty)
+~
+1 100 dhyzDJKL cEGU 6
+0 0 0 14 -1 -1
+D
+   The behemoth is formed from hulking blocks of lodestone, cobbled and stacked
+into a crude but unstoppable human-like shape. Countless weapons, some rusted
+and others still shining, cleave tightly to its surface to form a jagged shell
+of blades and shields that grinds and rearranges itself as the colossus moves.
+~
+I 4 12807 100.00 1  # LOOT: lodestone relic shield
+M
+11
+!rust !armor !fling !blades~
+M
+0
+All around you, rusted armor rattles in the ashes.~
+M
+0
+A piece of armor flies from the ashes to the colossus and attaches itself!~
+M
+0
+The colossus grows as red rust rises from the ashes to join it.~
+M
+0
+Jagged, rusted blades cling to the colossus as it moves.~
+M
+0
+An eering scraping noise echoes in the distance.~
+M
+0
+The colossus creaks as it slowly moves.~
+T 12822
+T 12821
+T 12823
+T 12820
+T 12816
+T 9600
+T 9601
+T 9604
+T 9609
+T 12808
+S
+#12832
+firefly fly lodestone~
+a lodestone firefly~
+A lodestone firefly twinkles in the air.
+~
+1 1 bdoD mn 1
+0 0 2 5 -1 -1
+D
+   The teensy lodestone flits around in the air, wingless, propelled by some
+unseen force. It flickers in the light, almost like a firefly, as it inspects
+every passing sword or piece of iron armor, sometimes landing on them for a few
+seconds before taking off again.
+~
+M
+0
+$n flickers in the light.~
+M
+0
+$n flits around in the air.~
+M
+0
+$n lands on you for a second, then takes off again.~
+T 12832
+S
+#12834
+elemental iron~
+an iron elemental~
+An iron elemental is here.
+~
+1 125 dhoGK cGL 3
+0 0 80 6 -1 -1
+D
+The elemental is configuring itself from a swirling mass of iron.
+~
+T 12836
+T 12835
+T 9903
+S
+#12838
+dummy training iron-plated ironplated plated~
+an iron-plated dummy~
+An iron-plated training dummy has been set up here.
+~
+1 100 bdhnyDJK G 3
+0 0 0 15 -1 -1
+D
+   Though it's little more than a suit of crude armor on a weighted wooden
+stand, the training dummy remains a valuable tool for combat instruction. It
+bobbles back and forth, never striking back after a blow or arrow.
+~
+M
+13
+This training dummy will not attack back.~
+T 12839
+T 12840
+S
+#12844
+elemental imperium~
+an imperium elemental~
+An imperium elemental is here.
+~
+1 225 dhoGK cGL 3
+0 0 94 6 -1 -1
+D
+The elemental is configuring itself from a swirling mass of imperium.
+~
+T 12836
+T 12835
+T 9903
+S
+#12851
+mateo master campwright wright~
+Mateo~
+Master Campwright Mateo stands near the smelter.
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   The master campwright is dressed in tight black trousers and a white shirt
+under a short, fitted black jacket, wrapped at the waist with a red sash. His
+face, soot-stained from work at the smelter, is gentle, with sharp creases
+around his eyes. On his head, he wears a wide-brimmed black hat, though the sun
+has already set.
+~
+M
+7
+say You've finally reached Victory Forge!~
+M
+7
+say We've been waiting for you.~
+M
+7
+say There's a lull in the fighting, but the smiths are hard at work.~
+M
+7
+say Be sure to have a look around.~
+M
+8
+say Oye, good to see you again.~
+M
+8
+say So long as the smelter burns, time yet remains to seize victory.~
+M
+0
+$n tends the smelter.~
+M
+0
+$n prods the smelter with a long poker.~
+M
+0
+$n sweeps some ash.~
+M
+0
+$n takes off $s hat and fans $mself.~
+M
+0
+$n wipes $s brow.~
+M
+1
+Such a nice night.~
+M
+1
+Looks like the fog is rolling in.~
+M
+0
+Anvils ring out rhythmically in the distance.~
+M
+0
+A light breeze chills you.~
+M
+0
+The sound of smiths working tireless fills the air.~
+M
+0
+Have you challenged the War Machine yet today?~
+T 12807
+S
+#12852
+amina veteran forgehand hand~
+Amina~
+Amina, Veteran Forgehand, works the anvil. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   The forgehand is steady as she raises and drops her hammer onto the anvil
+over and over, in perfect rhythm. She wears a hefty leather apron over a loose
+white dress hemmed just above the ankle with patterns of red, yellow, and
+green. Over her shoulders, she has pinned a gold shawl with colorful beads and
+her head is covered in a brimless gold cap decorated on the front with a
+stylized bead flower.
+~
+M
+7
+say Ah, a respectable visitor.~
+M
+7
+say I have some inspiration for you, but I am hard at work.~
+M
+7
+emote $n swings $s heavy hammer, bringing it down on the anvil with a heavy DING, DING, DING.~
+M
+7
+say Do not worry about being perfect. If you cannot be a lighthouse, be a candle.~
+M
+8
+emote $n looks up from $s work.~
+M
+8
+say Nice to see you again.~
+M
+8
+say Here to be inspired?~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n hits the anvil in steady rhythm.~
+M
+0
+$n wipes $s brow.~
+M
+0
+You can hear the pinging of other anvils in the distance.~
+T 12807
+S
+#12853
+Yara first~
+Yara~
+Yara of the First Anvil swings her hammer with precision. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   She wears a heavy leather apron over a sleeveless woven tunic, bound at the
+waist with a patterned sash coated in too much soot to guess the original
+color. Her feet bear only simple sandals, firmly planted in the earthy hilltop
+as she strikes the anvil. Her dark hair is braided back, clear of the sparks
+that fly from each strike.
+~
+M
+7
+emote $n grins as she looks up from her work for a moment.~
+M
+7
+say A new face. Do you find the battlefield as inspiring as I do?~
+M
+7
+say The greatest things are won at the highest cost.~
+M
+7
+say But enough chit-chat. I have work to do.~
+M
+8
+say Good to see you back again.~
+M
+8
+emote $n swings $s hammer high and brings it down on the anvil with a CLANG!~
+M
+8
+say Hope you're here for more inspiration.~
+M
+8
+emote $n swings $s hammer for another powerful CLANG!~
+M
+8
+say Pardon me if I don't stop what I'm doing, but there are only so many hours in the night.~
+M
+8
+emote $n looks at $s work and smiles.~
+M
+0
+$n brings $s hammer down with a powerful blow at the anvil.~
+M
+0
+$n hammers rhythmically at the anvil.~
+M
+0
+$n hammers rhythmically at the anvil.~
+M
+0
+You hear other smiths working their anvils in the distance.~
+T 12807
+S
+#12854
+hiro siege-honored honored~
+Hiro~
+Hiro the Siege-Honored works tirelessly at the anvil. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   The honored blacksmith wears a short, indigo-dyed work kimono with the
+sleeves tied back, layered beneath a thick leather apron. Below that, his
+hakama trousers are stained with ash and oil. His feet are wrapped in simple
+cloth sandals with firm leather soles. His hair is bound neartly at the nape of
+his neck, clear of the work he performs with measured precision.
+~
+M
+7
+say Ah! I thought you would make it here. Glad to see I was right.~
+M
+7
+say I hope you are studying more than just the smithing arts.~
+M
+7
+say It is also important to study your foe.~
+M
+7
+say Respect others, even your enemies.~
+M
+8
+emote $n looks up from $s work.~
+M
+8
+say You again.~
+M
+8
+say Good to see you.~
+M
+8
+say We can always use help here.~
+M
+8
+say As the cherry blossom is considered foremost among flowers, so the warrior is foremost among men.~
+M
+0
+$n heats a piece of metal.~
+M
+0
+$n hammers at the anvil.~
+M
+0
+$n examines $s work carefully.~
+M
+0
+$n hmms to $mself.~
+M
+0
+$n switches hammers.~
+M
+0
+$n taps at the anvil.~
+M
+0
+You hear the occasional ding of another anvil being struck in the distance.~
+T 12807
+S
+#12855
+Oksana lawhammer hammer~
+Oksana~
+Oksana Lawhammer is tallying the supplies. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   She wears a white blouse with flowers that match the standards the fly over
+the camp, tucked loosely into a striped red and white skirt. Her long brown
+hair flows freely over her shoulders and, at the top, she has adorned it with
+flowers of all colors. Though she isn't working the anvil, she has the muscled
+build of a smith, and the old burn scars on her arms from years of toil at the
+forge.
+~
+M
+7
+emote $n sets down a crate and looks up to see you.~
+M
+7
+say You don't wait for the weather from the sea, do you?~
+M
+7
+say Glad you're here, but be quick with what you want.~
+M
+7
+say Well, don't stand around, buy something or let me get back to work.~
+M
+8
+say Talking about the wolf...~
+M
+8
+say I was just thinking about you.~
+M
+8
+say Still lots more for sale here if you need supplies.~
+M
+0
+$n holds open a bag and catches some sparkling gems as they appear in the air.~
+M
+0
+$n sorts handles into bins.~
+M
+0
+$n stacks exotic hides in a pile.~
+M
+0
+$n carefully stacks ingots.~
+M
+0
+$n moves a crate.~
+M
+0
+$n steps aside quickly as a crate of imperium appears from thin air.~
+M
+1
+Donations aplenty to keep the war effort going.~
+M
+1
+Buy all you like; there's no shortage.~
+M
+0
+The rhythmic sound of hammers hitting anvils echoes in the distance.~
+M
+0
+The rhythmic sound of hammers hitting anvils echoes in the distance.~
+T 12807
+S
+#12857
+machine war plated heavily-plated fearsome~
+the War Machine~
+A heavily-plated War Machine rolls to the center of the field. (difficulty)
+~
+101 200 dhnyzDJKL cEGU 6
+0 0 0 30 -1 -1
+D
+   It stands in the center of the fog like a forgotten siege engine brought
+back to life. Its massive frame is built from thick timber beams, barely
+visible beneath black and white bands of powerful metal. Whoever controls this
+thing, whoever is moving it, you cannot see them. Every part of it is covered
+in armored plates that will have to come off in order to fight it.
+~
+I 4 12882 100.00 1  # LOOT: great imperium gear
+M
+0
+A small man runs out from under the War Machine, grabs a shield, and runs back in.~
+M
+0
+The War Machine turns toward you, briefly, before resuming its slow crawl.~
+M
+0
+The roar of a furnace erupts from within the War Machine.~
+M
+0
+The War Machine creaks as it rolls slowly forward.~
+M
+0
+Smoke billows from a chimney on top of the War Machine.~
+M
+0
+The War Machine seems to be adding armored plates.~
+M
+0
+Sparks spill from a seam in the War Machine as something is welded shut from the inside.~
+M
+0
+A hatch in the War Machine opens briefly, venting a blast of hot steam.~
+M
+0
+The War Machine's wheels crunch over broken weapons and shields.~
+M
+0
+A muffled hammering echoes from deep within the War Machine.~
+M
+0
+The War Machine creeps slowly across the battlefield.~
+T 12822
+T 12821
+T 12823
+T 12820
+T 12857
+T 12808
+S
+#12858
+machine war fearsome plated heavily-plated~
+the War Machine~
+A fearsome War Machine rolls ever forward.
+~
+101 200 dhyzDJKL cEGU 6
+0 0 0 30 -1 -1
+D
+   The fearsome machine has been stripped of some of its best armor, but it
+just keeps coming! Now, crossbows poke from every gap in its shields, and the
+grinding of gears signals worse to come.
+~
+I 4 12882 100.00 1  # LOOT: great imperium gear
+M
+11
+!catapult !whirl !tremor !scald !winch~
+M
+0
+The War Machine creeps slowly across the battlefield.~
+M
+0
+The War Machine turns toward you, briefly, before resuming its slow crawl.~
+M
+0
+The roar of a furnace erupts from within the War Machine.~
+M
+0
+The War Machine creaks as it rolls slowly forward.~
+M
+0
+Smoke billows from a chimney on top of the War Machine.~
+M
+0
+A hatch in the War Machine opens briefly, venting a blast of hot steam.~
+M
+0
+The War Machine's wheels crunch over broken weapons and shields.~
+M
+0
+A muffled hammering echoes from deep within the War Machine.~
+M
+0
+A crossbowman pops up from the top of the War Machine, then ducks back down.~
+M
+0
+Crossbow bolts glint from within the War Machine's arrow slits.~
+M
+0
+A winch ratchets loudly from within the War Machine.~
+T 12821
+T 12820
+T 12858
+T 12859
+T 9600
+T 9601
+T 9604
+T 9609
+T 12808
+S
+#12859
+machine war plated heavily-plated fearsome battered~
+the War Machine~
+A battered War Machine creaks onward.
+~
+101 200 dhzDJKL cEGU 6
+0 0 0 30 -1 -1
+D
+   Much of its armor now hangs twisted and torn away, exposing the timber
+framework beneath. Its gears are smashed and it barely moves, but the
+crossbowmen within continue their onslaught.
+~
+I 4 12882 100.00 1  # LOOT: great imperium gear
+M
+0
+The battered War Machine turns toward you, briefly, before resuming its slow crawl.~
+M
+0
+The roar of a furnace erupts from within the battered War Machine.~
+M
+0
+The War Machine creaks as it rolls slowly forward.~
+M
+0
+Smoke billows from a bent chimney on top of the War Machine.~
+M
+0
+Steam rises slowly from the battered seams of the War Machine.~
+M
+0
+The War Machine's battered wheels crunch over broken weapons and shields.~
+M
+0
+A muffled hammering echoes from deep within the battered War Machine.~
+M
+0
+A crossbowman pops up from the top of the battered War Machine, then ducks back down.~
+M
+0
+Crossbow bolts glint from within the battered War Machine's arrow slits.~
+M
+0
+The War Machine inches forward, one wheel grinding loudly against stone.~
+M
+0
+A broken catapult arm drags uselessly behind the War Machine.~
+M
+0
+A loose shield clatters off the War Machine and skids along the ground.~
+T 12821
+T 12820
+T 12808
+S
+#12873
+dummy training gleaming imperium~
+a gleaming imperium dummy~
+A gleaming imperium training dummy has been set up here.
+~
+100 200 bdhnyDJK G 3
+0 0 0 15 -1 -1
+D
+   This glorious suit of armor has been fitted over a weighted wooden stand,
+reinforced at the bottom so that it can take blow after blow from a heavy
+weapon. Though it teeters as it's struck, it never strikes back.
+~
+M
+13
+This training dummy will not attack back.~
+T 12839
+T 12840
+S
+#12877
+hawk banner sharp-eyed sharpeyed~
+a banner hawk~
+A sharp-eyed hawk circles overhead.
+~
+1 1 bdoD mn 1
+0 0 2 5 -1 -1
+D
+The lean, broad-winged hawk has feathers mottled in gleaming white and stark
+black. A light harness made of leather crosses its chest.
+~
+T 12877
+S
+#12891
+kaito measured~
+Kaito~
+Kaito the Measured stands near the bell.
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears a simple, sleeveless work robe tied at the waist, its dark fabric
+dusted with metal filings. His hair is bound back neatly, and he stands with
+perfect posture, making each motion deliberately. When he notices you, he
+inclines his head slightly and raises one hand in a calm, practiced sign of
+welcome.
+~
+M
+0
+The bell glows brighter for a moment.~
+M
+0
+You see a flash of light from a hammer in the distance.~
+M
+0
+A warm breeze blows over you.~
+M
+0
+$n tends the bell.~
+M
+0
+$n stares at the stars in the pool of water.~
+M
+0
+The bell rocks back and forth in silence.~
+M
+7
+do signlang 1~
+M
+7
+skip~
+M
+7
+do signlang 2~
+M
+7
+skip~
+M
+7
+do signlang 3~
+M
+7
+skip~
+M
+7
+do signlang 4~
+M
+7
+skip~
+M
+7
+do signlang 5~
+M
+7
+skip~
+M
+8
+do signlang 1~
+M
+8
+skip~
+M
+8
+do signlang 3~
+M
+8
+skip~
+T 12807
+T 12888
+S
+#12892
+ixchel starbound~
+Ixchel~
+Ixchel the Starbound hammers away at the forge. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   Her woven tunic is patterned with subtle geometric designs, reinforced at
+the shoulders with leather straps darkened by long years of use. Her skin has a
+warm bronze tone and her long hair is braided tightly to keep it clear of her
+work. Fine cords and small tools hang at her belt, and her hands are steady as
+she works dark metal into narrow, glowing bands.
+~
+M
+0
+There's a bright flash of light as $n strikes the anvil with $s hammer.~
+M
+0
+There's a flash of light in the distance.~
+M
+0
+There's a puff of steam as $n dips a piece of hot iron in the pool.~
+M
+0
+The forge glows brighter as $n heats $s work in the center of the anvil.~
+M
+0
+Light ripples across the great wall as it seems to shift a few inches.~
+M
+0
+There's a bright flash of light as $n strikes the anvil with $s hammer.~
+M
+0
+Light cascades across the tiles as $n hammers at the anvil.~
+M
+0
+The stars ripple through the sky overhead.~
+M
+7
+echo ~%self% looks up at you and sets down ^%self% hammer.~
+M
+7
+do signlang 10~
+M
+7
+skip~
+M
+7
+do signlang 11~
+M
+7
+skip~
+M
+7
+do signlang 12~
+M
+7
+skip~
+M
+7
+do signlang 13~
+M
+7
+skip~
+M
+8
+do signlang 14~
+M
+8
+skip~
+M
+8
+do signlang 15~
+M
+8
+skip~
+T 12807
+T 12888
+S
+#12893
+saoirse gleaming~
+Saoirse~
+Saoirse the Gleaming is working the anvil. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   She's dressed in layered linen and wool, muted in color and tied back for
+work, with a heavy apron protecting her from stray sparks of light. Pale
+freckles dust her fair skin, and her red hair is gathered into a loose twist at
+the back of her head. A simple knotwork charm is stitched into her sleeve,
+nearly hidden. She turns pieces in her hands thoughtfully, as if weighing more
+than just the material.
+~
+M
+0
+Shafts of light burst out from $n's hammer as $s works.~
+M
+0
+$n brings the hammer down hard and fast, letting out a great burst of light.~
+M
+0
+The tiles flash with little bursts of light as $n moves around the anvil.~
+M
+0
+$n stokes the forge.~
+M
+0
+$n ties back loose strands of hair.~
+M
+0
+The stars ripple overhead.~
+M
+0
+The wall sparkles with light as it shifts ever so slightly.~
+M
+0
+$n quenches a piece of hot metal in the pool.~
+M
+0
+There's a flash of light from one of the other anvils in the distance.~
+M
+7
+echo ~%self% sets ^%self% work in the center of the burning anvil.~
+M
+7
+do signlang 20~
+M
+7
+skip~
+M
+7
+do signlang 21~
+M
+7
+skip~
+M
+7
+do signlang 22~
+M
+8
+echo ~%self% glances at you as you come in.~
+M
+8
+do signlang 23~
+T 12807
+T 12888
+S
+#12894
+percy unfaltering~
+Percy~
+Percy the Unfaltering is examining something closely. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears a well-worn smith's apron over plain, practical clothing. The
+sleeves and edges show signs they have been neatly mended many times over. His
+arms are marked by old burns, but he keeps his sleeves rolled up as he works.
+His brown hair is beginning to gray at the temples. He squints slightly as he
+inspects his creations, tinkering with them patiently until they're just so.
+~
+M
+0
+$n taps at the anvil with a small hammer, eliciting many tiny bursts of light that scatter across the forge.~
+M
+0
+There's a flash of light from one of the other anvils.~
+M
+0
+$n straightens $s tie.~
+M
+0
+$n peers at $s work through small spectacles.~
+M
+0
+$n tosses an ingot into the forge.~
+M
+0
+$n turns an ingot in the fire.~
+M
+0
+The stars ripple in the heat of the forge.~
+M
+0
+A single milky eye opens in the wall, twitches, and then closes again.~
+M
+0
+There's a fair glow through $n's short hair as $e runs $s fingers through it.~
+M
+0
+The great wall shifts, sending sparkles of light down its curving length.~
+M
+0
+$n watches the wall for a moment, brow furrowed.~
+M
+0
+$n stokes the forge.~
+M
+0
+Part of the wall shakes and waves, like a long frill.~
+M
+7
+echo ~%self% sets down a half-finished piece and walks over to shake hands.~
+M
+7
+do signlang 30~
+M
+7
+skip~
+M
+7
+do signlang 31~
+M
+7
+skip~
+M
+8
+echo ~%self% waves a polite hello.~
+M
+8
+do signlang 32~
+M
+8
+skip~
+M
+8
+do signlang 33~
+M
+8
+skip~
+T 12807
+T 12888
+S
+#12895
+somsak ordered~
+Somsak~
+Somsak the Ordered is organizing items into the bins. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears loose, lightweight garments suited for long hours of work, belted
+securely to keep them clear as he glides back and forth, every movement
+perfectly silent as he stacks, counts, and arranges everything. His dark hair
+is cropped short his face is calm but concerted as he gives you a small nod
+before returning to his tasks.
+~
+M
+0
+A crate of ingots appears in the air and slams to the ground with a burst of white light.~
+M
+0
+$n organizes a set of poles in a bin.~
+M
+0
+$n wipes $s brow.~
+M
+0
+The stars twinkle overhead.~
+M
+0
+You catch a flash of light from the corner of your eye.~
+M
+0
+There's a burst of light from one of the anvils as a smith hits it with a large hammer.~
+M
+0
+The great wall moves just a little, sending a cascade of soft light down its length.~
+M
+0
+The bell at the center of the forge glows brighter for a moment.~
+M
+0
+$n packs stray shards into a crate.~
+M
+0
+A long bolt of cloth falls from the air into a soft pile on the ground; $n picks it up and folds it away.~
+M
+0
+The floor tiles glow as $n slides a heavy bin to the side.~
+M
+7
+echo ~%self% presses ^%self% palms together and bows slightly.~
+M
+7
+do signlang 40~
+M
+7
+skip~
+M
+7
+do signlang 41~
+M
+7
+skip~
+M
+7
+do signlang 42~
+M
+7
+skip~
+M
+7
+do signlang 43~
+M
+7
+skip~
+M
+7
+do signlang 44~
+M
+8
+echo ~%self% presses ^%self% palms together and bows slightly.~
+M
+8
+do signlang 41~
+M
+8
+skip~
+M
+8
+do signlang 45~
+M
+8
+skip~
+M
+8
+do signlang 46~
+T 12807
+T 12888
+S
+#12897
+serragon echo beast great echoserragon~
+the Echo Serragon~
+A great beast coils all the way around the rim of the forge! (difficulty)
+~
+201 300 dhyzDJKL cEGU 6
+0 0 0 12897 -1 -1
+D
+   Though it's hard to see in the darkness, the creature is immense. When it
+moves its head, you can make out frills against the backdrop of stars. As it
+coils around the battlefield, it makes a deeply unsettling grating sound. If
+this thing is a serragon, that horrific sound is surely its serrated scales
+grinding against each other.
+~
+I 4 12916 100.00 1  # LOOT: diminished scale
+M
+11
+!echo !echo !echo !bell !epic~
+M
+0
+$n shakes its head back and forth.~
+M
+0
+$n turns its head slowly.~
+M
+0
+$n turns the side of its head to you.~
+M
+0
+$n slowly blinks its huge, milky white eye.~
+M
+0
+There's a gnashing sound as $n shifts its entire mass.~
+M
+0
+$n prods at parts of the arena with its tapering tail.~
+M
+0
+There's a loud, dull DONG as $n's tail bumps the bell.~
+M
+0
+$n taps at the bell with the tip of its tail, giving a loud but brief DONG-DONG-DONG.~
+T 12822
+T 12821
+T 12823
+T 12820
+T 9600
+T 9601
+T 9604
+T 9609
+T 12897
+T 12808
+S
+#12898
+echo serragon~
+the echo of the serragon~
+Are your eyes playing tricks on you, or is there another serragon?
+~
+201 300 dhnDJK cEGU 6
+0 0 0 14 -1 -1
+D
+   In this light, it's hard to be sure, but it looks like you're seeing another
+serragon!
+~
+T 12899
+T 12898
+T 12900
+T 12808
 S
 $

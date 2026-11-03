@@ -1,7 +1,7 @@
 #0
 bug~
 a bug~
-This object is BAD!  If you see it, there must be a bug in the game. Please
+This object is BAD! If you see it, there must be a bug in the game. Please
 report it immediately using the BUG command.~
 ~
 3 k 0 0 0 1
@@ -9,9 +9,9 @@ report it immediately using the BUG command.~
 0 24
 S
 #1
-board~
-the board~
-A board is hanging on the wall.~
+board message~
+the message board~
+A message board is hanging on the wall.~
 Nothing.
 ~
 9 B 0 0 0 2

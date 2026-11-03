@@ -29,8 +29,8 @@ Stilt Buildings~
    Through extensive development and training, your empire has learned to build
 on stilts over water, allowing you to drain swamps and oases, as well as stilt
 houses and other useful seaside structures. Building the swamp platform will
-convert a swamp tile to plains, while building drainage will convert an oasis
-to desert.
+convert a swamp tile to grassland, while building drainage will convert an
+oasis to desert.
 ~
 5 1 70 0 b
 K 2 5156
@@ -59,9 +59,9 @@ P 2013
 S
 #1904
 Mountain Engineering~
-   Your engineers have learned to build stable buildings into the sides of the
-mountains. This unlocks multiple mountain buildings and also grants you the
-'tunnel' command.
+   Your engineers have learned to build stable buildings and farms into the
+sides of the mountains. This unlocks multiple mountain buildings and also
+grants you the 'tunnel' command.
 ~
 4 1 70 0 b
 K 2 5170
@@ -72,6 +72,7 @@ K 2 5202
 K 2 5203
 K 2 5204
 K 2 5205
+K 2 5222
 K 0 16
 P 2013
 P 1005
@@ -125,12 +126,31 @@ Livestock Livelihood~
 build chicken coops, pastures, and pigsties. Your workforce will produce eggs,
 poultry, mutton, wool, and pork from these outdoor buildings.
 ~
-3 1 15 0 b
+4 1 15 0 b
 K 2 5216
 K 2 5217
 K 2 5218
-K 2 5111
 P 1002
 P 2011
+S
+#1909
+High Mountain Graziers~
+   Never content with the flats, your empire spreads its pastoral range to the
+highest mountain pastures, where it can graze yaks and llamas at the roof of
+the world.
+~
+4 1 0 5 0
+K 2 5224
+K 2 5225
+K 2 5226
+P 1908
+P 1904
+W
+7 5111 0 1 a
+W
+7 5214 0 1 a
+_
+A minor bonus for having both Mountain Engineering and Livestock Livelihood.
+~
 S
 $

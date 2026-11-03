@@ -1,6 +1,12 @@
 #18500
 Sun King combat~
-0 k 100
+0 k 100 6
+L w 18501
+L w 18502
+L w 18503
+L w 18504
+L w 18505
+L w 18506
 ~
 set heroic_mode %self.mob_flagged(GROUP)%
 * Count combat script cycles until enrage
@@ -189,7 +195,13 @@ done
 ~
 #18501
 Serpent Lord combat~
-0 k 100
+0 k 100 6
+L b 18507
+L w 18501
+L w 18507
+L w 18508
+L w 18509
+L w 18510
 ~
 if %self.cooldown(18501)%
   halt
@@ -304,7 +316,13 @@ done
 ~
 #18502
 Quetzalcoatl combat~
-0 k 100
+0 k 100 6
+L b 18506
+L w 18501
+L w 18511
+L w 18512
+L w 18513
+L w 18514
 ~
 if %self.cooldown(18501)%
   halt
@@ -396,7 +414,10 @@ done
 ~
 #18503
 Jungle Temple Trash fight~
-0 k 10
+0 k 10 3
+L b 18503
+L b 18504
+L b 18505
 ~
 switch %random.3%
   case 1
@@ -421,6 +442,9 @@ switch %random.3%
         set target %actor%
       else
         %echo% ~%self% shoots a bolt of crackling emerald light, but misses completely.
+      end
+      * still no target?
+      if !%target% || %target.dead%
         halt
       end
     end
@@ -440,10 +464,13 @@ switch %random.3%
     if %self.vnum% == 18503
       %echo% ~%self% draws back ^%self% mighty fist...
       wait 5
+      if !%actor% || %actor.dead% || %actor.room% != %self.room%
+        halt
+      end
       %send% %actor% &&r~%self% delivers a devastating punch, sending you flying!
       %echoaround% %actor% ~%self% delivers a devastating punch, sending ~%actor% flying!
       %damage% %actor% 150 physical
-      if %actor.aff_flagged(!STUN)%
+      if %actor.aff_flagged(NO-STUN)%
         %send% %actor% You land on your feet and jump back into battle.
         %echoaround% %actor% ~%actor% lands on ^%actor% feet and charges back into battle.
       else
@@ -454,6 +481,9 @@ switch %random.3%
     elseif %self.vnum% == 18504
       %echo% ~%self% crouches, gathering energy to pounce...
       wait 5
+      if !%actor% || %actor.dead% || %actor.room% != %self.room%
+        halt
+      end
       %send% %actor% &&r~%self% pounces on you, raking you with ^%self% claws!
       %echoaround% %actor% ~%self% pounces on ~%actor%, raking *%actor% with ^%self% claws!
       %damage% %actor% 150 physical
@@ -469,7 +499,9 @@ done
 ~
 #18504
 Snake pit trap~
-2 q 100
+2 q 100 2
+L b 18516
+L j 18516
 ~
 if %actor.is_npc%
   return 1
@@ -531,7 +563,7 @@ done
 ~
 #18505
 Swinging blade trap~
-2 q 100
+2 q 100 0
 ~
 if %actor.is_npc%
   return 1
@@ -597,7 +629,7 @@ done
 ~
 #18506
 Poison dart trap~
-2 q 100
+2 q 100 0
 ~
 if %actor.is_npc%
   return 1
@@ -662,7 +694,7 @@ done
 ~
 #18507
 Trap action detection~
-2 c 0
+2 c 0 0
 run jump duck~
 context %instance.id%
 if !%trap_running%
@@ -687,7 +719,7 @@ remote last_trap_command %actor.id%
 ~
 #18508
 Trap flee fallback~
-2 q 100
+2 q 100 0
 ~
 context %instance.id%
 if %trap_running%
@@ -698,7 +730,14 @@ end
 ~
 #18509
 Idol-take open doors~
-1 g 100
+1 g 100 7
+L b 18500
+L b 18501
+L b 18502
+L c 18510
+L j 18504
+L j 18510
+L j 18511
 ~
 set room %self.room%
 if %room.template% != 18510
@@ -739,7 +778,14 @@ halt
 ~
 #18510
 Randomly assign jungle temple traps~
-2 n 100
+2 n 100 7
+L f 18504
+L f 18505
+L f 18506
+L f 18507
+L f 18508
+L f 18510
+L f 18512
 ~
 context %instance.id%
 * Pick and attach a random trap
@@ -772,7 +818,10 @@ detach 18510 %self.id%
 ~
 #18511
 Jungle Temple trash spawner~
-1 n 100
+1 n 100 3
+L b 18503
+L b 18504
+L b 18505
 ~
 switch %random.3%
   case 1
@@ -789,7 +838,10 @@ done
 ~
 #18512
 Search for Traps - Jungle Temple~
-2 c 0
+2 c 0 3
+L f 18504
+L f 18505
+L f 18506
 search~
 return 1
 %send% %actor% You search for traps...
@@ -818,7 +870,7 @@ done
 ~
 #18513
 Mob block higher template id~
-0 s 100
+0 s 100 0
 ~
 * One quick trick to get the target room
 set room_var %self.room%
@@ -832,7 +884,13 @@ return 0
 ~
 #18514
 Jungle Temple difficulty select~
-1 c 4
+1 c 4 6
+L b 18500
+L b 18501
+L b 18502
+L c 18508
+L j 18500
+L j 18502
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty.
@@ -908,13 +966,13 @@ done
 ~
 #18515
 Jungletemple delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #18516
 Snake pit block exit~
-0 s 100
+0 s 100 0
 ~
 if %actor.nohassle%
   halt
@@ -924,15 +982,50 @@ return 0
 ~
 #18517
 LT Start Progression~
-2 g 100
+2 g 100 1
+L y 18500
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(18500)%
 end
 ~
+#18518
+Lost Temple: Cleanup helper~
+1 n 100 7
+L c 105
+L c 125
+L c 2038
+L c 18503
+L c 18504
+L e 18501
+L e 18509
+~
+wait 0
+switch %self.room.building_vnum%
+  case 18501
+    * good jungle temple
+    nop %self.room.add_built_with(125,24,1)%
+    nop %self.room.add_built_with(2038,8,1)%
+    nop %self.room.add_built_with(105,70,1)%
+    nop %self.room.add_built_with(18503,14,1)%
+  break
+  case 18509
+    * ruined jungle temple
+    nop %self.room.add_built_with(125,%random.12%,1)%
+    nop %self.room.add_built_with(2038,%random.4%,1)%
+    nop %self.room.add_built_with(105,%random.35%,1)%
+    nop %self.room.add_built_with(18503,%random.14%,1)%
+  break
+done
+%purge% %self%
+~
 #18519
 Jungle Temple boss death - drop tokens~
-0 f 100
+0 f 100 4
+L b 18500
+L b 18506
+L b 18507
+L c 18502
 ~
 set var_name jungletemple_tokens
 * Tokens for everyone
@@ -958,7 +1051,8 @@ end
 ~
 #18520
 Jungle Temple boss summon timer~
-0 n 100
+0 n 100 1
+L b 18506
 ~
 wait 30 sec
 switch %self.vnum%
@@ -973,7 +1067,14 @@ done
 ~
 #18521
 Jungle temple: cleared temple interior setup~
-2 o 100
+2 o 100 7
+L e 18502
+L e 18503
+L e 18504
+L e 18505
+L e 18506
+L e 18507
+L e 18508
 ~
 set room %self%
 %door% %room% down add 18502
@@ -994,11 +1095,18 @@ set room7 %room6.east(room)%
 ~
 #18522
 Jungle Temple adventure cleanup building replacer~
-2 e 100
+2 e 100 4
+L c 18502
+L c 18505
+L e 18501
+L e 18509
 ~
 set start %instance.start%
 if %start% && %start.var(18247_hidden,0)%
   * shortcut and do not leave a temple behind
+  halt
+elseif %room.aff_flagged(*UNCLAIMABLE)%
+  * do not put a building on an unclaimable tile
   halt
 end
 set item %room.contents%
@@ -1012,17 +1120,19 @@ done
 set dir %room.exit_dir%
 if %instance_cleared%
   if %dir%
+    %load% obj 18505 %room%
     %build% %room% 18501 %dir%
   end
 else
   if %dir%
+    %load% obj 18505 %room%
     %build% %room% 18509 %dir%
   end
 end
 ~
 #18523
 Enrage Buff/Counter Reset~
-0 bw 25
+0 bw 25 0
 ~
 if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.enrage_counter% == 0
@@ -1037,7 +1147,13 @@ end
 ~
 #18544
 Boss loot replacer~
-1 n 100
+1 n 100 6
+L c 18512
+L c 18513
+L c 18514
+L c 18515
+L c 18516
+L c 18542
 ~
 set pet 18515
 set land_mount 18512

@@ -10,6 +10,9 @@ essences to the apprentice for re-summoning.
 elemental, and you can repeat these quests if you wait at least an hour after
 finishing them. You can purchase rewards from the apprentice with the 'list'
 and 'buy' commands. Hint: If you're a thief, try pickpocketing the apprentice.
+   Each adventure has its own goals and activities. For this one, use the
+'where elemental' command to find and fight each elemental, pick up its item,
+and return them to the apprentice.
 
 EmpireMUD Administrators: You can raise the instance limit on this
 adventure to equal the number of newbie you have.
@@ -27,6 +30,38 @@ L
 L
 6 0
 100 -1 -1 -1
+-1 0 0
+S
+#12625
+A Strange Plant~
+Paul Clarke~
+You have stumbled across a rather unusual plant in the jungle.
+~
+12625 12649 0-0
+20 0 dkp 0
+L
+4 a
+12625 12625 12625 -1
+-1 g g
+L
+1 a
+12626 -1 -1 -1
+9 g g
+L
+1 a
+12627 -1 -1 -1
+9 g g
+L
+1 a
+12628 -1 -1 -1
+9 m m
+L
+6 0
+45 -1 -1 -1
+-1 0 0
+L
+5 0
+10080 -1 -1 -1
 -1 0 0
 S
 #12650

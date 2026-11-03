@@ -162,7 +162,7 @@ A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
 home.
 ~
-3 0 a 0 0 8
+3 0 a 0 0 9
 256 3600 0
 6 0
 C
@@ -188,6 +188,9 @@ M
 M
 25
 The swirling light from @%self% fades.~
+M
+34
+Use this trinket to teleport home.~
 R
 4 5121 0
 R
@@ -202,7 +205,7 @@ Some bricks are piled on the ground.~
    These bricks have been made from fired clay, with holes in the middle to
 reduce the weight. You can use the bricks for building.
 ~
-3 el a 0 0 7
+3 el a 0 0 9
 0 0 0
 6 0
 C
@@ -213,6 +216,9 @@ You put down a layer of bricks.~
 M
 1
 $n puts down a layer of bricks.~
+M
+34
+This is a common building material.~
 O+ 1 6076
 R
 4 5117 0
@@ -288,7 +294,7 @@ a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
 ~
-3 0 a 0 0 5
+3 0 a 0 0 6
 262 1800 0
 6 0
 C
@@ -314,6 +320,9 @@ M
 M
 25
 The swirling light from @%self% fades.~
+M
+34
+This single-use trinket teleports you to the newbie island.~
 R
 4 5121 0
 R
@@ -329,11 +338,14 @@ A letheian icon is lying on the ground.~
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
 gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a 0 0 5
+3 0 a 0 0 6
 0 0 0
 0 0
 C
 1 1
+M
+34
+Type 'use icon Skill Name' to gain a reset, then 'skill reset Skill Name' to use it.~
 R
 4 5121 0
 R

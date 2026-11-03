@@ -510,6 +510,15 @@ is in.
 
 See also: BUILDING GUIDE
 #d
+AEDIT
+
+The correct help file prefixes for editors starting with 'A' are:
+  Abilities: ABILEDIT
+  Adventures: ADVEDIT
+  Archetypes: ARCHEDIT
+  Attack types: ATTACKEDIT
+  Augments: AUGEDIT
+#d
 ABILEDIT "OLC ABILITIES" "OLC ABILITY" "ABILITY EDITOR"
 
 Usage:  .abil <command>
@@ -654,6 +663,8 @@ fire damage.
 Hooked abilities send normal &cpre-&0, &ctarg-&0, &cself-&0, and &cfail-&0
 messages. You can set custom messages to * to silence them, as usual.
 
+Hooked abilities gain experience when they activate.
+
 See also: OLC ABILITIES
 #d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
@@ -764,7 +775,7 @@ Notes:
   companions with script changes.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
-and !DRINK-BLOOD flags.
+and NO-DRINK-BLOOD flags.
 
 Example companion abilities: 122 Familiar, 138 Bodyguard
 
@@ -1075,6 +1086,7 @@ See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 
 Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
+        .data move <number> <up | down>
 
 The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
@@ -1086,7 +1098,9 @@ The 'data' field is used by different types of abilities. Available types are:
  &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
  &cRANGE&0 - Used by some actions, as noted.
  &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
- &cSUPERCEDED-BY&0 - A better version of this ability. SEE ABILEDIT SUPERCEDE
+ &cSUPERCEDED-BY&0 - A better version of this ability. See ABILEDIT SUPERCEDE
+ &cREQUIRES-ABIL&0 - Can only use/trigger this ability if you have another.
+    See ABILEDIT REQUIRES-ABIL
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -1169,6 +1183,7 @@ The following ability flags are available:
    everything else hits the ability's target.
  &cSTAY-HIDDEN&0 - Won't cancel a hide effect when typed.
  &cBUFFS-COMMAND&0 - Will appear on the buffs command (must be a BUFF).
+ &cIGNORE-NO-EXP&0 - Gains experience even on !EXP mobs.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
@@ -1362,13 +1377,13 @@ an ability that targets one's self.
 
 The best example is 315 Splash Blood, which is a helper for ability
 314 Red Mist. Splash Blood hooks on any physical damage against a target but
-has a !DRINK-BLOOD immunity flag. If this immunity is present, nothing else
+has a NO-DRINK-BLOOD immunity flag. If this immunity is present, nothing else
 happens. If not, it will chain to 314 Red Mist, which targets the player to
 restore blood. Red Mist cannot check the immunity itself because its target is
 the player who's attacking, not the victim of the attack. Splash Blood fills in
 the middle link for this.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, ABILEDIT LINKED TRAIT
 #d
 "ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
 
@@ -1384,7 +1399,7 @@ The following traits cannot be used: &rHEALTH-REGEN, MOVE-REGEN, MANA-REGEN,
 AGE, MAX-MOVE, HEAL-OVER-TIME, MAX-HEALTH, MAX-MANA, INVENTORY, MAX-BLOOD,
 CRAFTING, BLOOD-UPKEEP&0
 
-See also: OLC ABILITIES, APPLIES
+See also: OLC ABILITIES, ABILEDIT LINK ABILITY, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
@@ -1514,15 +1529,6 @@ each word typed by the user is matched sequentially. For example, "hor fo"
 matches "Horrid Form".
 
 See also: OLC ABILITIES
-#d
-"SECTEDIT NOTES"
-
-Usage:  .notes
-
-This text field allows you to set notes that are only visible in the OLC editor
-and via the 'stat' command. You can put any information you want in the notes.
-
-See also: OLC, STAT
 #d
 "ABILEDIT OVER-TIME" "ABILEDIT OVER TIME" "OVER TIME ABILITY" "OVER-TIME ABILITY"
 
@@ -1659,7 +1665,7 @@ Available techs are:
  &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
  &cInfiltrate&0 * - Allows the player to enter claimed/restricted buildings.
  &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.
- &cLarger-Light-Radius&0 - +1 light radius (prefer NIGHT-VISION apply instead).
+ &cLarger-Light-Radius&0 - +1 light radius (prefer LIGHT-RADIUS apply instead).
  &cLight-Fire&0 * - Can light torches/fires without any tools.
  &cMap-Invis&0 *^ - Can't be seen at a distance on the map.
  &cMill-Upgrade&0 * - Increases the number of items received from mill.
@@ -1730,7 +1736,7 @@ Available techs are:
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
  &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
  &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
- &cFlee-Upgrade&0 * - Increased chance to flee.
+ &cFlee-Upgrade&0 * - Increased chance to flee, lower wait after fleeing.
  &cFaster-Melee-Combat&0 * - Slight speed boost in melee combat.
  &cFaster-Ranged-Combat&0 * - Slight speed boost in ranged combat.
  &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.
@@ -1805,6 +1811,19 @@ This determines which pool a RESTORE ability will affect. If you set it to
 
 See also: RESTORE ABILITY
 #d
+"ABILEDIT REQUIRES-ABILITY" "ABILEDIT REQUIRESABILITY" "ABILEDIT REQUIRES ABILITY"
+
+The REQUIRES-ABIL ability data indicates that the player can only use (or
+trigger) this ability if they also have another ability. 
+
+Also, if the player has an ability that is superceded by another, but they are
+missing a REQUIRES-ABIL for the 2nd ability, they will use the lower one.
+
+This is only supported for COMMAND abilities. Passives, buffs, and other types
+do not support REQUIRES-ABIL data.
+
+See also: OLC ABILITIES, ABILEDIT DATA
+#d
 "ABILEDIT RESOURCE ABILITY" "ABILEDIT RESOURCE ABILITIES" "RESOURCE ABILITY" "RESOURCE ABILITIES"
 
 The RESOURCE ability type marks an ability as mainly related to resource-gain.
@@ -1872,7 +1891,7 @@ Targeted resurrection messages:
 
 Self-resurrection messages:
  &cself-to-char&0 - Sent to the caster when resurrecting.
- &cself-to-room&0 - Sent to teh room the caster is in when resurrecting.
+ &cself-to-room&0 - Sent to the room the caster is in when resurrecting.
 
 When the resurrection completes, it also sends:
  &cspec-to-char&0 - Sent to the person being resurrected.
@@ -2049,6 +2068,7 @@ Modifier flags (use in combination with the above flags):
  &yNOT-SELF&0 - Character target cannot be self.
  &yNOT-ALLY&0 - Cannot target an ally.
  &yNOT-ENEMY&0 - Cannot target an enemy.
+ &yNOT-STOLEN&0 - Object cannot be stolen.
  &yDEAD-OK&0 - Can target dead people (otherwise they are invalid).
  &yMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 
@@ -2299,6 +2319,7 @@ The following adventure flags are available:
  &c   outside the adventure, before despawning.
  &cGLOBAL-NEARBY&0 - Shows the nearest location from any distance.
  &cDETECTABLE&0 - Can be detected with the ability action "detect adventures around".
+ &cFASTER-INSTANCING&0 - Overrides the 1-adventure-per-cycle limit for the instancer.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -2386,6 +2407,17 @@ running. It will also auto-complete all instances if they are open and the
 event is not running.
 
 See also: ADVEDIT LINKING
+#d
+"ADVEDIT FORBID-CLIMATE" "ADVEDIT LINK FORBID-CLIMATE" "ADVEDIT LINKING FORBID-CLIMATE"
+
+Usage:  .linking add FORBID-CLIMATE <climate flag(s)>
+
+This will forbid the adventure from spawning on a tile that has any flag in
+this list.
+
+This is the opposite of REQUIRE-CLIMATE.
+
+See also: ADVEDIT LINKING, ADVEDIT REQUIRE-CLIMATE, CLIMATE FLAGS
 #d
 "ADVEDIT IN-VEHICLE-EXISTING" "ADVEDIT LINK IN-VEHICLE-EXISTING" "ADVEDIT LINKING IN-VEHICLE-EXISTING"
 
@@ -2635,6 +2667,17 @@ After the adventure ends, the vehicle will vanish unless you remove its
 
 See also: ADVEDIT LINKING, VNUM
 #d
+"ADVEDIT REQUIRE-CLIMATE" "ADVEDIT LINK REQUIRE-CLIMATE" "ADVEDIT LINKING REQUIRE-CLIMATE"
+
+Usage:  .linking add REQUIRE-CLIMATE <climate flag(s)>
+
+This will require any tile the adventure spawns on to have a specific set of
+climate flags. If more than 1 flag is specified, all flags must match.
+
+This is the opposite of FORBID-CLIMATE.
+
+See also: ADVEDIT LINKING, ADVEDIT FORBID-CLIMATE, CLIMATE FLAGS
+#d
 "ADVEDIT TIME-LIMIT" "ADVEDIT LINK TIME-LIMIT" "ADVEDIT LINKING TIME-LIMIT"
 
 Usage:  .linking add TIME-LIMIT <minutes> [flags]
@@ -2682,6 +2725,8 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  &cIN-VEHICLE-NEW-BDG-NEW&0: Interior of new vehicle at new building.
  &cIN-VEHICLE-NEW-CROP&0: Interior of new vehicle at a crop.
  &cIN-VEHICLE-NEW-WORLD&0: Interior of new vehicle at a sector.
+ &cREQUIRE-CLIMATE&0: Climate flags must be present when spawning adventure.
+ &cFORBID-CLIMATE&0: Climate flags must NOT be present to spawn.
 
 Available flags:
  &cCLAIMED-OK&0 - Can link to claimed locations (default: unclaimed only).
@@ -2797,37 +2842,37 @@ The following affect flags are available:
    linked trait on that ability).
  &cINFRA&0 - Can see in the dark (glowing red eyes).
  &cSNEAK&0 - Cannot be seen while moving.
- &cHIDE&0 - Cannot be seen in room (without search).
- &c*CHARM&0 - NPC will take orders from its master -- do not use this on items.
+ &cHIDDEN&0 - Cannot be seen in room (without search).
+ &c*CHARM&0 - NPC will take orders from its master.
  &cINVIS&0 - Can't be seen, except by magic.
  &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
  &cSENSE-HIDDEN&0 - Can see hidden people.
- &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
- &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
- &c!SEE&0 - Cannot be seen in the room at all -- do not use this on items.
+ &c!PHYSICAL&0 - Immune to physical damage.
+ &cNO-TARGET-IN-ROOM&0 - Cannot be targeted in the room.
+ &cNO-SEE-IN-ROOM&0 - Cannot be seen in the room at all.
  &cFLYING&0 - Is flying.
- &c!ATTACK&0 - Cannot be attacked -- do not use this on items.
- &cIMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
- &cDISARMED&0 - Has lost their weapon -- do not use this on items.
+ &c!ATTACK&0 - Cannot be attacked.
+ &cIMMUNE-MAGICAL-DEBUFFS&0 - Immune to any 'magical' debuffs.
+ &cDISARMED&0 - Has lost their weapon.
  &cHASTE&0 - Has the effect of the Hasten ability.
- &cIMMOBILIZED&0 - Cannot move -- do not use this on items.
+ &cIMMOBILIZED&0 - Cannot move.
  &cSLOW&0 - Combat speed reduced, like the Slow spell.
- &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
+ &cSTUNNED&0 - Can't participate in combat or move.
  &cSTONED&0 - Sees the world in strange, trippy colors.
- &c!BLOOD&0 - Cannot spend blood points.
- &cDEATHSHROUDED&0 - Appears as a corpse and cannot act -- do not use this on items.
- &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
- &cMUMMIFIED&0 - Immune to attack and cannot act -- do not use this on items.
- &cSOULMASK&0 - Players cannot see affect details on character.
+ &cNO-SPEND-BLOOD&0 - Cannot spend blood points.
+ &cDEATHSHROUDED&0 - Appears as a corpse and cannot act.
+ &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions.
+ &cMUMMIFIED&0 - Immune to attack and cannot act.
+ &cMASK-AFFECTS&0 - Players cannot see affect details on character.
  &cNO-TRACKS&0 - Does not leave tracks.
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
  &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.
- &c!STUN&0 - Immune to stun effects.
- &c!DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
+ &cNO-STUN&0 - Immune to stun effects.
+ &cNO-DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
  &cDISTRACTED&0 - Cannot perform timed actions.
  &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
- &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
- &c!WHERE&0 - Cannot be found using the 'where' command.
+ &cIMMUNE-DAMAGE&0 - Cannot take damage.
+ &cIMMUNE-WHERE&0 - Cannot be found using the 'where' command.
  &cWATERWALKING&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC
    mob flag, this allows it to move on both water and land.
  &cLIGHT&0 - Character provides light to the room.
@@ -2839,8 +2884,8 @@ The following affect flags are available:
  &cAUTO-RESURRECT&0 - Will resurrect on death.
  &cCOUNTERSPELL&0 - Will cancel the next counterspellable ability then remove its
    affect. If applied by an ability, will also trigger skill gain and hooks.
- &c!DISARM&0 - Cannot be disarmed.
- &c!MORPH&0 - Cannot manually morph or unmorph one's self.
+ &cNO-DISARM&0 - Cannot be disarmed.
+ &cNO-MORPH&0 - Cannot manually morph or unmorph one's self.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -3499,7 +3544,7 @@ In some cases, tiles inherit properties from the base sector. For example,
 roads have the same climate as their base sector due to their
 INHERIT-BASE-CLIMATE flag.
 
-See also: SECTOR, STAT
+See also: MAPEDIT BASE SECTOR, SECTOR, STAT
 #d
 "BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS" "ROOM AFFECTS" "ROOM AFFECT FLAGS"
 
@@ -3533,6 +3578,7 @@ Some affects are managed by live data and commands (do not set affects with *):
  *TEMPORARY - will be removed when instance is cleaned up
  *UNCLAIMABLE - cannot be claimed
  *PUBLIC - can be used by empires other than the owner
+ *PRIVATE - cannot be used by allied empires
  *DISMANTLING - someone started dismantling it
  *IN-VEHICLE - room is part of the interior of a vehicle
  *!WORK - workforce ignores the room
@@ -3562,6 +3608,7 @@ tokens on the mob itself, if it is only loaded as an artisan:
  #n - randomly chosen first name
  #e - name of the empire it belongs to
  #a - the adjective form of its empire's name
+ #A - adjective form with "a" or "an" before it
 
 Use ".artisan none" if you need to remove the artisan.
 
@@ -3711,6 +3758,9 @@ Available flags:
     icons on the tile.
  &cIMMUNE-DAMAGE&0 - building cannot be damaged normally (can still be burned
     if BURNABLE is set; only takes yearly decay if resources are set)
+ &cHIDE-STORAGE-UNOWNED&0 - only shows as storage when identifying objects if owned
+ &cLIGHT&0 - building is always light (mainly for adventures)
+ &cNO-WALKING-NPCS&0 - mobs won't walk in but may fly over (like a fence)
  &cSAIL&0 - can enter this building with a boat
  &cITEM-LIMIT&0 - only a certain number of items can be dropped here
  &cLONG-AUTOSTORE&0 - autostore takes 72 hours instead of 3 here
@@ -3839,7 +3889,7 @@ range.
 
 See also: OLC BUILDINGS
 #d
-"BEDIT HITPOINTS" "BEDIT HEALTH"
+"BEDIT HITPOINTS" "BEDIT HIT POINTS" "BEDIT HP" "BEDIT HEALTH"
 
 Usage:  .hitpoints <value>
 
@@ -3948,6 +3998,7 @@ Optional interaction restrictions:
  &c-tech <name>&0 - Empire must have this tech.
  &c-tool <name>&0 - Require a specific tool for this interaction.
  &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
+ &c-region <flag>&0 - Restrict by region (see SPAWN FLAGS for regions).
 
 Examples:
 > .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
@@ -4022,6 +4073,10 @@ cycle of decay will destroy them.
 
 Note: Interior rooms do not normally require any maintenance and don't take
 damage.
+
+Examples:
+ > .resource add component 1 nail
+ > .resource add action 1001
 
 See HELP OLC RESOURCES for more information.
 
@@ -4235,6 +4290,7 @@ Available flags:
  &cSKILLED-LABOR&0 - workforce cannot work this craft unless you have Skilled Labor
  &cSKIP-CONSUMES-TO&0 - won't run consumes-to interactions on any of the resources
     (for example: if you're mixing paints and don't want to refund the jars)
+ &cDARK-OK&0 - craft can be done in the dark
  &cFIRE&0 - requires cooking fire
  &cSOUP&0 - requires a container of water and creates a liquid instead of an item
  &cIN-DEVELOPMENT&0 - only immortals can use this recipe
@@ -4283,6 +4339,7 @@ Fields:
   &c-requiresobject&0 - requires any object
   &c-requiresfunction&0 - requires a function flag
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
+  &c-tools&0 - See HELP TOOLS
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
@@ -4325,7 +4382,38 @@ which recipe to craft, e.g. "craft hammock".
 Names should be as short as possible, while still being distinct from other
 existing craft recipes.
 
+See CRAFT NAME MATCHING for additional details.
+
 See also: OLC CRAFTS
+#d
+"CEDIT NAME MATCHING" "CRAFT NAME MATCHING"
+
+One of the goals in EmpireMUD is to make it easy for the player to type the
+thing he wants to do. Craft names accept abbreviations, including partial
+abbreviations of each word in the name.
+
+It tries to match a name in this order:
+1. Exact match for the full name the player typed (forge dracoscale vambraces)
+   OR, if the last word was a direction, exact match for the name the player
+   entered without the direction (build unearthly manor south). Caution: this
+   means if there's a craft called "sword of the great" and another called
+   "sword of the Great North", there's a risk of mismatch.
+2. Did the player type a simple abbreviation of the full name (forge
+   dracoscale) OR, if the last word was a direction, did the player type a
+   simple abbreviation without the direction (build unearthly man south).
+3. Did the player type a complex abbreviation of the full name (forge drac vam)
+   OR, again, with the final direction removed, did they type a complex
+   abbreviation of the craft name (build un man south).
+
+For this name matching, crafts are sorted from highest to lowest level ability
+required, and then alphabetically.
+
+This process is simpler if you avoid crafts that contain direction names,
+especially at the end of the craft name. However, if you do include a direction
+in the name itself, be sure to test how the player might try to type the craft
+to make sure it selects the right one.
+
+See also: CEDIT NAME
 #d
 "CEDIT QUANTITY"
 
@@ -4636,6 +4724,7 @@ random each time.
 Message types:
  &cmagic-growth&0 - Shown to the whole room when a MAGIC-GROWTH evolution occurs.
    If the sector also has a magic-growth message, only the crop's will show.
+ &cburns-down&0 - Shown when this crop is burned (full crop only, not seeded).
 
 See also: OLC CROPS
 #d
@@ -4688,6 +4777,26 @@ use ".m search <mob's vnum>".
 Usage:  .mapout <color>
 
 This determines what color pixel the sector or crop has on the graphical map.
+
+Available colors:
+ Starting Location (shows a red diamond on the map)
+ Neutral (blank map color)
+ Bright White, Medium Gray, Dark Gray
+ Bright Red, Dark Red
+ Bright Green, Pale Green, Yellow-Green, Sea Green, Medium Green, Dark Green,
+   Olive Green, Lime Green, Dark Lime Green, Dark Dark Green
+ Bright Yellow, Pale Yellow, Deep Yellow, 
+ Bright Blue, Ice Blue, Light Blue, Medium Blue, Deep Blue, Dark Blue,
+   Dark Azure Blue
+ Bright Magenta, Dark Magenta, Pink, Dark Pink
+ Bright Cyan, Dark Cyan
+ Brown, Yellow Brown, Dark Brown, Tan, Light Tan
+ Orange, Dark Orange, Peach
+ Violet, Deep Violet
+
+To see what crops or sectors use these mapout colors, try:
+ > .crop fullsearch -mapout orange
+ > .sect fullsearch -mapout "sea green"
 
 See also: OLC CROPS, OLC SECTORS
 #d
@@ -4874,14 +4983,29 @@ do it in the quests or scripts that reward event points.
 
 See also: OLC EVENTS
 #d
-"EVEDIT NOTES"
+"EVEDIT NOTES" "ABILEDIT NOTES" "ADVEDIT NOTES" "ARCHEDIT NOTES" "AUGEDIT NOTES" "BEDIT NOTES" "BOOKEDIT NOTES" "CEDIT NOTES" "CLASSEDIT NOTES" "CROPEDIT NOTES" "FEDIT NOTES" "GEDIT NOTES" "GENEDIT NOTES"
 
 Usage:  .notes
 
-Notes are for internal use only. THis message is set in the string editor, and
-you should record anything that's important for running the event.
+Notes are for internal use only. This message is set in the string editor, and
+you should record anything that's important for future developers or immortals
+to know.
 
-See also: OLC EVENTS, STRING EDITOR
+This text is not shown to players. It is only visible on the 'stat' command.
+
+See also: OLC, STAT, STRING EDITOR
+#d
+"MEDIT NOTES" "MORPHEDIT NOTES" "OEDIT NOTES" "PROGEDIT NOTES" "QEDIT NOTES" "REDIT NOTES" "SECTEDIT NOTES" "SHOPEDIT NOTES" "SKILLEDIT NOTES" "SOCEDIT NOTES" "VEDIT NOTES"
+
+Usage:  .notes
+
+Notes are for internal use only. This message is set in the string editor, and
+you should record anything that's important for future developers or immortals
+to know.
+
+This text is not shown to players. It is only visible on the 'stat' command.
+
+See also: OLC, STAT, STRING EDITOR
 #d
 "EVEDIT REPEAT" "EVEDIT REPEAT TIME" "EVEDIT REPEATS AFTER"
 
@@ -5000,6 +5124,7 @@ The following faction flags are available:
  &cREP-FROM-KILLS&0 - Players can gain/lose rep by killing faction mobs.
  &cHIDE-IN-LIST&0 - Does not appear in the 'factions' command for players.
  &cHIDE-ON-MOB&0 - Does not appear below the mob description.
+ &cNPC-ONLY&0 - Players cannot acquire this faction.
 
 See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
 #d
@@ -5028,6 +5153,18 @@ no matter how much reputation they gain or lose. They will still gain/lose
 rep with related factions when at these limits.
 
 See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
+#d
+"FEDIT REPPERKILL" "FEDIT REP PER KILL" "REP PER KILL" "REPUTATION PER KILL" "FEDIT REP-FROM-KILLS" REP-FROM-KILLS
+
+Usage:  .repperkill <number>
+        .flags add rep-from-kills
+
+By adding the REP-FROM-KILLS flag and setting the repperkill (reputation per
+kill) property, you can control how many reputation points are lost from
+killing a mob of this faction, or how many are gained for a rival faction if
+you kill a member of this faction.
+
+See also: OLC FACTIONS, FEDIT FLAGS, REPUTATIONS
 #d
 "FEDIT RELATION" "FEDIT RELATIONS" "FEDIT RELATIONSHIPS" "RELATIONSHIP FLAGS"
 
@@ -5527,12 +5664,15 @@ Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
     Supported for: Mob Interactions (only when mob is attached to an instance),
-    Obj Interactions (disenchant), Mine Data (in room templates only).
+    Obj Interactions (disenchant), Mine Data (in room templates only). Do not
+    use this for Map Spawns, which will always fail.
  CUMULATIVE-PRC - Percent check will be cumulative.
  CHOOSE-LAST - The first choose-last global that passes the percent check will
     be saved for later, and only used if no other global succeeds. This can
     be used to create 100% "choose if nothing else passes" final cases.
  RARE - Requires a special flag, e.g. Rare Metals for mine type.
+ NO-NEWBIE - Won't occur on newbie islands.
+ NEWBIE-ONLY - Only occurs on newbie islands.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d
@@ -5835,7 +5975,7 @@ Scaling based on item types:
  pack - the "capacity" value
 
 The following attributes never scale: greatness, age, crafting, blood-upkeep,
-night-vision, nearby-range, where-range
+light-radius, nearby-range, where-range
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -5851,30 +5991,52 @@ map editor commands make instant changes to the map where you're standing.
 
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
- complete - Finishes the building you're standing in.
- convert2newbie - Converts an island's terrains to/from newbie terrains.
- decay - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
- decustomize - Removes custom icon, name, and description.
- deleteexit - Removes an exit (careful about cutting off building interiors).
- deleteroom - Deletes the room you're standing in (interior rooms only).
- description - Customize the description on an interior room.
- exit - Add a new exit between two interior rooms (similar to interlink).
- icon - Customize the map icon.
- maintain - Repairs and maintains a building.
- name - Customize the room title.
- naturalize - Returns this tile to its 'natural terrain'.
- passwalls - Able to move on the map unblocked by walls, interiors, etc.
- populate - Forces a building/vehicle to populate an npc, if possible.
- remember - Stores the current terrain as the 'natural terrain'.
- roomtype - Change the type of an interior room.
- ruin - Turn a building or vehicle to ruins.
- terrain - Change the tile you're standing on.
- unclaimable - Make a tile or square of tiles unclaimable (or not).
- undeplete - Remove depletion from a tile or vehicle.
+ &cbasesector&0 - Change the 'base' sector of the tile you're standing on.
+ &cbuild&0 - Create a finished building on this tile.
+ &ccomplete&0 - Finishes the building you're standing in.
+ &cconvert2newbie&0 - Converts an island's terrains to/from newbie terrains.
+ &cdecay&0 - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
+ &cdecustomize&0 - Removes custom icon, name, and description.
+ &cdeleteexit&0 - Removes an exit (careful about cutting off building interiors).
+ &cdeleteroom&0 - Deletes the room you're standing in (interior rooms only).
+ &cdescription&0 - Customize the description on an interior room.
+ &cevolve&0 - Triggers map evolutions (just like a normal cycle), see EVOLVER.
+ &cexit&0 - Add a new exit between two interior rooms (similar to interlink).
+ &cgrow&0 - Triggers immediate growth, similar to chant of nature.
+ &cheight&0 - Set the 'height' property of this tile (e.g. Mountain).
+ &cicon&0 - Customize the map icon.
+ &cmaintain&0 - Repairs and maintains a building.
+ &cname&0 - Customize the room title.
+ &cnaturalize&0 - Returns this tile to its 'natural terrain'.
+ &cpasswalls&0 - Able to move on the map unblocked by walls, interiors, etc.
+ &cpopulate&0 - Forces a building/vehicle to populate an npc, if possible.
+ &cremember&0 - Stores the current terrain as the 'natural terrain'.
+ &croomtype&0 - Change the type of an interior room.
+ &cruin&0 - Turn a building or vehicle to ruins.
+ &cspawn&0 - Cause the tile you're standing on to spawn mobs, if possible.
+ &cterrain&0 - Change the tile you're standing on.
+ &cunclaimable&0 - Make a tile or square of tiles unclaimable (or not).
+ &cundeplete&0 - Remove depletion from a tile or vehicle.
+ &cworldreset&0 - Runs a full maintenance/decay/newbie world reset.
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC
+#d
+"MAPEDIT BASESECTOR" "MAPEDIT BASE SECTOR" "CHANGE BASE SECTOR"
+
+Usage:  .map basesector <sector vnum | name>
+
+This changes the base sector for the tile you are standing on. The base sector
+is usually the same as the current sector, but it is different for various
+reasons, including:
+
+- the sector a crop tile will return to when harvested
+- the sector underneath a building, for when it's dismantled
+- the sector under a city center, which determines the color of the center
+- the sector underneath a road, determining the roadside icon
+
+See also: BASE SECTOR, MAPEDIT TERRAIN
 #d
 "MAPEDIT BUILD"
 
@@ -5972,6 +6134,15 @@ but it can also be used to create custom roadsigns on roads (which show their
 custom description as a sign).
 
 See also: MAP OLC, ROADSIGN
+#d
+"MAPEDIT EVOLVE" "MAPEDIT EVOLVER"
+
+Usage:  .map evolve [confirm]
+
+This command runs a regular evolution cycle on the entire map. These normally
+occur every 30 minutes.
+
+See also: EVOLVER, MAP OLC
 #d
 "MAPEDIT EXIT"
 
@@ -6104,6 +6275,22 @@ Usage:  .map ruin [vehicle]
 This command will reduce the map building you're in to ruins, or will do the
 same to a vehicle you target.
 #d
+"MAPEDIT SPAWN"
+
+Usage:  .map spawn
+
+This command causes the tile you're standing on to run a normal mob-spawning
+cycle.
+
+Mobs may spawn from:
+- the sector
+- the crop
+- the building
+- vehicles in the room
+
+Note: It's possible for nothing to spawn when you type this if all spawns fail
+their random chance OR if there are no spawns assigned to anything here.
+#d
 "MAPEDIT TERRAIN"
 
 Usage:  .map terrain <type/vnum>
@@ -6114,10 +6301,15 @@ a building on the map.
 
 This command accepts sector names, crop names, or sector vnums.
 
+This will also change the base sector of the tile in most cases, but you can
+set the base sector of a tile separately afterwards by using ".map basesector".
+You should check the base sector with "stat room" and fix it if necessary after
+using this command to create a crop tile.
+
 Example:
  > .map terrain Tower of Souls
 
-See also: MAP OLC, MAPEDIT UNCLAIMABLE
+See also: MAP OLC, MAPEDIT BASE SECTOR, MAPEDIT UNCLAIMABLE, SECTOR TYPE, STAT
 #d
 "MAPEDIT UNCLAIMABLE"
 
@@ -6135,6 +6327,17 @@ Example:
  > .map unclaimable 3
 
 See also: MAP OLC, MAPEDIT TERRAIN
+#d
+"MAPEDIT WORLDRESET" "MAPEDIT WORLD RESET" "MAPEDIT YEARLY" "UTILITY YEARLY" "UTIL YEARLY"
+
+Usage:  .map worldreset [confirm]
+
+This runs a regular world reset, which normally happens every 7.5 days,
+including building decay and a refresh of the newbie islands.
+
+This command was formerly 'utility yearly'.
+
+See also: WORLD RESET
 #d
 "MAPEDIT UNDEPLETE" UNDEPLETE "REMOVE DEPLETION"
 
@@ -6224,11 +6427,13 @@ random each time.
 Message types:
  &cecho&0 - The message is shown to the room periodically (may use $ tokens).
  &cecho-day&0 - Like echo, but only during the day.
- &cecho-night&0 - Only during the night.
+ &cecho-night&0 - Like echo, but only during the night.
+ &cecho-visible&0 - Like echo, but doesn't show to people who can't see the mob.
  &csay&0 - The message is said aloud by the mob periodically.
  &csay-day&0 - Like say, but only during the day.
  &csay-night&0 - Only during the night.
- &clong-desc&0 - Variable long descriptions (prevents normal long desc showing)
+ &clong-desc&0 - Variable long descriptions (prevents normal long desc showing).
+ &cwater-long-desc&0 - Variant long descriptions shown when on water tiles.
  &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
    %mob.custom(script1)%, %mob.custom(script1,0)%, etc.
  &cscavenge-corpse&0 - Shown when a SCAVENGER mob eats a corpse ($p is the corpse).
@@ -6269,7 +6474,8 @@ Available mob flags:
  &cCHAMPION&0 - Will rescue its leader in combat.
  &cEMPIRE&0 - Will not be saved through reboots.
  &c*PICKPOCKETED&0 - Has already been pickpocketed; cannot be pickpocketed again.
- &cCITYGUARD&0 - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
+ &cCITYGUARD&0 - Will assist allies from the same empire. This will only work
+   if it is spawned by the empire system or has had its loyalty set with %own%.
  &cPURSUE&0 - Will pursue players who flee in combat.
  &cHUMAN&0 - Counts as a human for various commands.
  &cVAMPIRE&0 - Counts as a vampire for various commands.
@@ -6303,8 +6509,10 @@ specify multiple fields if you want. Any arguments that don't start with a
 dash (-) are matched to the mob's keywords and text fields.
 
 Fields:
-  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-affects&0, &cunaffected&0 - see HELP AFFECT FLAGS
   &c-attack&0 - see HELP MEDIT ATTACK
+  &c-corpse&0 - find mobs who have any custom corpse (for a specific corpse,
+     use '.obj search' instead)
   &c-custom&0 - has a specific type, see HELP MEDIT CUSTOM
   &c-faction&0 - is a member of a specific faction
   &c-flagged&0, &cunflagged&0 - see HELP MEDIT FLAGS
@@ -6357,6 +6565,7 @@ Optional interaction restrictions:
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
  &c-tool <name>&0 - Require a specific tool for this interaction.
+ &c-region <flag>&0 - Restrict by region (see SPAWN FLAGS for regions).
 
 Example of a rare result from barding (order matters here):
  1. BARDE: 1x an epic warhorse .50% (e)
@@ -6944,7 +7153,7 @@ Most applies are self-explanatory:
  &cRESIST-MAGICAL&0 - magical damage reduction
  &cCRAFTING&0 - bonus to craft level (unscaled)
  &cBLOOD-UPKEEP&0 - adds to how much blood vampires must spend per hour (unscaled)
- &cNIGHT-VISION&0 - adds to light radius at night (unscaled)
+ &cLIGHT-RADIUS&0 - adds to light radius at night (unscaled)
  &cNEARBY-RANGE&0 - increases the range of the player's nearby command
  &cWHERE-RANGE&0 - increases the range of the player's where command
 
@@ -7157,6 +7366,7 @@ Message types:
  &center-portal-to-room&0 - Shown to the room when char enters a portal ($p).
  &cexit-portal-to-room&0 - Shown to the room when char exits a portal ($p).
  &cidentify-info&0 - Shown when the item is identified.
+ &cidentify-tutorial&0 - Shown when the item is identified if tutorials are on.
 
 Resource messages are shown when received from: butcher, chop, dig, fish,
 forage, harvest, mine, pick, quarry, scrape, shear, or skin. These use $p for
@@ -7225,7 +7435,7 @@ Available flags:
  &cLIGHT&0 - lights up the room (prefer LIGHT item type instead of the flag)
  &cSUPERIOR&0 - crafted by a master craftsman, adds the (superior) tag
  &cLARGE&0 - takes up 2 inventory slots, adds the (large) tag
- &c*CREATED&0 - created by a god command
+ *CREATED - created by a god command
  &c1-USE&0 - is destroyed when un-equipped
  &cSLOW&0 - for weapons, attacks slower
  &cFAST&0 - for weapons, attacks faster
@@ -7236,9 +7446,9 @@ Available flags:
  &cTWO-HANDED&0 - weapon requires both hand slots
  &cBOE&0 - item binds to a player when it is equipped (or used)
  &cBOP&0 - item binds to a player when it is picked up
- &cSTAFF&0 - counts as a staff (even if it doesn't have a staff weapon type)
+ *READIED-WEAPON-ABIL - automatic when an item comes from any Ready Weapon ability
  &cUNCOLLECTED-LOOT&0 - will decay on the ground if no player gets it
- &c*KEEP&0 - player has marked the object with the 'keep' command
+ *KEEP - player has marked the object with the 'keep' command
  &c!AUTOSTORE&0 - will not autostore (e.g. furniture)
  &cHARD-DROP&0 - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  &cGROUP-DROP&0 - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
@@ -7360,6 +7570,7 @@ Optional interaction restrictions:
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
  &c-tool <name>&0 - Require a specific tool for this interaction.
+ &c-region <flag>&0 - Restrict by region (see SPAWN FLAGS for regions).
 
 See also: OLC OBJECTS
 #d
@@ -8187,7 +8398,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: class, faction, global, morph, shop, social
+Unsupported types: class, faction, global, morph, shop
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -8526,6 +8737,10 @@ labor will eat if it COULD produce something, even if the random roll fails.
 
 See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
+PEDIT
+
+For progress goal editor help files, use the PROGEDIT prefix instead.
+#d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
 Usage:  .prog <command>
@@ -8603,8 +8818,8 @@ Fields:
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
- > .prog fullsearch -type PLAYER-TECH -ptech Swimming -vmin 10000 -vmax 10099
- > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
+ > .prog fullsearch -perk City-points
+ > .prog fullsearch -task OWN-ROADS
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all goals that require you to kill a
@@ -8771,6 +8986,7 @@ The following quest flags are available:
  &cEVENT&0 - Quest is marked as part of an event. If it's a daily quest, it is
     separate from non-event dailies.
  &cIN-CITY-ONLY&0 - Quest only starts/ends at in-city locations.
+ &cCONFIRM-DROP&0 - Player must type 'confirm' when dropping this quest.
 
 See also: OLC QUESTS, DAILY QUEST
 #d
@@ -8875,6 +9091,10 @@ Available reward types:
  &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
  &cBONUS-ABILITY&0 - Grants the player a bonus ability.
  &cREMOVE-ABILITY&0 - Revokes a bonus ability from a player.
+ &cCOMPANION&0 - Grants a companion to the companion list (an npc that assists
+    in battle).
+ &cREMOVE-COMPANION&0 - Removes a companion from the companion list, if present.
+ &cMINIPET&0 - Grants a minipet (an npc that does not engage in combat).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -8951,15 +9171,17 @@ See also: OLC ROOM TEMPLATES, REDIT MATCH EXITS, VNUM
 Usage:  .flags [add | remove] <flags>
 
 The following room template flags are available:
- OUTDOOR - Affected by sun.
- DARK - Always requires a light. (By default, rooms are dark at night.)
- LIGHT - Never requires a light.
- !MOB - Mobs will not wander into the room (they may still be spawned there).
- PEACEFUL - No combat allowed.
- NEED-BOAT - Requires a boat, swimming, waterwalking, or flying.
- !TELEPORT - Cannot teleport in or out.
- LOOK-OUT - can see the map using "look out"
- !LOCATION - no location shown; disables "where"
+ &cOUTDOOR&0 - Affected by sun and weather; player can mount.
+ &cDARK&0 - Always requires a light. (By default, rooms are dark at night.)
+ &cLIGHT&0 - Never requires a light.
+ &c!MOB&0 - Mobs will not wander into the room (they may still be spawned there).
+ &cPEACEFUL&0 - No combat allowed.
+ &cNEED-BOAT&0 - Requires a boat, swimming, waterwalking, or flying.
+ &c!TELEPORT&0 - Cannot teleport in or out.
+ &cLOOK-OUT&0 - Can see the map using "look out".
+ &c!LOCATION&0 - No location shown; disables "where".
+ &cWATER-DESCRIPTIONS&0 - Mobs use water-long-desc.
+ &cALLOW-MOUNTS&0 - Player can mount (not needed if OUTDOOR is set).
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -9091,6 +9313,7 @@ Available tasks:
  &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
  &cOWN-BUILDING&0 - Empire has a certain building.
  &cOWN-BUILDING-FUNCTION&0^ - Empire has a building (or building-vehicle) with a given function flag.
+ &cNOT-OWN-BUILDING&0 - Empire does not own this many of a certain building.
  &cOWN-VEHICLE&0 - Empire has a certain vehicle (or building-vehicle).
  &cOWN-VEHICLE-FLAGGED&0^ - Empire has a vehicle (including building-vehicles) with specific flags.
  &cOWN-VEHICLE-FUNCTION&0^ - Empire has a non-building vehicle with specific functions.
@@ -9130,6 +9353,12 @@ Available tasks:
  &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
  &cDAYTIME&0, &cNIGHTTIME&0 - Only valid during certain times of day (quests only).
  &cOWN-ROADS&0 - Empire owns enough road or road-icon tiles.
+ &cEMPIRE-HAS-PROGRESS&0 - Empire completed a progress goal.
+ &cEMPIRE-LACKS-PROGRESS&0 - Empire has not completed a progress goal.
+ &cEMPIRE-ON-PROGRESS&0 - Empire has started and is working on a progress goal.
+ &cEMPIRE-NOT-ON-PROGRESS&0 - Empire is not currently working on a progress goal.
+ &cHAVE-COMPANION&0 - Player has a companion in their list (quests only).
+ &cNOT-HAVE-COMPANION&0 - Player doesn't have a companion in their list (quests).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the
@@ -9219,6 +9448,11 @@ random each time.
 Message types:
  &cmagic-growth&0 - Shown to the whole room when a MAGIC-GROWTH evolution occurs.
    This will not be shown if there is a crop here that has one.
+ &cburns-down&0 - Shown when this sector gets burned. This will not be shown on
+   crop tiles if the crop also has a custom message.
+ &cwas-burned&0 - Shows when this sect appears after a burn. Note that if no
+   burns-down or was-burned message is shown, a default message is shown for
+   burning instead.
 
 See also: OLC SECTORS
 #d
@@ -9322,6 +9556,11 @@ Available sector flags:
  &cINHERIT-BASE-CLIMATE&0 - Uses the climate flags of the base sector in addition
     to the ones set on this sector. For example, a road or building sector.
  &cIRRIGATES-AREA&0 - This flag is used to trigger irrigation evolutions.
+ &cNO-WORKFORCE-AUTOABANDON&0 - Workforce chores will not abandon this terrain.
+ &cBASIC-CROP&0 - Indicates this tile counts as a basic crop tile for its
+    climate. Used in conjunction with the CROP flag by commands like .map
+    terrain.
+ &cHIDE-ON-ISLAND-DESCRIPTION&0 - Won't show in auto-generated island descs.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
@@ -9359,16 +9598,18 @@ Usage:  .icons add <type> <color code> <icon>
         .icons copy <from type> <from vnum>
         .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
+        .icons list
 
 EmpireMUD uses four different seasons and the biggest change between them is
 that sectors look different at different times of year. You can also specify
-an icon for ANY season. The <type> parameter is where you specify which season,
-and a list of valid types is shown on the olc display for the sector.
+an icon for ANY season.
 
-If more than one icon is available for a given season (or from season + any),
-one is chosen at random. If you want to have random icons available, but want
-one pre-selected, set the LOCK-ICON sector flag. Be warned, however, that once
-an icon is locked, it remains the same in any season.
+The <type> parameter is where you specify which season: spring, summer, autumn,
+winter, or ANY. If more than one icon is available for a given season (or from
+season + any), one is chosen at random.
+
+Use the LOCK-ICON flag to select 1 random icon and keep it; be warned, however,
+that once an icon is locked, it remains the same in any season.
 
 For icons, the base color is separate from the icon, so the icon does not
 need to start with a color code (unless it's different from the base you set).
@@ -9447,6 +9688,12 @@ Each map room also has a BASE SECTOR and a NATURAL SECTOR. You can view all
 three sector types on a room using "stat room".
 
 See also: BASE SECTOR, MAPEDIT TERRAIN, NATURAL SECTOR, SECTEDIT, SHOW SECTORS
+#d
+SEDIT
+
+For shop editor help files, use the SHOPEDIT prefix instead. Other editors
+beginning with 'S' include sectors (SECTEDIT), skills (SKILLEDIT), and socials
+(SOCEDIT).
 #d
 SHOPEDIT "OLC SHOPS" "SHOP OLC"
 
@@ -9787,13 +10034,39 @@ Usage:  .flags [add | remove] <flags>
 Social flags are properties that affect how the social behaves.
 
 Available flags:
- IN-DEV - Cannot be used by mortals.
- HIDE-IF-INVIS - No messages are shown to the room if the actor is not visible.
+ &cIN-DEV&0 - Cannot be used by mortals.
+ &cHIDE-IF-INVIS&0 - No messages are shown to the room if the actor is not visible.
    (this is normally used for socials that are visual but silent, like 'smile')
+ &cNOISY&0 - If the social would make noise, won't work in SILENT rooms.
 
 See also: OLC SOCIALS
 #d
-"SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND"
+"SOCEDIT FULLSEARCH" "SOCIAL FULLSEARCH"
+
+Usage:  .social fullsearch -<field> <argument> <...>
+
+This command allows you to search for socials matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the social's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP SOCEDIT FLAGS
+  &c-hasrequirements&0, &c-norequirements&0 - find only ones that do or don't
+                                              have any requirements
+  &c-maxcharposition&0, &c-mincharposition&0 - for actor - HELP POSITIONS
+  &c-maxvictposition&0, &c-minvictposition&0 - for victim
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .soc fullsearch clap -noreq
+ > .soc fullsearch -flag NOISY
+ > .soc fullsearch -flag NOISY -vmin 0 -vmax 9999
+
+To search the "requirements" field, you can generally use normal searches for
+other OLC types. For example, to find which social requires the hag's pointe
+shoes (object 19034), use ".obj search 19034".
+#d
+"SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND" "SOCEDIT SILENT2CHAR" "SOCEDIT SILENT2OTHERS"
 
 Usage:  .n2char <message | none>
         .<type> <message | none>
@@ -9815,6 +10088,10 @@ Messages when a social is typed with an argument ("grin Gaia"):
 Messages when the actor targets himself ("grin self"):
   Target-self to character <&ys2char&0>  - may be blank
   Target-self to others <&ys2other&0>  - may be blank (s2char must be blank)
+
+When a room has the SILENT affect AND the social has the NOISY flag:
+  Silent to character <&ysilent2char&0>  - may be blank (sends default message)
+  Silent to others <&ysilent2others&0>  - may be blank
 
 See &cHELP DOLLAR SIGN CODES&0 for a list of codes that can be used in socials:
   $n, $m, $e, $s - used for the actor
@@ -9926,6 +10203,30 @@ Examples:
  > .t fullsearch i11234 -vmin 11200 -vmax 11299
  > .t fullsearch %force%
 #d
+"TRIGEDIT LINKS"
+
+Usage:  .links add <type> <vnum(s)>
+        .links remove <type> <vnum | all>
+        .links remove all
+
+Trigger links are used internally to help the game detect which other 'things'
+a trigger is connected to. This is primarily used with the '.olc search' system
+which would have trouble finding linked items using the trigger command text.
+
+You can add multiple vnums at the same type at once, for example:
+ > .links add obj 120 122 128 137
+
+For example, if trigger 9600 has a link to generic 9602:
+ > .gen search 9602
+ Occurrences of generic 9602 (struggling):
+ TRG [ 9104] Snake: Constrict
+ TRG [ 9108] Snake: Constrict Damage
+ TRG [ 9600] SCF Script Fight: Setup dodge, interrupt, struggle
+ TRG [ 9602] SCF Script Fight: Struggle to get free
+ TRG [ 9603] SCF Script Fight: Check struggle and remove
+ 
+See also: OLC TRIGGERS
+#d
 "TRIGEDIT NAME"
 
 Usage:  .name <name>
@@ -9972,6 +10273,8 @@ keywords.
       spawn on the map.
 
 - #a  Empire adjective. See notes on #e.
+
+- #A  Same as #a but will add "a" or "an" before.
 
 See also: MEDIT NAMESET
 #d
@@ -10299,6 +10602,7 @@ Optional interaction restrictions:
  &c-tech <name>&0 - Empire must have this tech.
  &c-tool <name>&0 - Require a specific tool for this interaction.
  &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
+ &c-region <flag>&0 - Restrict by region (see SPAWN FLAGS for regions).
 
 Examples:
 > .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
@@ -10697,6 +11001,7 @@ Player entering/exiting messages:
 
 Other messages:
  &cidentify-info&0 - Shown when the vehicle is identified.
+ &cidentify-tutorial&0 - Shown when the vehicle is identified.
 
 See also: OLC VEHICLES, DOLLAR SIGN CODES
 #d
@@ -10738,46 +11043,48 @@ Flags let you specify certain properties about the vehicle. Many different
 types of vehicles can be constructed this way.
 
 Available flags:
- *INCOMPLETE - vehicle is not fully constructed (triggered by crafting)
- DRIVING - vehicle moves on land**
- SAILING - vehicle moves on water**
- FLYING - vehicle moves through the air**
- ALLOW-ROUGH - drag/drive work on rough terrain (e.g. mountains)
- SIT - player can sit on the vehicle
- IN - changes text from "on" to "in", and "aboard" to "inside"
- BURNABLE - can be burnt using the "burn" command
- CONTAINER - items can be placed inside
- SHIPPING - can be used by the shipping system
- CUSTOMIZABLE - allows "customize vehicle"
- DRAGGABLE - players can move it on land with "drag"
- !BUILDING - cannot be dragged/driven into a building (e.g. too large)
- CAN-PORTAL - can be dragged/driven/led through portals
- LEADABLE - can be pulled around with the "lead" command
- CARRY-VEHICLES - vehicles can be put inside (usually via drag/lead)
- CARRY-MOBS - mobs can be put inside (usually via lead)
- SIEGE-WEAPONS - can fire on buildings and vehicles
- ON-FIRE - currently burning (via the "burn" command)
- !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
- VISIBLE-IN-DARK - can be seen at night without a light
- !CLAIM - cannot be claimed
- BUILDING - acts more like a building than a vehicle
- NEVER-DISMANTLE - can never be dismantled
- *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on
- *DISMANTLING - is being dismantled
- *PLAYER-NO-WORK - player has toggled no-work on
- CHAMELEON - vehicle cannot be seen at a distance (when in good repair)
- INTERLINK - rooms can be interlinked with other interlink-flagged places
- IS-RUINS - counts as ruins for city status and building decay
- SLEEP - can sleep and rest in/on it
- !PAINT - cannot be painted
- *BRIGHT-PAINT - is brightly painted (set by the paint command)
- DEDICATE - can be dedicated
- RUIN-SLOWLY-FROM-CLIMATE - always ruins slowly no matter what climate change
- RUIN-QUICKLY-FROM-CLIMATE - always ruins quickly due to climate change
- OBSCURE-VISION - blocks tiles behind it on the map
- *INSTANCE - vehicle has an instance attached
- *TEMPORARY - vehicle will be removed when the instance ends
- TINY - like furniture, can go be made/moved places vehicles normally can't go
+ &c*INCOMPLETE&0 - vehicle is not fully constructed (triggered by crafting)
+ &cDRIVING&0 - vehicle moves on land**
+ &cSAILING&0 - vehicle moves on water**
+ &cFLYING&0 - vehicle moves through the air**
+ &cALLOW-ROUGH&0 - drag/drive work on rough terrain (e.g. mountains)
+ &cSIT&0 - player can sit on the vehicle
+ &cIN&0 - changes text from "on" to "in", and "aboard" to "inside"
+ &cBURNABLE&0 - can be burnt using the "burn" command
+ &cCONTAINER&0 - items can be placed inside
+ &cSHIPPING&0 - can be used by the shipping system
+ &cCUSTOMIZABLE&0 - allows "customize vehicle"
+ &cDRAGGABLE&0 - players can move it on land with "drag"
+ &c!BUILDING&0 - cannot be dragged/driven into a building (e.g. too large)
+ &cCAN-PORTAL&0 - can be dragged/driven/led through portals
+ &cLEADABLE&0 - can be pulled around with the "lead" command
+ &cCARRY-VEHICLES&0 - vehicles can be put inside (usually via drag/lead)
+ &cCARRY-MOBS&0 - mobs can be put inside (usually via lead)
+ &cSIEGE-WEAPONS&0 - can fire on buildings and vehicles
+ &cON-FIRE&0 - currently burning (via the "burn" command)
+ &c!LOAD-ONTO-VEHICLE&0 - cannot be loaded onto another vehicle
+ &cVISIBLE-IN-DARK&0 - can be seen at night without a light
+ &c!CLAIM&0 - cannot be claimed
+ &cBUILDING&0 - acts more like a building than a vehicle
+ &cNEVER-DISMANTLE&0 - can never be dismantled
+ &c*PLAYER-NO-DISMANTLE&0 - player has toggled no-dismantle on
+ &c*DISMANTLING&0 - is being dismantled
+ &c*PLAYER-NO-WORK&0 - player has toggled no-work on
+ &cCHAMELEON&0 - vehicle cannot be seen at a distance (when in good repair)
+ &cINTERLINK&0 - rooms can be interlinked with other interlink-flagged places
+ &cIS-RUINS&0 - counts as ruins for city status and building decay
+ &cSLEEP&0 - can sleep and rest in/on it
+ &c!PAINT&0 - cannot be painted
+ &c*BRIGHT-PAINT&0 - is brightly painted (set by the paint command)
+ &cDEDICATE&0 - can be dedicated
+ &cRUIN-SLOWLY-FROM-CLIMATE&0 - always ruins slowly no matter what climate change
+ &cRUIN-QUICKLY-FROM-CLIMATE&0 - always ruins quickly due to climate change
+ &cOBSCURE-VISION&0 - blocks tiles behind it on the map
+ &c*INSTANCE&0 - vehicle has an instance attached
+ &c*TEMPORARY&0 - vehicle will be removed when the instance ends
+ &cTINY&0 - like furniture, can go be made/moved places vehicles normally can't go
+ &cHIDE-STORAGE-UNOWNED&0 - only shows as storage when identifying objects if owned
+ &cLIGHT&0 - vehicle provides light
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually
@@ -10823,6 +11130,7 @@ Fields:
   &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
+  &c-forbidclimate&0 - see HELP CLIMATE FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
   &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
      use e.g. "-icon any" to check if it has one at all.
@@ -10832,6 +11140,7 @@ Fields:
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
+  &c-requiresclimate&0 - see HELP CLIMATE FLAGS
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
   &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED
@@ -10863,7 +11172,7 @@ range.
 
 See also: OLC VEHICLES
 #d
-"VEDIT HITPOINTS" "VEDIT HEALTH"
+"VEDIT HITPOINTS" "VEDIT HIT POINTS" "VEDIT HP" "VEDIT HEALTH"
 
 Usage:  .hitpoints <value>
 

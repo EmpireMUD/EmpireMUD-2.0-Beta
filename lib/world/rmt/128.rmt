@@ -10,8 +10,9 @@ The Mining Tunnel of a Bygone Age~
 fireflies that scatter as you approach. At one end, rocky steps rise up through
 a narrow hole where the air smells of warm, spicy incense. At the other, the
 tunnel ends abruptly.
+Commands: return
 ~
-ci 0 0 12810
+cei 0 0 12810
 D8
 ~
 0 12811
@@ -47,15 +48,18 @@ The end of the tunnel is a curved rocky wall cut by miners' picks.
 ~
 T 12803
 T 12810
+T 12802
+T 12801
 S
 #12811
-The Lodestone Forge~
+Lodestone Forge~
    An echoing, high-pitched tap follows each step you take on the iron floor.
 Around you, weapons and shields of all sorts hang on bright red walls, lit by
 iron lanterns. Above, the roof is open, showing the infinite expanse of a
 starry night. A heavy chain supports a massive lodestone over your head. Light
 wisps of smoke drift through the air, carrying the aroma of a warm, spicy
 incense.
+Commands: challenge
 ~
 cei 0 0 12810
 D9
@@ -80,7 +84,23 @@ there is no gap or grout between them. A large chain is bolted to the floor
 near the hole down to the tunnel.
 ~
 E
-walls red~
+north~
+You see a Ptahite blacksmith rearranging supplies.
+~
+E
+south~
+You see a Thorian blacksmith prodding a smelting pit.
+~
+E
+east~
+You see a Brigidine blacksmith staring up at the stars.
+~
+E
+west~
+You see a Hephaestian blacksmith fixing his hair.
+~
+E
+walls red northeast northwest southeast southwest ne se sw nw~
 The towering walls have been painted a rich red color.
 ~
 E
@@ -120,18 +140,21 @@ smoke wisps~
 The wisps of smoke have a warm, spicy, almost sweet scent.
 ~
 E
-hole tunnel steps stairs~
+hole tunnel steps stairs down~
 A hole in the floor contains stone steps that lead down into the tunnel.
 ~
 M 0 12811 100.00 1
 T 12803
+T 12802
+T 12819
 S
 #12812
-The Lodestone Forge~
+Lodestone Forge~
    The tap-tap-tap of light hammering echoes in time with the twinkling stars
 overhead. A trio of small anvils sit on wooden blocks that do little to dampen
 the sound. Between them, a red-hot pit smoulders with spiced smoke from
 incense which has been tossed into it.
+Commands: forge, smelt, shatter <item to destroy>
 ~
 cei 0 hv 12810
 D1
@@ -162,11 +185,15 @@ roof up stars sky expanse~
 its dazzling stars.
 ~
 E
-walls red~
+east~
+You see a Gibilian blacksmith tending to the lodestone.
+~
+E
+walls red north south west northwest northeast southwest southeast nw ne sw se~
 The smooth walls are painted red and hung with iron lanterns.
 ~
 E
-plates iron floor tiles~
+plates iron floor tiles down~
 The floor is made up of square iron plates.
 ~
 E
@@ -180,13 +207,16 @@ lodestone, which seems to tug at the chain as it pulls upward and to the north.
 ~
 M 0 12812 100.00 1
 T 12803
+T 12802
+T 5195
 S
 #12813
-The Lodestone Forge~
+Lodestone Forge~
    A pair of small anvils stand side-by-side atop a wooden block in front of
 a smelting pit that sparks and crackles as fresh incense sends up smoke with a
 warm, spicy aroma that rises upward and out of the open roof. The iron tiles
 of the floor are stained and partly melted near the pit.
+Commands: forge, smelt, shatter <item to destroy>
 ~
 cei 0 hv 12810
 D3
@@ -215,7 +245,7 @@ roof up stars sky expanse~
 The open roof reveals a cosmic canvas of twinkling stars.
 ~
 E
-floor tiles plates~
+floor tiles plates down~
    The floor is made from tight-fitting squares of solid iron. Near the
 smelting pit, some of the tiles are partly melted.
 ~
@@ -224,7 +254,11 @@ stains~
 The floor is stained with red-orange rust along some of the seams.
 ~
 E
-walls red~
+west~
+You see a Gibilian blacksmith tending to the lodestone.
+~
+E
+walls red north south east northwest northeast southwest southeast nw ne sw se~
 The walls have been painted red and lit by iron lanterns.
 ~
 E
@@ -236,15 +270,23 @@ lodestone stone chain~
    At the center of the forge, a huge, silvery lodestone strains against its
 iron chain as it pulls to the north.
 ~
+E
+stacks piles designs patterns~
+   There are stacks of patterns and designs for various earrings all over, but
+you can't really understand the notes scrawled on them.
+~
 M 0 12813 100.00 1
 T 12803
+T 12802
+T 5195
 S
 #12814
-The Lodestone Forge~
+Lodestone Forge~
    A mammoth anvil looms over an open smelting pit, wreathed in the warm, smoky
 incense that has been sprinkled over the coals. Tools of every sort hang
 between lanterns on the red wall, some so close to the open roof that they're
 out of reach for all but the giants.
+Commands: forge, smelt, shatter <item to destroy>
 ~
 cei 0 hv 12810
 D0
@@ -271,7 +313,11 @@ tools~
 are too high to reach.
 ~
 E
-walls red~
+north~
+You see a Gibilian blacksmith tending to the lodestone.
+~
+E
+walls red south east west northwest northeast southwest southeast nw ne sw se~
 The red walls look recently-painted.
 ~
 E
@@ -280,7 +326,7 @@ roof up stars sky expanse~
 night sky.
 ~
 E
-plates iron floor tiles~
+plates iron floor tiles down~
 Square iron plates tile the floor.
 ~
 E
@@ -294,9 +340,11 @@ Iron lanterns hang along the walls, casting shadows around the tools.
 ~
 M 0 12814 100.00 1
 T 12803
+T 12802
+T 5195
 S
 #12815
-The Lodestone Forge~
+Lodestone Forge~
    Cast iron barrels are stacked from the iron floor to the open top of the red
 walls, forming heavy walls of their own. Each is marked in fiery red letters,
 no two labeled alike. Wisps of smoke weave their way between them, carrying the
@@ -323,7 +371,11 @@ letters labels fiery red~
 The barrels are labeled in a red script that you cannot read.
 ~
 E
-walls~
+south~
+You see a Gibilian blacksmith tending to the lodestone.
+~
+E
+walls north east west northwest northeast southwest southeast nw ne sw se~
 The walls have been painted a rich red color.
 ~
 E
@@ -341,7 +393,7 @@ smoke~
 Smoky wisps of spiced incense hang in the air.
 ~
 E
-plates floor tiles~
+plates floor tiles down~
    The square floor tiles are made of solid iron. Smaller shards of iron are
 scattered here and there.
 ~
@@ -361,5 +413,1762 @@ Barrels are stacked so high you can hardly see the lanterns on the wall.
 ~
 M 0 12815 100.00 1
 T 12803
+T 12802
+S
+#12817
+An Old and Broken Battlefield~
+   The ground is carpeted with the rusted remnants of an ancient battle.
+Broken spears, shattered shields, and dented helms lie half-buried in dark ash,
+a silent farm of fallen arms stretching as far as the eye can see. A rough
+scraping noise follows every footstep as you trod along, watching as loose bits
+of iron slowly creep across the ground, drawn to the shape at the center.
+Commands: return
+~
+ci 0 0 12817
+E
+ground carpet~
+   Rare hints of green poke through the ash and armor that carpet the
+battlefield where eons of endless war have left little natural ground exposed.
+~
+E
+remnants~
+From horizon to horizon, all you can see is what remains of endless war.
+~
+E
+rust~
+A soft blanket of dark red covers many of the fallen arms and armor.
+~
+E
+spears shields helms arms armor weapons~
+All around you are the rusted remains of battle.
+~
+E
+ash farm~
+Old weapons rise from the field of ash like so many crops.
+~
+E
+iron~
+Everything here is made of iron.
+~
+E
+shape center mass hulking~
+There's a hulking mass at the center of the battlefield.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12818
+An Old and Broken Battlefield~
+   The ground is carpeted with the rusted remnants of an ancient battle.
+Broken spears, shattered shields, and dented helms lie half-buried in dark ash,
+a silent farm of fallen arms stretching as far as the eye can see. A rough
+scraping noise follows every footstep as you trod along, watching as loose bits
+of iron slowly creep across the ground, drawn to the shape at the center.
+Commands: return
+~
+ci 0 0 12818
+E
+ground carpet~
+   Rare hints of green poke through the ash and armor that carpet the
+battlefield where eons of endless war have left little natural ground exposed.
+~
+E
+remnants~
+From horizon to horizon, all you can see is what remains of endless war.
+~
+E
+rust~
+A soft blanket of dark red covers many of the fallen arms and armor.
+~
+E
+spears shields helms arms armor weapons~
+All around you are the rusted remains of battle.
+~
+E
+ash farm~
+Old weapons rise from the field of ash like so many crops.
+~
+E
+iron~
+Everything here is made of iron.
+~
+E
+shape center mass hulking~
+There's a hulking mass at the center of the battlefield.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12819
+An Old and Broken Battlefield~
+   The ground is carpeted with the rusted remnants of an ancient battle.
+Broken spears, shattered shields, and dented helms lie half-buried in dark ash,
+a silent farm of fallen arms stretching as far as the eye can see. A rough
+scraping noise follows every footstep as you trod along, watching as loose bits
+of iron slowly creep across the ground, drawn to the shape at the center.
+Commands: return
+~
+ci 0 0 12819
+E
+ground carpet~
+   Rare hints of green poke through the ash and armor that carpet the
+battlefield where eons of endless war have left little natural ground exposed.
+~
+E
+remnants~
+From horizon to horizon, all you can see is what remains of endless war.
+~
+E
+rust~
+A soft blanket of dark red covers many of the fallen arms and armor.
+~
+E
+spears shields helms arms armor weapons~
+All around you are the rusted remains of battle.
+~
+E
+ash farm~
+Old weapons rise from the field of ash like so many crops.
+~
+E
+iron~
+Everything here is made of iron.
+~
+E
+shape center mass hulking~
+There's a hulking mass at the center of the battlefield.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12850
+A Cluttered Siege Pavilion~
+   The tent is crowded with the tools of war, its canvas walls bowed inward by
+hanging maps, tally boards, and rolls of marked parchment. Long tables sag
+beneath stone weights, carved tokens standing in for regiments on plots of the
+battlefield. The light flickers off of fresh ink, wax seals, and bits of soot
+as lanterns swing from the central poles. Outside there's a general silence,
+punctuated by the ring of hammers against hard anvils.
+Commands: return
+~
+cei 0 0 12850
+D5
+~
+0 12851
+E
+pavilion tent canvas walls~
+   The pavilion is made of heavy canvas, grayed from soot and wear, held up by
+sturdy beams of solid wood. Maps and boards hang all over the walls.
+~
+E
+maps hanging~
+   The walls of the tent are hung with many maps showing parts of the
+battlefield, surrounding areas, and the larger campaign.
+~
+E
+boards tally~
+Boards hanging from the walls bear tally marks in charcoal.
+~
+E
+tables weights stone carved carvings tokens regiments plots battlefield~
+   Solid wood tables are burdened nearly to the point of breaking, weighed
+down by heavy stone and carved tokens that are used to plan the siege.
+~
+E
+northeast ne out flap exit~
+   Cool night air rushes in as you glance out the tent flap and see the
+smelter and anvils, all hard at work repairing arms and armor for the weary
+soldiers.
+~
+E
+light lanterns~
+Oil lanterns hang from wooden poles, casting flickering light over the tent.
+~
+E
+poles~
+Sturdy wooden poles hold up the tent.
+~
+E
+soot~
+   There's light soot on almost everything in this pavilion, especially the
+upper parts of the tent where smoke from the lanterns stains the canvas. The
+outside of the tent also bears soot from the smelter and the tireless work of
+the camp's smiths.
+~
+E
+ink fresh~
+Light from the lanterns flickers off of fresh ink on various parchments.
+~
+E
+parchments~
+   Many parchments fill the tent, both old and new. In some cases, the ink is
+still fresh. But when you look closely at them, you can't make out any of the
+words.
+~
+E
+seals wax~
+Red wax seals adorn rolled letters on the table.
+~
+T 12803
+T 12802
+T 12801
+T 12850
+S
+#12851
+Victory Forge~
+   At the heart of Victory Forge rises a squat smelting furnace, glowing
+white-hot at its mouth, burning steady despite the night air. Heat ripples
+outward from it, warping shadows cast by the lanterns. The furnace breathes a
+fiery roar that drowns out the silence of the battlefield, punctuated by the
+rhythmic ringing of the anvils.
+Commands: challenge, smelt
+~
+cei 0 vGL 12850
+D6
+~
+0 12850
+D3
+~
+0 12852
+D1
+~
+0 12853
+D2
+~
+0 12854
+D0
+~
+0 12855
+E
+forge~
+   Victory Forge stands all around you, perched on a hilltop above the
+battlefield.
+~
+E
+furnace smelter smelting squat glow mouth fire~
+   A heavy smelter smokes nearby, ensuring strong metal is available for the
+war effort.
+~
+E
+shadows~
+   The lanterns cast shadows through the hot air, making the shadows dance
+across the forge.
+~
+E
+lanterns poles~
+Lanterns swing from poles to light up the work area.
+~
+E
+north~
+You see one of the blacksmiths rearranging supplies.
+~
+E
+south~
+You see a blacksmith working at an anvil near the edge of the hill.
+~
+E
+east~
+You see a blacksmith hammering away at one of the anvils.
+~
+E
+west~
+You see a veteran forgehand working a lone anvil.
+~
+E
+tent pavilion southwest sw~
+The siege pavilion stands at the center of Victory Forge.
+~
+E
+up stars sky expanse night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+out battlefield field around fog~
+   A light fog hangs low in the air as the battlefield stretches out below the
+hill, still smoking from the day's fighting, though silence has overtaken it
+now.
+~
+E
+camp hilltop~
+   The small camp takes up much of the hilltop, perched well above the empty
+battlefield.
+~
+E
+dewdrops grass down~
+Bits of grass here and there shimmer with the night's dew.
+~
+M 1 12850 100.00 5
+M 0 12851 100.00 1
+T 12803
+T 12802
+T 12819
+S
+#12852
+Victory Forge~
+   A lone anvil stands planted in the packed earth, scarred across its surface
+by countless blows. Sparks still glitter faintly around it, cooling in the
+night air before they reach the ground. The hilltop wind carries the sound of
+hammering outward, echoing in measured rhythm over the silent battlefield.
+Commands: forge, shatter <item to destroy>
+~
+cei 0 h 12850
+D1
+~
+0 12851
+E
+anvil lone surface~
+   The anvil is old and well-scarred from many decades of use on different
+battlefields.
+~
+E
+earth packed ground~
+Little grass pokes out from the well-trampled bare earth.
+~
+E
+hilltop camp~
+   The small camp takes up much of the hilltop, perched well above the empty
+battlefield.
+~
+E
+sparks glitter~
+Hot red embers and stray sparks glow like glitter around the anvil.
+~
+E
+up stars sky expanse night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+east~
+You see Mateo tending the smelter.
+~
+E
+out battlefield field around fog north south west northwest northeast southwest southeast nw ne sw se down~
+   A light fog hangs low in the air as the battlefield stretches out below the
+hill, still smoking from the day's fighting, though silence has overtaken it
+now.
+~
+E
+dewdrops grass~
+Bits of grass here and there shimmer with the night's dew.
+~
+E
+lanterns poles~
+Lanterns swing from poles to light up the work area.
+~
+E
+pavilion tent~
+The siege pavilion stands at the center of Victory Forge.
+~
+E
+forge~
+   Victory Forge stands all around you, perched on a hilltop above the
+battlefield.
+~
+M 1 12850 100.00 5
+M 0 12852 100.00 1
+T 12803
+T 12802
+T 12851
+T 5195
+S
+#12853
+Victory Forge~
+   Several anvils are set in a rough arc, each surrounded by scorched earth and
+scattered hammerscale. The metal beneath them gleams dully in lanternlight,
+twinkling like the stars above. Beyond the forge lights, the camp and
+battlefield rest in uneasy stillness as the smiths work through the night.
+Commands: forge, shatter <item to destroy>
+~
+cei 0 h 12850
+D3
+~
+0 12851
+E
+anvils arc~
+   The anvils arc around a central patch where several artisans can work in
+tandem. They show heavy use, with hammerscale scattered all around.
+~
+E
+earth scorched ground~
+The ground around the anvils is blackened and scorched from heavy use.
+~
+E
+metal hammerscale scale gleam~
+   Bits of scattered metal on the ground gleam in the lanternlight. Most of
+these are hammerscale, the byproduct of heavy hammer blows against hot iron.
+~
+E
+lanterns lanternlight~
+Lanterns swing from poles to light up the work area.
+~
+E
+forge~
+   Victory Forge stands all around you, perched on a hilltop above the
+battlefield.
+~
+E
+up stars sky expanse night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+west~
+You see Mateo tending the smelter.
+~
+E
+out battlefield field around fog north south east northwest northeast southwest southeast nw ne sw se down~
+   A light fog hangs low in the air as the battlefield stretches out below the
+hill, still smoking from the day's fighting, though silence has overtaken it
+now.
+~
+E
+hilltop camp~
+   The small camp takes up much of the hilltop, perched well above the empty
+battlefield.
+~
+E
+dewdrops grass~
+Bits of grass here and there shimmer with the night's dew.
+~
+E
+pavilion tent~
+The siege pavilion stands at the center of Victory Forge.
+~
+M 1 12850 100.00 5
+M 0 12853 100.00 1
+T 12803
+T 12802
+T 12851
+T 5195
+S
+#12854
+Victory Forge~
+   An anvil rests near the edge of the hill, overlooking the darkened siege
+lines below. Lanternlight glints off its battered face, reflecting every dent
+and ding from its storied past. The air here feels thinner, colder, almost
+silent but for the echoing pings of the smiths working tirelessly to resupply
+the soldiers at the front.
+Commands: forge, shatter <item to destroy>
+~
+cei 0 h 12850
+D0
+~
+0 12851
+E
+anvil battered face dents dings~
+The old anvil is heavily worn from many years of travel on hard campaigns.
+~
+E
+edge~
+   The hill drops off precipitously not far from the anvil, plummeting down
+toward the smouldering battlefield.
+~
+E
+hilltop camp~
+   The small camp takes up much of the hilltop, perched well above the quiet
+battlefield.
+~
+E
+siege lines front~
+   Only a handful of troops still guard the front line, visible in the distance
+across the smouldering battlefield.
+~
+E
+lanterns lanternlight poles~
+Lanterns swing from poles to light up the work area.
+~
+E
+up stars sky expanse night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+north~
+You see Mateo tending the smelter.
+~
+E
+out battlefield field around fog south east west northwest northeast southwest southeast nw ne sw se down~
+   A light fog hangs low in the air as the battlefield stretches out below the
+hill, still smoking from the day's fighting, though silence has overtaken it
+now.
+~
+E
+dewdrops grass~
+Bits of grass here and there shimmer with the night's dew.
+~
+E
+pavilion tent~
+The siege pavilion stands at the center of Victory Forge.
+~
+M 1 12850 100.00 5
+M 0 12854 100.00 1
+T 12803
+T 12802
+T 12851
+T 5195
+S
+#12855
+Victory Forge~
+   Crates of iron and imperium ingots are stacked in careful rows beneath tarps
+darkened by soot and dew. Barrels of charcoal and oil sit wedged between weapon
+blanks and bundled hafts, all arranged with the tidy severity of a war camp. A
+clean water barrel rests near the supplies with a ladle to drink from. The
+battlefield below lies quiet and still, blanketed by a light fog.
+~
+cei 0 F 12850
+D2
+~
+0 12851
+E
+crates~
+Reinforced crates are stacked along the edge of the hilltop camp.
+~
+E
+iron imperium ingots stacks rows~
+   Rows and rows of metal ingots are stacked in easy reach of the forge, but
+any attempt to touch them is met with only failure. These aren't here for you.
+~
+E
+tarps tarpaulins~
+Dark canvas tarpaulins cover many of the supplies.
+~
+E
+soot canvas~
+Soot has settled on most things here, especially on the canvas tarps.
+~
+E
+water barrel ladle~
+An open water barrel is available to all.
+~
+E
+charcoal oil weapons blanks bundles hafts barrels~
+   The camp is full of supplies for both its brave soldiers and its legendary
+smiths.
+~
+E
+up stars sky expanse night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+south~
+You see Mateo tending the smelter.
+~
+E
+out battlefield field around fog north east west northwest northeast southwest southeast nw ne sw se down~
+   A light fog hangs low in the air as the battlefield stretches out below the
+hill, still smoking from the day's fighting, though silence has overtaken it
+now.
+~
+E
+hilltop camp~
+   The small camp takes up much of the hilltop, perched well above the empty
+battlefield.
+~
+E
+dewdrops grass~
+Bits of grass here and there shimmer with the night's dew.
+~
+E
+pavilion tent~
+The siege pavilion stands at the center of Victory Forge.
+~
+E
+lanterns poles~
+Lanterns swing from poles to light up the work area.
+~
+M 1 12850 100.00 5
+M 0 12855 100.00 1
+T 12803
+T 12802
+T 12851
+S
+#12857
+A Smouldering Battlefield~
+   The battlefield stretches out in uneasy silence, a broad expanse of churned
+mud, shattered wagons, and abandoned siege works. Smoke still coils lazily from
+blackened pits and splintered palisades, but no banners fly and no voices
+carry. From here, the hilltop forge looms as a dark silhouette against the
+night sky, its furnaces the only steady lights in the distance. Below it, a low
+fog creeps in from the edges of the field, draping it in a still silence.
+Commands: return
+~
+ci 0 0 12857
+E
+battefield field around distance out expanse~
+   Nightfall has brought silence to the battlefield as each and every soldier
+has retreated to their own side to rest and recharge. A light fog makes it
+difficult to make out details; you cannot tell which side is winning.
+~
+E
+mud ground grass~
+   The ground is mostly mud, divided into a thousand tiny territories by
+wagon wheels and lines of bootprints. Only the rare patch of grass offers a
+glimmer of green in the sea of brown.
+~
+E
+wagons works shattered~
+   Fallen wagons and siege machines line the battlefield, some burned and
+others merely smashed.
+~
+E
+smoke~
+Smoke rises from parts of the battlefield, joining with the fog.
+~
+E
+up stars sky night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+hilltop forge victory silhouette lights~
+   Victory Forge sits atop the hill, watching over the silent battlefield like
+a sentinel.
+~
+E
+fog~
+A low fog hangs in the air.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12858
+A Smouldering Battlefield~
+   The battlefield stretches out in uneasy silence, a broad expanse of churned
+mud, shattered wagons, and abandoned siege works. Smoke still coils lazily from
+blackened pits and splintered palisades, but no banners fly and no voices
+carry. From here, the hilltop forge looms as a dark silhouette against the
+night sky, its furnaces the only steady lights in the distance. Below it, a low
+fog creeps in from the edges of the field, draping it in a still silence.
+Commands: return
+~
+ci 0 0 12858
+E
+battefield field around distance out expanse~
+   Nightfall has brought silence to the battlefield as each and every soldier
+has retreated to their own side to rest and recharge. A light fog makes it
+difficult to make out details; you cannot tell which side is winning.
+~
+E
+mud ground grass~
+   The ground is mostly mud, divided into a thousand tiny territories by
+wagon wheels and lines of bootprints. Only the rare patch of grass offers a
+glimmer of green in the sea of brown.
+~
+E
+wagons works shattered~
+   Fallen wagons and siege machines line the battlefield, some burned and
+others merely smashed.
+~
+E
+smoke~
+Smoke rises from parts of the battlefield, joining with the fog.
+~
+E
+up stars sky night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+hilltop forge victory silhouette lights~
+   Victory Forge sits atop the hill, watching over the silent battlefield like
+a sentinel.
+~
+E
+fog~
+A low fog hangs in the air.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12859
+A Smouldering Battlefield~
+   The battlefield stretches out in uneasy silence, a broad expanse of churned
+mud, shattered wagons, and abandoned siege works. Smoke still coils lazily from
+blackened pits and splintered palisades, but no banners fly and no voices
+carry. From here, the hilltop forge looms as a dark silhouette against the
+night sky, its furnaces the only steady lights in the distance. Below it, a low
+fog creeps in from the edges of the field, draping it in a still silence.
+Commands: return
+~
+ci 0 0 12859
+E
+battefield field around distance out expanse~
+   Nightfall has brought silence to the battlefield as each and every soldier
+has retreated to their own side to rest and recharge. A light fog makes it
+difficult to make out details; you cannot tell which side is winning.
+~
+E
+mud ground grass~
+   The ground is mostly mud, divided into a thousand tiny territories by
+wagon wheels and lines of bootprints. Only the rare patch of grass offers a
+glimmer of green in the sea of brown.
+~
+E
+wagons works shattered~
+   Fallen wagons and siege machines line the battlefield, some burned and
+others merely smashed.
+~
+E
+smoke~
+Smoke rises from parts of the battlefield, joining with the fog.
+~
+E
+up stars sky night~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+hilltop forge victory silhouette lights~
+   Victory Forge sits atop the hill, watching over the silent battlefield like
+a sentinel.
+~
+E
+fog~
+A low fog hangs in the air.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12890
+Above Echo Forge~
+   No sound echoes out as you step onto a raised tile platform beneath a starry
+night sky. A brick-filled archway stands at one end of the small platform; the
+other side has a twisting metal staircase that leads downward. As you look out,
+you see a massive wall enclosing a circular area below you. Something beneath
+the platform glows bright enough to cast inky shadows, but you can't see it
+from here. The rest of the circle's interior is dark, but the occasional flash
+illuminates shadowy figures working at anvils.
+Commands: return
+~
+cei b 0 12890
+D9
+~
+0 12891
+E
+floor tiles tiled platform~
+   The platform is made from long tiles of dark blue-black metal. With each
+step you take, there's a flicker of light around your foot that skitters off
+into the distance until it's too faint to see.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
+out wall north south east west ne northeast nw northwest se southeast sw southwest~
+You can't see anything beyond the great, dark wall in the distance.
+~
+E
+down glow beneath~
+   A soft white glow encircles the tiled floor beneath the platform, casting
+shadows outward in all directions.
+~
+E
+staircase stairs~
+The spiral staircase is made of cast metal steps and a matching handrail.
+~
+E
+handrail railing~
+A sleek blue-black metal handrail runs down the spiral staircase.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+circle area forge~
+   Echo forge is a large, round space with shadowy blue-black metal floors and
+long pools of shallow water. Beyond that, there is only the great, circular
+wall.
+~
+E
+flashes anvils figures~
+   There's a bright flash of light every time one of the figures below strikes
+an anvil with their hammer.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
+E
+pools water reflecting reflection~
+   Wedge-shaped pools of water radiate out from the center of Echo Forge below,
+reflecting the starry sky in the gentle water.
+~
+E
+archway bricks~
+The archway is filled with clay bricks.
+~
+E
+archways~
+   Archways lie along the edge of the floor below, positioned in each of the
+cardinal directions, though they lead nowhere. There's also an archway up here,
+on the platform, though this one is filled with bricks.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+light~
+   Light dances across the forge each time you take a step and flashes out each
+time a hammer strikes.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
+T 12803
+T 12802
+T 12801
+T 12885
+T 12886
+T 12887
+S
+#12891
+Echo Forge~
+   Beneath the raised platform is a brilliant white bell, glowing like a star
+such that you can't look at it for long. It floats in the air above a small,
+engraved dais. Near the bell, a twisting staircase leads back up to the
+platform. The floor here is made of large, dark tiles, apparently metal, but
+there is no sound as you step. There's no sound here at all, not even from the
+artisans working the anvils around you. Beyond them, in the distance, is a
+great, round wall too high to see over and too dark to make out from here.
+Commands: challenge
+~
+cei b 0 12890
+D8
+~
+0 12890
+D3
+~
+0 12892
+D1
+~
+0 12893
+D2
+~
+0 12894
+D0
+~
+0 12895
+E
+platform up~
+   Above you, a square metal platform rests on nothing but the spiral
+staircase. It almost looks like it's floating there, right above the bell.
+~
+E
+bell unrang light~
+   Above a small dais and below the raised platform hovers a glowing white
+bell, large enough to hang in a steeple and bright enough to light the whole
+town. It glows like a soft, bright white light that pulses as you walk, and
+when you touch it.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+flashes~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+dais engraved engraving label~
+   A metal plinth stands beneath the bell, dark black even when the bell
+flashes at its brightest. A label on the plinth reads, 'The Unrang Bell'.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+stairs staircase~
+   A spiral staircase made of cast metal rises up toward the platform.
+Strangely, nothing supports the platorm except the staircase.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+artisans~
+In each direction, you can see an artisan hard at work.
+~
+E
+anvils~
+   Three massive, round anvils are seated around Echo Forge, one in the east,
+one in the west, and one to the south.
+~
+E
+walls distance~
+   In the distance, a massive wall encircles the forge, though it's so far that
+the light doesn't seem to reach.
+~
+E
+pools water stars starry reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+north~
+You see Somsak organizing items into bins.
+~
+E
+south~
+You see a man bent over the anvil, examining something up close.
+~
+E
+east~
+You see Saoirse working the anvil.
+~
+E
+west~
+You see Ixchel working at the forge.
+~
+E
+out around ne northeast nw northwest se southeast sw southwest circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
+M 0 12891 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+T 12889
+S
+#12892
+Echo Forge~
+   A large, round anvil rests between two pools of water beneath the endless
+starry night. A momentary flash of white light bursts forth each time Ixchel
+strikes the anvil, but it makes no sound. Behind the anvil, a tall archway
+marks the boundary of the metal tile floor. And beyond that, blocking your
+view, is the great circular wall.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei b hv 12890
+D1
+~
+0 12891
+E
+bell unrang light~
+   The bell glows white from the center of Echo Forge, lighting up the anvil
+and the pools, though its light barely reflects from the great wall. Each time
+a hammer strikes the anvil, you see both the hammer and the bell flash
+brilliantly.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+anvil round forge~
+   The anvil, if you can call it that, is round in shape, and large enough for
+five artisans to work side-by-side. At its center, a red-hot forge heats the
+master's works in progress. The air above it ripples up toward the sky, where
+it seems to make the stars dance across the heavens.
+~
+E
+pools water reflecting reflection~
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
+archway west~
+A tall metal archway guards the west edge of Echo Forge.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+walls out north south nw northwest sw southwest~
+   A great wall wraps around Echo Forge, just a short distance from the
+archway. No light reflects from the wall, so you can only begin to make out the
+details when it suddenly moves, ever so slightly, sending a ripple of light
+across its surface, revealing many jagged and serrated edges.
+~
+E
+flashes ne northeast se southeast~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+serragon creature~
+You can't really get a look at it from here.
+~
+E
+scales serrations serrated~
+   You can hardly see them except when light flashes across the wall, revealing
+that it is covered in serrated scales.
+~
+E
+east~
+Kaito is standing near the Unrang Bell.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
+M 0 12892 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+T 5195
+S
+#12893
+Echo Forge~
+   The air over the heavy, round anvil ripples with heat as the blade of an
+unfinished greatsword grows brighter and brighter in the forge at the center.
+Beyond the gleaming metal arch that stands at the rim of the tiled floor, the
+great wall seems to shift, even twitch, sending twinkles of soft, dappled light
+cascading across Echo Forge.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei b hv 12890
+D3
+~
+0 12891
+E
+bell unrang~
+   The bell glows white from the center of Echo Forge, lighting up the anvil
+and the pools, though its light barely reflects from the great wall. Each time
+a hammer strikes the anvil, you see both the hammer and the bell flash
+brilliantly.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
+pools water reflecting reflection~
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
+~
+E
+air ripples heat waves~
+The air over the anvil ripples and waves.
+~
+E
+anvil round~
+   The anvil, if you can call it that, is round in shape, and large enough for
+five artisans to work side-by-side. At its center, a red-hot forge heats the
+master's works in progress. The air above it ripples up toward the sky, where
+it seems to make the stars dance across the heavens.
+~
+E
+forge center~
+   The center of the anvil is a red-hot forge. An unfinished sword is resting
+in the heat.
+~
+E
+archway east~
+A tall metal archway guards the east edge of Echo Forge.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+rim~
+The tiles end at the large, circular rim.
+~
+E
+walls out north south ne northeast se southeast~
+   The massive wall that encircles the forge stirs a little, revealing what
+appears to be the tip of a tail!
+~
+E
+tail tip~
+   The wall appears to have a tail! When it moves, light flickers across it,
+revealing that it is covered in huge, serrated scales.
+~
+E
+light cascade dappled dapples twinkles~
+   You watch the wall move, ever so slightly, sending a cascade of dappled
+light across the entire area.
+~
+E
+scales serrations serrated~
+   You can hardly see them except when light flashes across the wall, revealing
+that it is covered in serrated scales... like a serragon!
+~
+E
+west~
+Kaito is standing by the Unrang Bell.
+~
+E
+flashes nw northwest sw southwest~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here, except for the tail.
+~
+E
+blade sword greatsword~
+An unfinished greatsword is resting in the forge at the center of the anvil.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
+M 0 12893 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+T 5195
+S
+#12894
+Echo Forge~
+   Between two long pools of water stands a round anvil, large enough for five
+expert smiths to work side-by-side, with a red-hot forge at its center. The air
+above it ripples up to the sky, where the stars dance in reverie. Behind it,
+past the end of the tiles and beyond a tall archway, the great wall that
+encircles Echo Forge seems to move.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei b hv 12890
+D0
+~
+0 12891
+E
+bell unrang light~
+   The bell glows white from the center of Echo Forge, lighting up the anvil
+and the pools, though its light barely reflects from the great wall. Each time
+a hammer strikes the anvil, you see both the hammer and the bell flash
+brilliantly.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+pools water reflecting reflection~
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
+~
+E
+anvil round forge~
+   The anvil, if you can call it that, is round in shape, and large enough for
+five artisans to work side-by-side. At its center, a red-hot forge heats the
+master's works in progress. The air above it ripples up toward the sky, where
+it seems to make the stars dance across the heavens.
+~
+E
+archway south~
+A tall metal archway guards the south edge of Echo Forge.
+~
+E
+red-hot redhot~
+The forge in the center of the anvil glows red-hot.
+~
+E
+heat ripples waves~
+The air ripples and waves over the anvil.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+walls out east west se southeast sw southwest~
+   When it moves, the wall flickers with light and reveals its true shape: a
+long, continuous coil that loops around and around Echo Forge. And here,
+alarmingly close, it had a tremendous head!
+~
+E
+head~
+   The impossibly large head is lined with a dozen serrated frills, all leading
+toward its mouth, which stretches from one side of the head to the other. When
+its eye shifts, it lights up for a moment, but you can see no pupil. There is
+only a milky white color.
+~
+E
+frill~
+The creature's serrated frill identifies it as a serragon!
+~
+E
+scales serrations serrated~
+   The wall is covered along its full length with serrated scales, though they
+only become apparent when it moves and they flicker with momentary light.
+~
+E
+serragon creature~
+   You can only just make out the creature's head, covered in serrated frills.
+And then, just a little bit, the creature moves, sending a cascade of light
+down its jagged scales and allowing you to see the serragon in all its glory,
+if only for a moment.
+~
+E
+eye milky pupil~
+   The eye, larger than a full wagon, has a milky white color, but no
+discernible pupil.
+~
+E
+north~
+Kaito is standing by the Unrang Bell.
+~
+E
+flashes ne northeast nw northwest~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
+M 0 12894 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+T 5195
+S
+#12895
+Echo Forge~
+   In this arc of the great circle, tightly packed between two pools of still
+water, wide baskets and tall stacks of bins organize a vast collection of
+metal, wood, and cloth to be used in the creation of legendary arms and armor.
+The supplies cast a fragmented shadow on the great wall from the soft light of
+the bell.
+~
+cei b 0 12890
+D2
+~
+0 12891
+E
+bell unrang light~
+   The bell glows white from the center of Echo Forge, lighting up the piles
+of supplies, though the wall is far enough away the shadows don't seem to reach
+it. Every few moments, the bell flashes brighter.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
+arc circle~
+The tiled floor forms a massive circle. You're standing near the north edge.
+~
+E
+archway north~
+A tall metal archway guards the north edge of Echo Forge.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+supplies baskets stacks bins collection wood cloth~
+All manner of smithing and crafting supplies are available here.
+~
+E
+shadows shadowy fragmented walls tubes out east west ne northeast nw northwest~
+   The supplies cast shadows on the great, circular wall, revealing hints to
+its shape. It isn't a single, flat wall. It looks more like enormous tubes
+stacked upon each other. The shadows fragment at the borders of each tube,
+suggesting a serrated edge.
+~
+E
+pools water reflecting reflection~
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
+~
+E
+south~
+You the Unrang Bell at the center of the forge.
+~
+E
+anvils~
+   You see three large, round anvils in the distance, each being worked by one
+of the smiths. Each time they strike with the hammer, a bright light flashes
+across the forge.
+~
+E
+flashes se southeast sw southwest~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+scales serrations serrated~
+   You can hardly see them except when light flashes across the wall, revealing
+that it is covered in serrated scales.
+~
+E
+serragon creature~
+You can't really get a look at it from here.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
+M 0 12895 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+S
+#12897
+A Cavernous Battlefield~
+   A low rumble rises in the darkness from the great wall around the forge,
+echoing through your entire body before falling into silence for a moment.
+Your feet tap loudly as you walk along the blue-black metal tiles, but oddly,
+the sound doesn't bounce back off of the wall. Instead, it seems to escape into
+the starry night above.
+Commands: return
+~
+ci 0 hv 12897
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great wall, the stars alone light the arena.
+~
+E
+wall walls~
+   A tremendous wall encircles Echo Forge, taller than most buildings and, in
+this light, quite difficult to see. Every few moments, the entire wall releases
+a powerful, unsettling rumble that rolls through your very core and makes your
+hair stand on end.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Long reflecting pools stretch out from the
+center of the area to the edge, but they stop short of the wall.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+battlefield field~
+The entire forge has become a battlefield!
+~
+E
+anvils forges fires red-hot redhot~
+Large, round anvils with hot forges in their centers dot the area.
+~
+E
+platform~
+A raised platform sits above Echo Forge, but you can't access it right now.
+~
+E
+bell unrang dais~
+   Above a small dais and below the raised platform hovers a silvery argentine
+bell, large enough to hang in a steeple, glinting softly with the reflection of
+the stars.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+light~
+Most of the light here is coming from the stars dancing overhead.
+~
+E
+stairs staircase~
+   A delicate metal staircase rises toward the platform, but you can't access
+it right now.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+artisans~
+You didn't see where any of the artisans went, but they're not here.
+~
+E
+Kaito Percy Somsak~
+You don't see him here at the moment.
+~
+E
+Ixchel Saoirse~
+It looks like she left, but you didn't see where she went.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+scales serrations serrated~
+You can't see that from here.
+~
+E
+frill~
+You can't see that from here.
+~
+E
+shadows shadowy~
+It's too dark to see any shadows.
+~
+E
+tail~
+As the wall shifts to the side, you think you see part of it flick like a tail.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+T 12802
+T 5195
+T 12889
+Z1 1
+S
+#12898
+A Cavernous Battlefield~
+   A low rumble rises in the darkness from the great wall around the forge,
+echoing through your entire body before falling into silence for a moment.
+Your feet tap loudly as you walk along the blue-black metal tiles, but oddly,
+the sound doesn't bounce back off of the wall. Instead, it seems to escape into
+the starry night above.
+Commands: return
+~
+ci 0 hv 12898
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great wall, the stars alone light the arena.
+~
+E
+wall walls~
+   A tremendous wall encircles Echo Forge, taller than most buildings and, in
+this light, quite difficult to see. Every few moments, the entire wall releases
+a powerful, unsettling rumble that rolls through your very core and makes your
+hair stand on end.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Long reflecting pools stretch out from the
+center of the area to the edge, but they stop short of the wall.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+battlefield field~
+The entire forge has become a battlefield!
+~
+E
+anvils forges fires red-hot redhot~
+Large, round anvils with hot forges in their centers dot the area.
+~
+E
+platform~
+A raised platform sits above Echo Forge, but you can't access it right now.
+~
+E
+bell unrang dais~
+   Above a small dais and below the raised platform hovers a silvery argentine
+bell, large enough to hang in a steeple, glinting softly with the reflection of
+the stars.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+light~
+Most of the light here is coming from the stars dancing overhead.
+~
+E
+stairs staircase~
+   A delicate metal staircase rises toward the platform, but you can't access
+it right now.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+artisans~
+You didn't see where any of the artisans went, but they're not here.
+~
+E
+Kaito Percy Somsak~
+You don't see him here at the moment.
+~
+E
+Ixchel Saoirse~
+It looks like she left, but you didn't see where she went.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+scales serrations serrated~
+You can't see that from here.
+~
+E
+frill~
+You can't see that from here.
+~
+E
+shadows shadowy~
+It's too dark to see any shadows.
+~
+E
+tail~
+As the wall shifts to the side, you think you see part of it flick like a tail.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+T 12802
+T 5195
+T 12889
+Z1 1
+S
+#12899
+A Cavernous Battlefield~
+   A low rumble rises in the darkness from the great wall around the forge,
+echoing through your entire body before falling into silence for a moment.
+Your feet tap loudly as you walk along the blue-black metal tiles, but oddly,
+the sound doesn't bounce back off of the wall. Instead, it seems to escape into
+the starry night above.
+Commands: return
+~
+ci 0 hv 12899
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great wall, the stars alone light the arena.
+~
+E
+wall walls~
+   A tremendous wall encircles Echo Forge, taller than most buildings and, in
+this light, quite difficult to see. Every few moments, the entire wall releases
+a powerful, unsettling rumble that rolls through your very core and makes your
+hair stand on end.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Long reflecting pools stretch out from the
+center of the area to the edge, but they stop short of the wall.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+battlefield field~
+The entire forge has become a battlefield!
+~
+E
+anvils forges fires red-hot redhot~
+Large, round anvils with hot forges in their centers dot the area.
+~
+E
+platform~
+A raised platform sits above Echo Forge, but you can't access it right now.
+~
+E
+bell unrang dais~
+   Above a small dais and below the raised platform hovers a silvery argentine
+bell, large enough to hang in a steeple, glinting softly with the reflection of
+the stars.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+light~
+Most of the light here is coming from the stars dancing overhead.
+~
+E
+stairs staircase~
+   A delicate metal staircase rises toward the platform, but you can't access
+it right now.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+artisans~
+You didn't see where any of the artisans went, but they're not here.
+~
+E
+Kaito Percy Somsak~
+You don't see him here at the moment.
+~
+E
+Ixchel Saoirse~
+It looks like she left, but you didn't see where she went.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+scales serrations serrated~
+You can't see that from here.
+~
+E
+frill~
+You can't see that from here.
+~
+E
+shadows shadowy~
+It's too dark to see any shadows.
+~
+E
+tail~
+As the wall shifts to the side, you think you see part of it flick like a tail.
+~
+T 12817
+T 12818
+T 12824
+T 12803
+T 12802
+T 5195
+T 12889
+Z1 1
 S
 $

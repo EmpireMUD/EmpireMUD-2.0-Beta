@@ -204,8 +204,8 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
-	double chain_prc = 100.0;
-	int count, iter;
+	double chance, chain_prc = 100.0;
+	int count, iter, max_width;
 	size_t l_size;
 	ability_data *abiter, *next_abil, *supercede;
 	craft_data *craft, *next_craft;
@@ -234,7 +234,8 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	else {
 		strcpy(lbuf, " ");
-		count = (66 - strlen(ABIL_NAME(abil)) - 4) / 2;
+		max_width = MIN(66, GET_SCREEN_WIDTH(ch));
+		count = (max_width - strlen(ABIL_NAME(abil)) - 4) / 2;
 		for (iter = 0; iter < count; ++iter) {
 			strcat(lbuf, "-");
 		}
@@ -252,7 +253,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	build_page_display_str(ch, lbuf);
 	
 	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
-		build_page_display(ch, "Mastery ability: %s%s\t0%s", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
+		build_page_display(ch, "Mastery ability: %s%s\t0%s", ability_color(ch, find_ability_by_vnum(ABIL_MASTERY_ABIL(abil))), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
 	}
 	
 	if (ABIL_ASSIGNED_SKILL(abil) && !parent) {
@@ -422,7 +423,18 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL) {
 		has_param_details = TRUE;
-		build_page_display(ch, "Difficulty: %s", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		
+		if (has_ability(ch, ABIL_VNUM(abil))) {
+			chance = get_ability_skill_level(ch, ABIL_VNUM(abil));
+			chance = MIN(chance, MAX_SKILL_CAP);
+			chance *= skill_check_difficulty_modifier[ABIL_DIFFICULTY(abil)];
+			chance = MIN(100.0, MAX(0.0, chance));
+			
+			build_page_display(ch, "Difficulty: %d%% chance - %s", (int)chance, skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		}
+		else {
+			build_page_display(ch, "Difficulty: %s", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		}
 	}
 	
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil) > 1) {
@@ -479,8 +491,21 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		has_param_details = TRUE;
 	}
 	
+	// requires abilities
+	*lbuf = '\0';
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == ADL_REQUIRES_ABIL) {
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", (*lbuf ? ", " : ""), (has_ability(ch, adl->vnum) ? "" : "\tr"), get_ability_name_by_vnum(adl->vnum));
+		}
+	}
+	if (*lbuf) {
+		has_param_details = TRUE;
+		build_page_display(ch, "Requires ability: %s", lbuf);
+	}
+	
 	// supercede?
 	if ((supercede = check_superceded_by(ch, abil)) != abil) {
+		has_param_details = TRUE;
 		build_page_display(ch, "Superceded by: %s", ABIL_NAME(supercede));
 	}
 	
@@ -785,7 +810,7 @@ ability_data *check_superceded_by(char_data *ch, ability_data *abil) {
 	struct ability_data_list *adl;
 	
 	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type == ADL_SUPERCEDED_BY && has_ability(ch, adl->vnum) && (other = ability_proto(adl->vnum)) && other != abil) {
+		if (adl->type == ADL_SUPERCEDED_BY && has_ability(ch, adl->vnum) && (other = ability_proto(adl->vnum)) && other != abil && has_required_abilities(ch, other)) {
 			// recurse!
 			return check_superceded_by(ch, other);
 		}
@@ -882,6 +907,28 @@ bool has_ability_hook(ability_data *abil, bitvector_t hook_type, int hook_value)
 
 
 /**
+* Checks REQUIRES-ABIL data to make sure the character has other required
+* abilities, if present.
+*
+* @param char_data *ch The person trying to use the ability.
+* @param ability_data *abil Which ability they want to use.
+* @return bool TRUE if they have all required abilities (or it requires none), or FALSE if they're missing one.
+*/
+bool has_required_abilities(char_data *ch, ability_data *abil) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == ADL_REQUIRES_ABIL && !has_ability(ch, adl->vnum)) {
+			return FALSE;
+		}
+	}
+	
+	// none missing?
+	return TRUE;
+}
+
+
+/**
 * Determines if two people could be considered allies for the purposes of
 * ability targeting.
 *
@@ -945,10 +992,17 @@ bool is_ability_enemy(char_data *ch, char_data *vict) {
 	if (GET_COMPANION(ch) == vict) {
 		return FALSE;	// nope
 	}
+	if (GET_LEADER(vict) == ch && IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
+		return FALSE;	// charmed follower
+	}
 	if (in_same_group(ch, vict)) {
 		return FALSE;	// nope
 	}
 	if (!can_fight(ch, vict)) {
+		return FALSE;
+	}
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) {
+		// same empire, e.g. guard, and not fighting each other
 		return FALSE;
 	}
 	
@@ -1174,9 +1228,10 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 /**
 * Chooses a random room up to the ability's RANGE data. If there is no range
 * data, it returns the current room. Does not return the current room if a
-* valid range is available.
+* valid range is available. This fails from a !LOCATION room template because
+* conceptually the player is not in this location.
 *
-* @param char_data *ch The pperson lookin for a random room.
+* @param char_data *ch The person lookin for a random room.
 * @param ability_data *abil Which ability they are using.
 * @param bool require_guest_permission If TRUE, checks permission
 * @return room_data* The random room, NULL if none found, or current room if range 0.
@@ -1188,6 +1243,9 @@ room_data *get_random_room_for_ability(char_data *ch, ability_data *abil, bool r
 	
 	range = get_ability_data_value(abil, ADL_RANGE, TRUE);
 	
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+		return NULL;
+	}
 	if (!range) {
 		return IN_ROOM(ch);	// no range
 	}
@@ -1222,7 +1280,8 @@ room_data *get_random_room_for_ability(char_data *ch, ability_data *abil, bool r
 * @return double The modifier based on the trait (0 to 1.0).
 */
 double get_trait_modifier(char_data *ch, int apply) {
-	double value = 1.0;
+	double cap, value = 1.0;
+	int max;
 	
 	// APPLY_x: char's percent of max value for a trait
 	switch (apply) {
@@ -1251,15 +1310,20 @@ double get_trait_modifier(char_data *ch, int apply) {
 			break;
 		}
 		case APPLY_BLOCK: {
-			value = 1.0;	// TODO: move block cap calculation to a function
+			cap = get_block_cap_for(ch, GET_COMPUTED_LEVEL(ch), /* not used */ 0, NOBITS);
+			value = get_block_rating(ch, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_TO_HIT: {
-			value = 1.0;	// TODO: move to-hit cap calculation to a function
+			max = att_max(ch);
+			cap = get_hit_cap_for(ch, GET_COMPUTED_LEVEL(ch), MIN(max, GET_COMPUTED_LEVEL(ch) / 20), NOBITS);
+			value = get_to_hit(ch, NULL, FALSE, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_DODGE: {
-			value = 1.0;	// TODO: move dodge cap calculation to a function
+			max = att_max(ch);
+			cap = get_dodge_cap_for(ch, GET_COMPUTED_LEVEL(ch), MIN(max, GET_COMPUTED_LEVEL(ch) / 20), NOBITS);
+			value = get_dodge_modifier(ch, NULL, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_RESIST_PHYSICAL: {
@@ -2023,7 +2087,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 	}
 	
 	// apply matching role if over level 100
-	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS) && get_approximate_level(ch) >= MAX_SKILL_CAP) {
+	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS) && GET_SKILL_LEVEL(ch) >= MAX_SKILL_CAP) {
 		points *= data->matching_role ? 1.20 : 0.70;
 	}
 	
@@ -2182,6 +2246,16 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	
+	// objects
+	if (ovict && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_STOLEN) && IS_STOLEN(ovict)) {
+		if (send_msgs) {
+			msg_to_char(ch, "You can't use that on a stolen item!\r\n");
+		}
+		return FALSE;
+	}
+	
+	// rooms
 	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), (ROOM_ATARS & ~ATAR_ROOM_HERE))) {
 		if (send_msgs) {
 			msg_to_char(ch, "You have to use it on the room you're in.\r\n");
@@ -2194,6 +2268,8 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	
+	// other limits
 	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ, send_msgs, fatal_error)) {
 		// sends own message when false
 		return FALSE;
@@ -2246,12 +2322,6 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
 	
 	request_obj_save_in_world(inter_item);
-	
-	if (data) {
-		// for pricing
-		data->total_amount += quantity;
-	}
-	
 	return TRUE;
 }
 
@@ -2699,8 +2769,9 @@ DO_ABIL(abil_action_devastate_area) {
 	
 	// SUCCESS: distribute resources
 	if (to_room) {
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && (has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST) || has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_PICK))) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_PICK, NULL, MEMBERS_ONLY, devastate_crop);
 			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			uncrop_tile(to_room);
 			data->success = TRUE;
@@ -3354,7 +3425,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			}
 			case ABIL_LIMIT_IN_CITY: {
 				bool wait = FALSE;
-				if (!ROOM_OWNER(any_room) && !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
+				if (!ROOM_OWNER(any_room) || !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
 					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
 					_set_fatal_error(TRUE);
 					return FALSE;
@@ -4091,6 +4162,16 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 		}
 	}
 	
+	// check amount needed in container
+	if (data->conjure_liquid_max == 0 || data->conjure_liquid_max > (GET_DRINK_CONTAINER_CAPACITY(ovict) - GET_DRINK_CONTAINER_CONTENTS(ovict))) {
+		data->conjure_liquid_max = (GET_DRINK_CONTAINER_CAPACITY(ovict) - GET_DRINK_CONTAINER_CONTENTS(ovict));
+		if (data->conjure_liquid_max == 0) {
+			act("$p seems to be full.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+	
 	// check costs and set maximum based on available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
@@ -4101,6 +4182,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 			data->conjure_liquid_max = MIN(data->conjure_liquid_max, avail);
 		}
 		
+		// TODO: this should not be necessary because it's now checked later by data->total_amount
 		if (avail < 1) {
 			msg_to_char(ch, "You are too low on %s to do that.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
 			CANCEL_ABILITY(data);
@@ -4109,6 +4191,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	}
 	
 	// otherwise it seems ok
+	data->total_amount += data->conjure_liquid_max;
 }
 
 
@@ -4175,7 +4258,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 	}
 	
 	if (any_inv && any_size > 0 && IS_CARRYING_N(ch) + any_size > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You can't use that ability because your inventory is full.\r\n");
+		msg_to_char(ch, "You can't use that ability because your inventory is full (%d/%d items).\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
 		CANCEL_ABILITY(data);
 		return;
 	}
@@ -4472,15 +4555,15 @@ PREP_ABIL(prep_restore_ability) {
 		amount += subdata->scale_points * points_per_scale_over_100 * ((level - 100) / 100.0);
 	}
 	
-	// 4.1. check costs and reduce by available mana/etc
+	// 4.1. reduce to how much they actually need
+	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
+	amount = MIN(amount, diff);
+	
+	// 4.2. check costs and reduce by available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
 		amount = MIN(amount, avail);
 	}
-	
-	// 4.2. reduce to how much they actually need
-	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
-	amount = MIN(amount, diff);
 	
 	// 5. store amount of damage now -- before bonus-healing
 	data->total_amount += amount;
@@ -5059,7 +5142,7 @@ DO_ABIL(do_building_damage_ability) {
 		besiege_room(ch, room_targ, dam, NULL);
 		
 		if (SECT(room_targ) != secttype || bldtype != GET_BUILDING(room_targ)) {
-			msg_to_char(ch, "It is destroyed!\r\n");
+			msg_to_char(ch, "The building is destroyed!\r\n");
 			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
 		data->success = TRUE;
@@ -5347,6 +5430,12 @@ DO_ABIL(do_ready_weapon_ability) {
 		return;
 	}
 	
+	// determine if we're replacing an item from any Ready Weapon ability
+	if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_READIED_WEAPON_ABIL)) {
+		// replacement: use same level as the cap
+		level = MIN(level, GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)));
+	}
+	
 	// attempt to remove existing item
 	if (GET_EQ(ch, pos)) {
 		perform_remove(ch, pos);
@@ -5359,6 +5448,7 @@ DO_ABIL(do_ready_weapon_ability) {
 	
 	// load the object
 	obj = read_object(obj_vnum, TRUE);
+	SET_BIT(GET_OBJ_EXTRA(obj), OBJ_READIED_WEAPON_ABIL);
 	
 	// mastery = superior
 	if (data->has_mastery) {
@@ -5570,6 +5660,7 @@ DO_ABIL(do_summon_random_ability) {
 DO_ABIL(do_teleport_ability) {
 	room_data *was_in = IN_ROOM(ch), *to_room;
 	bool infiltrate;
+	struct follow_type *fol, *next_fol;
 	
 	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
 	
@@ -5580,7 +5671,7 @@ DO_ABIL(do_teleport_ability) {
 			// failure (will message as a fail on the ability)
 			// fall through to log infiltrate attempt
 		}
-		else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
+		else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability", was_in)) {
 			// no message (will message as a fail on the ability)
 			return;
 		}
@@ -5594,17 +5685,18 @@ DO_ABIL(do_teleport_ability) {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
 			
-			if (!enter_triggers(ch, NO_DIR, "ability", TRUE)) {
+			if (!enter_triggers(ch, NO_DIR, "ability", TRUE, was_in)) {
 				char_from_room(ch);
 				char_to_room(ch, was_in);
 				return;
 			}
 			
+			qt_visit_room(ch, to_room);
 			look_at_room(ch);
 			
 			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
 			
-			if (!greet_triggers(ch, NO_DIR, "ability", TRUE)) {
+			if (!greet_triggers(ch, NO_DIR, "ability", TRUE, was_in)) {
 				char_from_room(ch);
 				char_to_room(ch, was_in);
 				look_at_room(ch);
@@ -5613,19 +5705,26 @@ DO_ABIL(do_teleport_ability) {
 			
 			GET_LAST_DIR(ch) = NO_DIR;
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
-			qt_visit_room(ch, to_room);
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
 			
-			// teleport companion, too
-			if (GET_COMPANION(ch) && !FIGHTING(GET_COMPANION(ch)) && IN_ROOM(ch) != was_in && IN_ROOM(GET_COMPANION(ch)) == was_in) {
-				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
-				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
-				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
-				
-				if (!enter_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE) || !greet_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE)) {
-					char_from_room(GET_COMPANION(ch));
-					char_to_room(GET_COMPANION(ch), was_in);
+			// teleport followers, too
+			LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+				if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+					if (pre_greet_mtrigger(fol->follower, to_room, NO_DIR, "ability", was_in)) {
+						act("$n vanishes!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+						char_to_room(fol->follower, IN_ROOM(ch));
+						
+						if (!enter_triggers(fol->follower, NO_DIR, "ability", TRUE, was_in) || !greet_triggers(fol->follower, NO_DIR, "ability", TRUE, was_in)) {
+							char_from_room(fol->follower);
+							char_to_room(fol->follower, was_in);
+						}
+						else {
+							look_at_room(fol->follower);
+						}
+						
+						send_ability_special_messages(fol->follower, vict, ovict, abil, data, NULL, 0);
+					}
 				}
 			}
 		}
@@ -7102,7 +7201,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH], *argptr = arg;
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct ability_exec *data;
 	struct empire_city_data *city;
 	ability_data *super;
@@ -7113,6 +7212,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	bitvector_t multi_targ = NOBITS;
 	bool has = FALSE;
 	int find_dir, iter, level, number;
+	struct ability_data_list *adl;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -7130,6 +7230,20 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// check for a supercede ability and pass control to that instead:
 	if ((super = check_superceded_by(ch, abil)) != abil) {
 		perform_ability_command(ch, super, argument);
+		return;
+	}
+	
+	// check if it requires another ability?
+	if (!has_required_abilities(ch, abil)) {
+		*buf = '\0';
+		
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_REQUIRES_ABIL && !has_ability(ch, adl->vnum)) {
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), get_ability_name_by_vnum(adl->vnum));
+			}
+		}
+		
+		msg_to_char(ch, "You are missing %s: %s.\r\n", (strchr(buf, ',') ? "required abilities" : "a required ability"), buf);
 		return;
 	}
 	
@@ -7261,9 +7375,15 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HOME)) {
-			if (is_abbrev(argptr, "home") && (find_room = find_home(ch)) && can_use_room(ch, find_room, GUESTS_ALLOWED)) {
-				room_targ = find_room;
-				has = TRUE;
+			if (is_abbrev(argptr, "home")) {
+				if ((find_room = find_home(ch)) && can_use_room(ch, find_room, GUESTS_ALLOWED)) {
+					room_targ = find_room;
+					has = TRUE;
+				}
+				else {
+					msg_to_char(ch, "You don't have a home.\r\n");
+					return;
+				}
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT)) {
@@ -7378,6 +7498,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE, NULL)) {
 		// sent own message
+		command_lag(ch, ABIL_WAIT_TYPE(abil));
 		return;
 	}
 	
@@ -7725,6 +7846,12 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 			data->should_charge_cost = FALSE;
 			return;
 		}
+		else if (ABIL_COST_PER_AMOUNT(abil) > 0.0 && data->total_amount == 0) {
+			msg_to_char(ch, "You don't have enough %s for that ability to have any effect.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
+			return;
+		}
 	}
 	if (IS_SET(run_mode, RUN_ABIL_NORMAL)) {
 		// resource cost check -- normal ONLY
@@ -7802,7 +7929,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
 			// ensure immunities don't block this type
-			if (vict && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+			if (vict && do_ability_data[iter].check_immune && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
 				// if this results in no-success, player will see a fail message
 				// if another type succeeds, they will see success instead
 				continue;
@@ -7818,7 +7945,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	post_ability_procs(ch, abil, vict, ovict, vvict, room_targ, data);
 	
 	// exp gain unless we hit something that prevented costs
-	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict))) {
+	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict, abil))) {
 		// determine exp gain amount
 		if (ABIL_COOLDOWN_SECS(abil) >= 300) {
 			// long cooldown
@@ -8826,6 +8953,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	skill_data *skill, *next_skill;
+	trig_data *trig, *next_trig;
 	obj_data *obj, *next_obj;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
@@ -8848,6 +8976,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any |= has_ability_hook(abiter, AHOOK_ABILITY, vnum);
 		any |= find_ability_data_entry_for(abiter, ADL_PARENT, vnum) ? TRUE : FALSE;
 		any |= find_ability_data_entry_for(abiter, ADL_SUPERCEDED_BY, vnum) ? TRUE : FALSE;
+		any |= find_ability_data_entry_for(abiter, ADL_REQUIRES_ABIL, vnum) ? TRUE : FALSE;
 		any |= find_interaction_restriction_in_list(ABIL_INTERACTIONS(abiter), INTERACT_RESTRICT_ABILITY, vnum);
 		
 		if (any) {
@@ -9009,6 +9138,14 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_ABILITY, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -9340,6 +9477,9 @@ void free_ability(ability_data *abil) {
 	}
 	if (ABIL_COMMAND(abil) && (!proto || ABIL_COMMAND(abil) != ABIL_COMMAND(proto))) {
 		free(ABIL_COMMAND(abil));
+	}
+	if (ABIL_NOTES(abil) && (!proto || ABIL_NOTES(abil) != ABIL_NOTES(proto))) {
+		free(ABIL_NOTES(abil));
 	}
 	if (ABIL_RESOURCE_COST(abil) && (!proto || ABIL_RESOURCE_COST(abil) != ABIL_RESOURCE_COST(proto))) {
 		free_resource_list(ABIL_RESOURCE_COST(abil));
@@ -9742,6 +9882,10 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				}
 				break;
 			}
+			case '_': {	// notes
+				ABIL_NOTES(abil) = fread_string(fl, error);
+				break;
+			}
 			
 			// end
 			case 'S': {
@@ -9840,7 +9984,7 @@ void write_ability_index(FILE *fl) {
 * @param ability_data *abil The thing to save.
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
-	char temp[256], temp2[256], temp3[256], temp4[256];
+	char temp[MAX_STRING_LENGTH], temp2[256], temp3[256], temp4[256];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;
 	struct ability_type *at;
@@ -9930,6 +10074,13 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	// former 'X' type is no longer used; replaced by X+
 	
+	// '_'
+	if (ABIL_NOTES(abil) && *ABIL_NOTES(abil)) {
+		strcpy(temp, ABIL_NOTES(abil));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
+	
 	// end
 	fprintf(fl, "S\n");
 }
@@ -9989,6 +10140,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	skill_data *skill, *next_skill;
+	trig_data *trig, *next_trig;
 	obj_data *obj, *next_obj;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
@@ -10016,6 +10168,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		found |= delete_from_ability_hooks(abiter, AHOOK_ABILITY, vnum);
 		found |= delete_from_ability_data_list(abiter, ADL_PARENT, vnum);
 		found |= delete_from_ability_data_list(abiter, ADL_SUPERCEDED_BY, vnum);
+		found |= delete_from_ability_data_list(abiter, ADL_REQUIRES_ABIL, vnum);
 		found |= delete_from_interaction_restrictions(&ABIL_INTERACTIONS(abiter), INTERACT_RESTRICT_ABILITY, vnum);
 		
 		if (found) {
@@ -10188,6 +10341,16 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_ABILITY, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to ability [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		found = delete_from_interaction_restrictions(&VEH_INTERACTIONS(veh), INTERACT_RESTRICT_ABILITY, vnum);
@@ -10225,6 +10388,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			found |= delete_from_ability_hooks(GET_OLC_ABILITY(desc), AHOOK_ABILITY, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_PARENT, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUPERCEDED_BY, vnum);
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_REQUIRES_ABIL, vnum);
 			found |= delete_from_interaction_restrictions(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), INTERACT_RESTRICT_ABILITY, vnum);
 			
 			if (found) {
@@ -10337,6 +10501,12 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A required ability has been deleted from the social you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "Ability [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -10616,7 +10786,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, ABIL_NAME(abil)) && !multi_isname(find_keywords, NULLSAFE(ABIL_COMMAND(abil))) && !search_custom_messages(find_keywords, ABIL_CUSTOM_MSGS(abil))) {
+		if (*find_keywords && !multi_isname(find_keywords, ABIL_NAME(abil)) && !multi_isname(find_keywords, NULLSAFE(ABIL_COMMAND(abil))) && (!ABIL_NOTES(abil) || !multi_isname(find_keywords, ABIL_NOTES(abil))) && !search_custom_messages(find_keywords, ABIL_CUSTOM_MSGS(abil))) {
 			continue;
 		}
 		
@@ -10683,6 +10853,9 @@ void save_olc_ability(descriptor_data *desc) {
 	if (ABIL_COMMAND(proto)) {
 		free(ABIL_COMMAND(proto));
 	}
+	if (ABIL_NOTES(proto)) {
+		free(ABIL_NOTES(proto));
+	}
 	while ((adl = ABIL_DATA(proto))) {
 		ABIL_DATA(proto) = adl->next;
 		free(adl);
@@ -10702,6 +10875,10 @@ void save_olc_ability(descriptor_data *desc) {
 	if (ABIL_COMMAND(abil) && !*ABIL_COMMAND(abil)) {
 		free(ABIL_COMMAND(abil));	// don't allow empty
 		ABIL_COMMAND(abil) = NULL;
+	}
+	if (ABIL_NOTES(abil) && !*ABIL_NOTES(abil)) {
+		free(ABIL_NOTES(abil));
+		ABIL_NOTES(abil) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -10754,12 +10931,14 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_TYPE_LIST(new) = copy_ability_type_list(ABIL_TYPE_LIST(input));
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
+		ABIL_NOTES(new) = ABIL_NOTES(input) ? str_dup(ABIL_NOTES(input)) : NULL;
 		ABIL_RESOURCE_COST(new) = copy_resource_list(ABIL_RESOURCE_COST(input));
 		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
 		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
 		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
 		ABIL_INTERACTIONS(new) = copy_interaction_list(ABIL_INTERACTIONS(input));
 		ABIL_HOOKS(new) = copy_ability_hooks(ABIL_HOOKS(input));
+		ABIL_NOTES(new) = ABIL_NOTES(input) ? str_dup(ABIL_NOTES(input)) : NULL;
 		
 		// unassign this data:
 		ABIL_ASSIGNED_SKILL(new) = NULL;
@@ -10871,6 +11050,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 			break;
 		}
 		case ADL_SUPERCEDED_BY: {
+			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			break;
+		}
+		case ADL_REQUIRES_ABIL: {
 			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
@@ -11225,6 +11408,10 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 		}
 	}
 	
+	if (ABIL_NOTES(abil) && *ABIL_NOTES(abil)) {
+		build_page_display(ch, "Notes:\r\n%s", ABIL_NOTES(abil));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -11421,6 +11608,8 @@ void olc_show_ability(char_data *ch) {
 		build_page_display(ch, " \ty%d\t0. %s", ++count, ability_data_display(adl));
 	}
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(ABIL_NOTES(abil)), NULLSAFE(ABIL_NOTES(abil)));
+	
 	send_page_display(ch);
 }
 
@@ -11484,6 +11673,20 @@ OLC_MODULE(abiledit_ready_weapon) {
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
 		safe_snprintf(arg, sizeof(arg), "%s ready-weapon %s", arg1, arg2);
+	}
+	else {
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_requiresabil) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		safe_snprintf(arg, sizeof(arg), "%s requires-abil %s", arg1, arg2);
 	}
 	else {
 		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
@@ -11865,6 +12068,9 @@ OLC_MODULE(abiledit_data) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PAINT_BUILDING)) {
 		allowed_types |= ADL_PAINT_COLOR;
 	}
+	if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil)) {
+	 	allowed_types |= ADL_REQUIRES_ABIL;
+	 }
 	
 	// arg1 arg2
 	half_chop(argument, arg1, arg2);
@@ -12080,7 +12286,8 @@ OLC_MODULE(abiledit_data) {
 					val_id = ABIL_VNUM(find_abil);
 					break;
 				}
-				case ADL_SUPERCEDED_BY: {
+				case ADL_SUPERCEDED_BY:
+				case ADL_REQUIRES_ABIL: {
 					if (!(find_abil = find_ability(val_arg))) {
 						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
 						return;
@@ -12104,9 +12311,66 @@ OLC_MODULE(abiledit_data) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "move")) {
+		struct ability_data_list *to_move, *prev, *next;
+		bool up;
+		
+		// usage: data move <number> <up | down>
+		half_chop(arg2, val_arg, type_arg);
+		up = is_abbrev(type_arg, "up");
+		
+		if (!*val_arg || !*type_arg) {
+			msg_to_char(ch, "Usage: data move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*val_arg) || (num = atoi(val_arg)) < 1) {
+			msg_to_char(ch, "Invalid data entry number.\r\n");
+		}
+		else if (!is_abbrev(type_arg, "up") && !is_abbrev(type_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (adl = ABIL_DATA(abil); adl && !to_move; adl = adl->next) {
+				if (--num == 0) {
+					to_move = adl;
+				}
+				else {
+					// store for next iteration
+					prev = adl;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid data entry number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					LL_DELETE(ABIL_DATA(abil), to_move);
+					LL_PREPEND_ELEM(ABIL_DATA(abil), prev, to_move);
+				}
+				else {
+					next = to_move->next;
+					LL_DELETE(ABIL_DATA(abil), to_move);
+					LL_APPEND_ELEM(ABIL_DATA(abil), next, to_move);
+				}
+				
+				// message: re-atoi(val_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move data entry %d %s.\r\n", atoi(val_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: data add <type> <name | vnum>\r\n");
 		msg_to_char(ch, "Usage: data remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: data move <number> <up | down>\r\n");
 		
 		found = FALSE;
 		msg_to_char(ch, "Allowed types:");
@@ -12429,6 +12693,19 @@ OLC_MODULE(abiledit_movetype) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_notes) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", ABIL_NAME(abil));
+		start_string_editor(ch->desc, buf, &ABIL_NOTES(abil), MAX_NOTES, TRUE);
+	}
 }
 
 

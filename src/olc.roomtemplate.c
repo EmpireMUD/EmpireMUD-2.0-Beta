@@ -66,7 +66,7 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title not capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(GET_RMT_TITLE(rmt)[strlen(GET_RMT_TITLE(rmt)) - 1])) {
+	if (ends_in_punct(GET_RMT_TITLE(rmt))) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title is punctuated");
 		problem = TRUE;
 	}
@@ -275,6 +275,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	room_data *room, *next_room;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
+	trig_data *trig, *next_trig;
 	descriptor_data *desc;
 	room_template *rmt;
 	char name[256];
@@ -348,6 +349,16 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_ROOM_TEMPLATE, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to room template [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// update world
 	count = 0;
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
@@ -396,6 +407,12 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A room template required by the social you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_ROOM_TEMPLATE, vnum);
+			if (found) {
+				msg_to_desc(desc, "Room template [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 	}
@@ -495,7 +512,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 			}
 		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, GET_RMT_TITLE(rmt)) && !multi_isname(find_keywords, GET_RMT_DESC(rmt)) && !search_extra_descs(find_keywords, GET_RMT_EX_DESCS(rmt))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_RMT_TITLE(rmt)) && !multi_isname(find_keywords, GET_RMT_DESC(rmt)) && (!GET_RMT_NOTES(rmt) || !multi_isname(find_keywords, GET_RMT_NOTES(rmt))) && !search_extra_descs(find_keywords, GET_RMT_EX_DESCS(rmt))) {
 			continue;
 		}
 		
@@ -527,6 +544,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
+	trig_data *trig, *next_trig;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
 	int found;
@@ -604,6 +622,14 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 	}
 	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_ROOM_TEMPLATE, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		}
+	}
+	
 	if (found > 0) {
 		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
@@ -660,6 +686,9 @@ void save_olc_room_template(descriptor_data *desc) {
 	if (GET_RMT_DESC(proto)) {
 		free(GET_RMT_DESC(proto));
 	}
+	if (GET_RMT_NOTES(proto)) {
+		free(GET_RMT_NOTES(proto));
+	}
 	while ((spawn = GET_RMT_SPAWNS(proto))) {
 		GET_RMT_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -688,6 +717,10 @@ void save_olc_room_template(descriptor_data *desc) {
 			free(GET_RMT_DESC(rmt));
 		}
 		GET_RMT_DESC(rmt) = str_dup("");
+	}
+	if (GET_RMT_NOTES(rmt) && !*GET_RMT_NOTES(rmt)) {
+		free(GET_RMT_NOTES(rmt));
+		GET_RMT_NOTES(rmt) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -728,6 +761,7 @@ room_template *setup_olc_room_template(room_template *input) {
 		// copy things that are pointers
 		GET_RMT_TITLE(new) = GET_RMT_TITLE(input) ? str_dup(GET_RMT_TITLE(input)) : NULL;
 		GET_RMT_DESC(new) = GET_RMT_DESC(input) ? str_dup(GET_RMT_DESC(input)) : NULL;
+		GET_RMT_NOTES(new) = GET_RMT_NOTES(input) ? str_dup(GET_RMT_NOTES(input)) : NULL;
 		
 		// copy extra descs
 		GET_RMT_EX_DESCS(new) = copy_extra_descs(GET_RMT_EX_DESCS(input));
@@ -976,6 +1010,8 @@ void olc_show_room_template(char_data *ch) {
 		show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
 	}
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_RMT_NOTES(rmt)), NULLSAFE(GET_RMT_NOTES(rmt)));
+	
 	send_page_display(ch);
 }
 
@@ -1209,6 +1245,19 @@ OLC_MODULE(rmedit_matchexits) {
 	
 	if (!found) {
 		msg_to_char(ch, "No exits to match.\r\n");
+	}
+}
+
+
+OLC_MODULE(rmedit_notes) {
+	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_RMT_TITLE(rmt));
+		start_string_editor(ch->desc, buf, &GET_RMT_NOTES(rmt), MAX_NOTES, TRUE);
 	}
 }
 

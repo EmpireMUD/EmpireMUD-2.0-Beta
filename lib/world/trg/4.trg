@@ -1,6 +1,8 @@
 #450
 Mirror Image no-heal~
-0 pt 100
+0 pt 100 2
+L o 110
+L o 114
 ~
 * Prevents 'Heal Friend' and 'Rejuvenate'
 if (%ability% != 110 && %ability% != 114)

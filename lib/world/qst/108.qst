@@ -599,7 +599,7 @@ S
 #10830
 Museum: Collect More Materials~
 The curator wants you to collect some more advanced resources.
-Get 2 small leather:
+Get 4 small leather:
  1. Kill small animals like squirrels, meerkats, or rabbits.
  2. Skin the corpses using a knife.
  3. Tan the small skins.
@@ -635,7 +635,7 @@ R
 W
 6 10825 0 1 a
 W
-1 6521 0 2 a
+1 6521 0 4 a
 W
 1 6090 0 2 a
 W
@@ -650,7 +650,7 @@ materials using the supplies you collected. This will require the
 Basic Crafts ability. You can type 'skill trade' to see it.
 Make 2 leather ropes:
  1. If you haven't already, type 'skill buy basic crafts'.
- 2. You should still have 2 small leather.
+ 2. You should still have 4 small leather.
  3. Type 'craft 2 leather rope'.
 Make a pile of bricks:
  1. You need 2 clay and a fire. You can make a fire by lighting some wood.
@@ -1020,9 +1020,11 @@ most locations on the map. Follow these steps:
 ~
    You have satisfied the Spirit of the Wild! Digging and gathering are good
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
-Navigation' to improve your map.
+Navigation' to improve your map. The benevolent spirit refuses to take the rock
+and flint; keep them to use yourself or try the 'junk' command to get rid of
+them forever.
 ~
-11 d 0 25 -1
+12 0 0 25 -1
 A
 1 10852
 P
@@ -1065,9 +1067,10 @@ it to learn how to use it. Here are the steps for this quest:
     'enter soulstream' to get back inside.
  7. Type 'finish Battle' at the Spirit of the Hunt.
 ~
-You have satisfied the Spirit of the Hunt!
+   You have satisfied the Spirit of the Hunt! The spirit has no use for the
+skin, and allows you to keep it for your own crafts.
 ~
-11 d 0 25 -1
+12 0 0 25 -1
 A
 1 10853
 P
@@ -1135,7 +1138,7 @@ You can't really tell whether or not you were successful at sneaking. But don't
 worry, you'll get better at it as you level up.
  1. Purchase the ability with 'skill buy sneak'.
  2. Make sure you're in the Soulstream.
- 3. Sneak into the hidden part of the Soulstream with 'sneak north'.
+ 3. Sneak into the hidden part of the Soulstream with the 'sneak' command.
  4. If you were successful, this quest's tracker will show complete.
  5. Type 'quest track Stealth' to check.
  6. Sneak between the two rooms of the Soulstream until complete.
@@ -1265,7 +1268,21 @@ spirit tokens you have right now.
 special companion! Use this spirit bell to add the 'companion spirit' to your
 minipet collection. Then you can type 'minipet companion spirit' to summon it.
 ~
-10 d 0 25 -1
+13 cd 0 25 -1
+A
+5 10851
+A
+5 10852
+A
+5 10853
+A
+5 10854
+A
+5 10855
+A
+5 10857
+A
+5 10858
 R
 2 10859 1
 W
@@ -1335,6 +1352,52 @@ W
 Z
 1 10825
 S
+#10862
+What Is This?~
+   The young man, still a little addled from his trip through the Soulstream,
+is turning an object over and over in his hands, perplexed. He's so focused on
+it that he hardly notices you at first. But when he does, he smiles.
+   'I see you're as curious about it as I am,' he says. 'Here, have a look for
+yourself. Maybe you can figure out what it is. I've never seen one like it.'
+   He hands you the strange-looking item. Start by looking at it -- that's a
+great way to find out what things are.
+   Once you figure out what the item is, be sure to report back to the new
+arrival outside the Soulstream on the Newbie Island.
+   Type 'look object' or 'examine object' to get started.
+~
+   'That's all it was?' the young man says with more than a little surprise in
+his voice. 'I really must learn to examine things more carefully.'
+   You leave him with his thoughts. Glancing back, you see he's picked up
+something else off the ground and is examining it intently. Perhaps he, like
+you, has finally learned that he can just look at items and identify them to
+see what they do.
+~
+5 h 1 15 -1
+A
+1 10862
+P
+0 10851 0 1 -
+P
+0 10852 0 1 -
+P
+0 10853 0 1 -
+P
+0 10854 0 1 -
+P
+0 10855 0 1 -
+P
+0 10857 0 1 -
+P
+0 10858 0 1 -
+R
+0 0 2
+T 10853
+W+
+11 0 0 1 a
+Determine what the item is~
+Z
+1 10862
+S
 #10863
 High Sorcery: Study Sorcery~
 This quest has no description.
@@ -1392,18 +1455,20 @@ Leaving Newbie Island~
    The newbie island has been your home, and it may be hard to imagine leaving
 it now, but eventually you must find a 'forever home'. You can only stay on the
 newbie island for 7 days (real time), and any resources you gather there will
-be difficult to transport to your new home. But don't leave until you're ready
-because the newbie island protects you from hostile NPCs and gives you a safe
-place to complete some tutorials, level some skills, and learn the game.
-   When you've done all that and you're ready to leave, craft a canoe (Basic
-Crafts) or find a raft (surely one of those goblins sells one). You'll only
-be able to take what you can carry, but any items you stored on the newbie
-island will be safe there until you found a city. Abandon your newbie island
-claims (use the territory command to find them) because you'll need to be able
-to claim in your new location (type estats to see your claim limits).
+be difficult to transport to your new home. But make sure you're ready to go
+because only the newbie island protects you from hostile NPCs and gives you a
+safe place to complete tutorials, level some skills, and learn the game. Other
+lands might be more hostile.
+   When you've done all that and you're ready to leave, craft a canoe (from
+Primitive Crafts) or find a raft (surely one of those goblins sells one).
+You'll only be able to take what you can carry, but any items you stored on the
+newbie island will be safe there until you found a city. Abandon your newbie
+island claims (use the territory command to find them) because you'll need to
+be able to claim in your new location (type estats to see your claim limits).
    When you found your empire's first city out in the world, any items you
 stored on a newbie island will be transferred there automatically.
 Use these tips to find a good home:
+- Bring food and water so you don't end up sailing at half speed.
 - Check the game's website for a world map to help you find a location.
 - Use the 'mapscan' command to find out what lies beyond the sea.
 - Choose a continent (not an island) for your city. Continents have better
@@ -1451,5 +1516,46 @@ W
 26 0 134217728 1 a
 Z
 0 5009
+S
+#10866
+Personal Growth~
+   The young man leans way over as he stretches one muscle group after another,
+working himself up for the next task.
+   'I'm preparing to start adventuring,' he says, sheepishly. 'But I'm not sure
+what to focus on in order to get ready. Perhaps you could give me some tips.
+I'm not sure I understand how to gain experience.'
+   It seems like the new arrival is new to all this -- which is okay! Everyone
+is new at some point. EmpireMUD uses a different leveling system than most
+games. In this one, your level is based on your skills and your gear.
+   There's more information available when you type HELP LEVELS, which explains
+the difference between your different level types. You can also find out how to
+improve your skills with HELP EXPERIENCE.
+   Skill trees each have abilities you can purchase, and you can find out more
+about when you get those by typing HELP ABILITY POINTS. Don't forget that when
+you reach level 50 or 75 in a skill tree, you must 'specialize' in it to take
+it to the next level. See HELP SPECIALIZE for more info on that.
+   Use your newfound knowledge to reach level 15 and then report back to the
+new arrival outside the Soulstream on the Newbie Island.
+~
+   You slowly explain how skills and leveling work as the new arrival eagerly
+listens. At first, it seems a little bit confusing to him, but your explanation
+is good and he picks it up fairly quickly.
+   'Well, it sounds like all I need to do is practice my skills by using my
+abilities! I thought it was going to be harder than that,' he says.
+   You're off to a great start! Keep working on your skills to reach your
+maximum potential.
+~
+2 0 1 15 -1
+A
+1 10862
+P
+0 10850 0 1 -
+R
+0 0 2
+W+
+39 0 0 15 -
+Reach level 15~
+Z
+1 10862
 S
 $

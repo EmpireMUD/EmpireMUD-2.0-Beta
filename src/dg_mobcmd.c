@@ -130,11 +130,16 @@ ACMD(do_madventurecomplete) {
 
 // attempts to aggro the player, his party, or any PC present (in order)
 ACMD(do_maggro) {
-	char_data *iter, *next_iter, *victim = NULL;
+	char_data *iter, *next_iter, *victim = NULL, *backup = NULL;
 	char arg[MAX_INPUT_LENGTH];
 
 	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
 		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// newbie island safety check
+	if (ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 		return;
 	}
 	
@@ -203,8 +208,13 @@ ACMD(do_maggro) {
 		}
 		
 		// success!
-		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
-		return;
+		if (IS_NPC(iter) && !backup && (!victim || iter != victim)) {
+			backup = iter;
+		}
+		else if (!IS_NPC(iter) || iter == victim) {
+			hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
+			return;
+		}
 	}
 	
 	// okay, look for a broader target
@@ -217,8 +227,18 @@ ACMD(do_maggro) {
 		}
 		
 		// success!
-		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
-		return;
+		if (IS_NPC(iter) && !backup) {
+			backup = iter;
+		}
+		else if (!IS_NPC(iter)) {
+			hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
+			return;
+		}
+	}
+	
+	if (backup) {
+		// reached here with no player target-- use a backup
+		hit(ch, backup, GET_EQ(ch, WEAR_WIELD), TRUE);
 	}
 }
 
@@ -709,7 +729,7 @@ ACMD(do_mload) {
 	room_data *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
-	vehicle_data *veh;
+	vehicle_data *veh, *cnt_veh;
 	struct empire_storage_data *store;
 	char *target;
 	bool ally = FALSE;
@@ -817,7 +837,7 @@ ACMD(do_mload) {
 			}
 			
 			// ok: charge it
-			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), number, 1, TRUE);
+			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), number, 1, STORAGE_TIMERS_OLDEST);
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			// and load it
@@ -905,6 +925,12 @@ ACMD(do_mload) {
 			load_otrigger(object);
 			return;
 		}
+		cnt_veh = (*arg1 == UID_CHAR) ? get_vehicle(arg1) : get_vehicle_room(IN_ROOM(ch), arg1, NULL);
+		if (cnt_veh && VEH_FLAGGED(cnt_veh, VEH_CONTAINER)) {
+			obj_to_vehicle(object, cnt_veh);
+			load_otrigger(object);
+			return;
+		}
 
 		/* neither char nor container found - just dump it in room */
 		obj_to_room(object, IN_ROOM(ch)); 
@@ -952,12 +978,23 @@ ACMD(do_mload) {
 
 ACMD(do_mlog) {
 	char source_info[MAX_STRING_LENGTH];
+	
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
 	safe_snprintf(source_info, sizeof(source_info), "mob %d %s", GET_MOB_VNUM(ch), GET_SHORT_DESC(ch));
 	script_log_command(argument, source_info);
 }
 
 
 ACMD(do_mmod) {
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
 	script_modify(argument);
 }
 
@@ -1108,7 +1145,7 @@ ACMD(do_mquest) {
 /* lets the mobile goto any location it wishes that is not private */
 ACMD(do_mgoto) {
 	char arg[MAX_INPUT_LENGTH];
-	room_data *location;
+	room_data *location, *was_in;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -1133,10 +1170,12 @@ ACMD(do_mgoto) {
 	if (FIGHTING(ch))
 		stop_fighting(ch);
 
+	was_in = IN_ROOM(ch);
+	
 	char_from_room(ch);
 	char_to_room(ch, location);
-	enter_triggers(ch, NO_DIR, "script", FALSE);
-	greet_triggers(ch, NO_DIR, "script", FALSE);
+	enter_triggers(ch, NO_DIR, "script", FALSE, was_in);
+	greet_triggers(ch, NO_DIR, "script", FALSE, was_in);
 	msdp_update_room(ch);
 }
 
@@ -1370,7 +1409,7 @@ ACMD(do_mrestore) {
 */
 ACMD(do_mteleport) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	room_data *target;
+	room_data *target, *was_in;
 	char_data *vict, *next_ch;
 	struct instance_data *inst;
 	vehicle_data *veh;
@@ -1406,13 +1445,14 @@ ACMD(do_mteleport) {
 			return;
 		}
 		
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_ch, next_in_room) {
+		was_in = IN_ROOM(ch);
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(was_in), vict, next_ch, next_in_room) {
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_triggers(vict, NO_DIR, "script", FALSE);
-				greet_triggers(vict, NO_DIR, "script", FALSE);
+				enter_triggers(vict, NO_DIR, "script", FALSE, was_in);
+				greet_triggers(vict, NO_DIR, "script", FALSE, was_in);
 				qt_visit_room(vict, IN_ROOM(vict));
 				RESET_LAST_MESSAGED_TEMPERATURE(vict);
 				msdp_update_room(vict);
@@ -1440,11 +1480,12 @@ ACMD(do_mteleport) {
 					
 					// teleport players and their followers
 					if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
+						was_in = IN_ROOM(vict);
 						char_from_room(vict);
 						char_to_room(vict, target);
 						GET_LAST_DIR(vict) = NO_DIR;
-						enter_triggers(vict, NO_DIR, "script", FALSE);
-						greet_triggers(vict, NO_DIR, "script", FALSE);
+						enter_triggers(vict, NO_DIR, "script", FALSE, was_in);
+						greet_triggers(vict, NO_DIR, "script", FALSE, was_in);
 						qt_visit_room(vict, IN_ROOM(vict));
 						RESET_LAST_MESSAGED_TEMPERATURE(vict);
 						msdp_update_room(vict);
@@ -1461,11 +1502,12 @@ ACMD(do_mteleport) {
 				return;
 			}
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
+				was_in = IN_ROOM(vict);
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_triggers(vict, NO_DIR, "script", FALSE);
-				greet_triggers(vict, NO_DIR, "script", FALSE);
+				enter_triggers(vict, NO_DIR, "script", FALSE, was_in);
+				greet_triggers(vict, NO_DIR, "script", FALSE, was_in);
 				qt_visit_room(vict, IN_ROOM(vict));
 				RESET_LAST_MESSAGED_TEMPERATURE(vict);
 				msdp_update_room(vict);
@@ -1882,7 +1924,7 @@ ACMD(do_mforce) {
 
 		if (*arg == UID_CHAR) {
 			if (!(victim = get_char(arg))) {
-				mob_log(ch, "mforce: victim (%s) does not exist",arg);
+				mob_log(ch, "mforce: victim (%s) does not exist (mforce %s %s)", arg, arg, argument);
 				return;
 			}
 		}
@@ -2123,6 +2165,7 @@ ACMD(do_mslay) {
 		return;
 
 	argument = one_argument(argument, name);
+	skip_spaces(&argument);
 
 	if (!*name) {
 		mob_log(ch, "mslay: no target");

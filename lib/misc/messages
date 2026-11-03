@@ -190,7 +190,7 @@ You watch on as $n jabs at $N, but misses!
 #
 #
 You jab at $N, and all that happens is that $E slaps himself as if a mosquito bit $M.
-Was that a bee you just felt?  Oh... wait, it was just $n.
+Was that a bee you just felt? Oh... wait, it was just $n.
 $N begins to slap at $Mself as $n tries to jab $M.
 
 M4 abcd 0 +
@@ -232,8 +232,8 @@ $N returns $n's pierce with a piercing look, hmmm...
 M4 abcd 0 
 stab~
 ~
-You stab $N through the heart!  Instant death!
-$n drives a stab at you, it pierces your heart!  RIP!
+You stab $N through the heart! Instant death!
+$n drives a stab at you, it pierces your heart! RIP!
 $n stabs brutally at $N, killing $M as $E is impaled!
 You stab at $N, missing!
 $n misses a particularly nasty stab in your direction!
@@ -241,8 +241,8 @@ $n stabs at $N, but $e misses!
 #
 #
 #
-You stab at $N!  Too bad $E's a god, huh?
-$n stabs at you!  Lucky for you that you are immune to this kind of thing.
+You stab at $N! Too bad $E's a god, huh?
+$n stabs at you! Lucky for you that you are immune to this kind of thing.
 You watch in pity as $n stabs towards $N missing in the most futile way possible!
 
 M4 abcd 0 
@@ -257,7 +257,7 @@ $N grins at $n as the stab sent by $n goes wide!
 #
 #
 #
-Gods can't be stabbed, did noone ever teach you that?  And $N just so happens to be one.
+Gods can't be stabbed, did noone ever teach you that? And $N just so happens to be one.
 It sure is nice being a god isn't it... especially since $n can't hit you with $s stabs.
 $n stabs at $N only to discover $N's immunity to stabbing weapons.
 
@@ -277,7 +277,7 @@ $n looks perturbed as $s pound misses $N!
 #
 #
 #
-You pound $N!  And $E thanks you for it?  *boggle*
+You pound $N! And $E thanks you for it? *boggle*
 $n gives you a pound. Wonder what the exchange rate is...
 $n starts giving pounds to $N who begins to count the money.
 
@@ -313,7 +313,7 @@ $n looks perturbed as $s hammer misses $N!
 #
 #
 #
-You hammer $N!  And $E thanks you for it?  *boggle*
+You hammer $N! And $E thanks you for it? *boggle*
 $n tries to hammer you.
 $n starts trying to hammer $N.
 
@@ -389,7 +389,7 @@ $n fiercely snaps $s teeth at $N but misses the mark.
 #
 #
 #
-You attempt to bite $N. Ouch!  That hurt!
+You attempt to bite $N. Ouch! That hurt!
 $n tries to bite you, how funny.
 $n tries to bite $N - funny, huh?
 
@@ -425,7 +425,7 @@ $n tries to claw at $N, missing by a hair!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -441,7 +441,7 @@ $n tries to claw at $N but nearly nicks $mself instead!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -501,7 +501,7 @@ $n tries to claw at $N, missing by a hair!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -517,7 +517,7 @@ $n tries to claw at $N but nearly nicks $mself instead!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -609,7 +609,7 @@ It isn't polite to swing at a GOD!
 $n tries to take a swing at you -- how pathetic!
 $n pathetically tries to take a swing at $N - ha!
 
-M16 abc 0 +
+M16 ab 0 +
 magic fire~
 ~
 blast~
@@ -689,7 +689,7 @@ You raise your staff toward $N, but it seems to have no effect.
 $n raises $s staff at you, but you feel nothing.
 $n raises $s staff at $N, but it seems to have no effect.
 
-M20 abc 0 +
+M20 ab 0 +
 magic frost~
 ~
 chill~
@@ -709,7 +709,7 @@ You try to freeze $N, but nearly wind up frozen yourself!
 $n tries to freeze you, but nearly winds up frozen $mself.
 $n tries to freeze $N, but nearly winds up frozen $mself.
 
-M20 abc 0 
+M20 ab 0 
 magic frost~
 ~
 You grab $N, draining heat from $M until $E falls dead!
@@ -725,7 +725,7 @@ You try to freeze $N, but nearly wind up frozen yourself!
 $n tries to freeze you, but nearly winds up frozen $mself.
 $n tries to freeze $N, but nearly winds up frozen $mself.
 
-M21 abc 0 +
+M21 ab 0 +
 magic shock~
 ~
 shock~
@@ -745,7 +745,7 @@ Your bolt of electricity hits $N, to no avail.
 $n's bolt of electricity hits you, to no avail.
 $n's bolt of electricity hits $N, to no avail.
 
-M21 abc 0 
+M21 ab 0 
 magic shock~
 ~
 You hurl sparks at $N, cutting through $M, killing $M!
@@ -761,7 +761,7 @@ Your bolt of electricity hits $N, to no avail.
 $n's bolt of electricity hits you, to no avail.
 $n's bolt of electricity hits $N, to no avail.
 
-M22 abc 0 +
+M22 ab 0 +
 magic light~
 ~
 flash~
@@ -781,7 +781,7 @@ You try to shoot a flash of light at $N, but $E doesn't seem to mind.
 $n tries to shoot a flash of light at you, but it doesn't seem to affect you!
 $n tries to shoot a flash of light at $N, but $E doesn't seem to mind.
 
-M22 abc 0 
+M22 ab 0 
 magic light~
 ~
 You shoot a beam of light straight through $N, leaving a hole in $S chest!
@@ -1352,6 +1352,326 @@ $N ducks under $n's fist as $e takes a swing at $M.
 It isn't polite to swing at a GOD!
 $n tries to take a swing at you -- how pathetic!
 $n pathetically tries to take a swing at $N - ha!
+
+M38 abc 0 +
+net lash~
+~
+lash~
+lashes~
+net~
+0 0 3.0 3.2 3.4
+You fling your net around $N's neck and give it a sharp jerk; there's a crack and then $E falls to the ground!
+$n flings $s net around your neck and gives it a quick jerk... there's sharp crack and everything goes black!
+$n flings $s net around $N's neck and gives it a sharp jerk... there's a crack and then $E falls to the ground!
+You cast your net, but $N sidesteps and it flops to the ground.
+$n casts $s net, but you sidestep and it flops to the ground.
+$n casts $s net, but $N sidesteps and it flops to the ground.
+#
+#
+#
+Your net unravels in mid-air as you cast it toward $N!
+$n's net unravels in mid-air as $e casts it toward you!
+$n's net unravels in mid-air as $e casts it toward $N!
+
+M38 abc 0 
+net lash~
+~
+$N struggles to breathe in your net... until $E can't!
+You struggle to breathe in $n's net... until you can't! It all goes dark!
+$N struggles to breathe in $n's net... until $E can't!
+Your net sails wide, snagging on nothing but air.
+$n's net sails wide, snagging on nothing but air.
+$n's net sails wide, snagging on nothing but air.
+#
+#
+#
+Your net drifts toward $N, then changes its mind and falls politely to the ground.
+$n's net drifts toward you, then changes its mind and falls politely to the ground.
+$n's net drifts toward $N, then changes its mind and falls politely to the ground.
+
+M38 abc 0 
+net lash~
+~
+You whip your net at $N, hitting $M in the head with one of the weights and causing instant death!
+$n whips $s net at you, striking you right in the head... for the last time!
+$n whips $s net at $N, hitting $M in the head with one of the weights and causing instant death!
+You cast your net but $N slips free.
+$n casts $s net but you slip free.
+$n casts $s net but $N slips free.
+#
+#
+#
+$N holds up a hand and you get tangled in your own net!
+You hold up a hand and $N gets tangled in $S own net!
+$N holds up a hand and $n gets tangled in $s own net!
+
+M39 ab 0 +
+magic water~
+~
+blast~
+blasts~
+water blast~
+1 2 3.8 4.0 4.4
+You create a surge that swallows $N whole... when it recedes, $E lies drowned!
+$n creates a surge of water that swallows you whole... you gasp for breath, but there's none!
+$n creates a surge that swallows $N whole... when it recedes, $E lies drowned!
+You blast a jet of water toward $N, but it splashes harmlessly as $E dodges.
+$n blasts a jet of water toward you, but it splashes harmlessly as you dodge.
+$n blasts a jet of water toward $N, but it splashes harmlessly as $E dodges.
+#
+#
+#
+$N looks mildly inconvenienced as you splash $M with water.
+You feel mildly inconvenienced as $n splashes you with water.
+$N looks mildly inconvenienced as $n splashes $M with water.
+
+M39 ab 0 
+magic water~
+~
+$N gasps for breath as your magic drowns $M where $E stands!
+You gasp for breath as $n's magic drowns you where you stand!
+$N gasps for breath as $n's magic drowns $M where $E stands!
+You shoot a spray of water toward $N but $E's barely splashed.
+$n shoots a spray of water toward you, but you're barely splashed.
+$n shoots a spray of water toward $N, but $E's barely splashed.
+#
+#
+#
+Your jet of water arcs around $N and waters $S plants.
+$n's jet of water arcs around you and waters your plants.
+$n's jet of water arcs around $N and waters $S plants.
+
+M39 ab 0 
+magic water~
+~
+You raise your hand and conjure a blade of pure water to slice clean through $N!
+$n raises $s hand and conjures a blade of pure water which slices clean through you!
+$n raises $s hand and conjures a blade of pure water to slice clean through $N!
+A torrent of bubbles burst around $N, but doesn't seem to faze $M.
+A torrent of bubbles from $n bursts around you, with no effect.
+A torrent of bubbles from $n bursts around $N, but doesn't seem to faze $M.
+#
+#
+#
+Your water magic evaporates in $N's face.
+$n's water magic evaporates in your face.
+$n's water magic evaporates in $N's face.
+
+M40 b 27 +
+antler gore~
+~
+gore~
+gores~
+antlers~
+0 0 3.9 4.1 4.3
+You drive your antlers into $N's chest, piercing straight through the heart!
+$n drives $s antlers into your chest, piercing straight through the heart!
+$n drives $s antlers into $N's chest, piercing straight through the heart!
+You lower your antlers and charge, but $N slips away at the last moment!
+$n lowers $s antlers and charges, but you dodge aside!
+$n lowers $s antlers and charges, but $N dodges aside!
+#
+#
+#
+You lower your antlers toward $N, but instead bow your head in reverence.
+$n lowers $s antlers toward you, but instead bows $s head in reverence.
+$n lowers $s antlers toward $N, but instead bows $s head in reverence.
+
+M40 b 27 
+antler gore~
+~
+You slam your antlers into $N in a brutal charge, tearing deep -- $E is dead!
+$n slams $s antlers into you in a brutal charge, tearing deep -- you are dead!
+$n slams $s antlers into $N in a brutal charge, tearing deep -- $E is dead!
+You charge past $N with lowered antlers, missing by inches!
+$n charges past you with lowered antlers, missing by inches!
+$n charges past $N with lowered antlers, missing by inches!
+#
+#
+#
+You lower your antlers toward $N, but instead bow your head in worship.
+$n lowers $s antlers toward you, but instead bows $s head in worship.
+$n lowers $s antlers toward $N, but instead bows $s head in worship.
+
+M41 b 27 +
+one horn gore~
+~
+gore~
+gores~
+horn~
+0 0 3.9 4.1 4.3
+You drive your horn straight into $N's chest, punching through the heart!
+$n drives $s horn straight into your chest, punching through the heart!
+$n drives $s horn straight into $N's chest, punching through the heart!
+You thrust your horn at $N, but skid past without landing the blow!
+$n thrusts $s horn at you, but skids past without landing the blow!
+$n thrusts $s horn at $N, but skids past without landing the blow!
+#
+#
+#
+You lower your horn toward $N, but instead dip your head in reverence.
+$n lowers $s horn toward you, but instead dips $s head in reverence.
+$n lowers $s horn toward $N, but instead dips $s head in reverence.
+
+M41 b 27 
+one horn gore~
+~
+You spear $N with your horn in a crushing charge, tearing deep -- $E is dead!
+$n spears you with $s horn in a crushing charge, tearing deep -- you are dead!
+$n spears $N with $s horn in a crushing charge, tearing deep -- $E is dead!
+You thunder past $N with your horn lowered, missing entirely!
+$n thunders past you with $s horn lowered, missing entirely!
+$n thunders past $N with $s horn lowered, missing entirely!
+#
+#
+#
+You lower your horn toward $N, but instead dip your head in reverence.
+$n lowers $s horn toward you, but instead dips $s head in reverence.
+$n lowers $s horn toward $N, but instead dips $s head in reverence.
+
+M42 b 27 +
+horns gore~
+~
+gore~
+gores~
+horns~
+0 0 3.9 4.1 4.3
+You drive your horns into $N's chest, crushing straight through the heart!
+$n drives $s horns into your chest, crushing straight through the heart!
+$n drives $s horns into $N's chest, crushing straight through the heart!
+You lower your horns and charge at $N, but $E slips aside!
+$n lowers $s horns and charges at you, but you slip aside!
+$n lowers $s horns and charges at $N, but $E slips aside!
+#
+#
+#
+You lower your horns toward $N, but instead bow your head in reverence.
+$n lowers $s horns toward you, but instead bows $s head in reverence.
+$n lowers $s horns toward $N, but instead bows $s head in reverence.
+
+M42 b 27 
+horns gore~
+~
+You gore $N with a devastating horned charge, tearing through flesh -- $E is dead!
+$n gores you with a devastating horned charge, tearing through flesh -- you are dead!
+$n gores $N with a devastating horned charge, tearing through flesh -- $E is dead!
+You thunder past $N with sweeping horns, missing your mark!
+$n thunders past you with sweeping horns, missing you!
+$n thunders past $N with sweeping horns, missing $M!
+#
+#
+#
+You lower your horns toward $N, but instead bow your head in reverence.
+$n lowers $s horns toward you, but instead bows $s head in reverence.
+$n lowers $s horns toward $N, but instead bows $s head in reverence.
+
+M43 b 27 +
+tusks gore~
+~
+gore~
+gores~
+tusks~
+0 0 3.9 4.1 4.3
+You drive your tusks into $N's chest, ripping straight through the heart!
+$n drives $s tusks into your chest, ripping straight through the heart!
+$n drives $s tusks into $N's chest, ripping straight through the heart!
+You lunge at $N with bared tusks, but $E dodges aside!
+$n lunges at you with bared tusks, but you dodge aside!
+$n lunges at $N with bared tusks, but $E dodges aside!
+#
+#
+#
+You lower your tusks toward $N, but instead dip your head in reverence.
+$n lowers $s tusks toward you, but instead dips $s head in reverence.
+$n lowers $s tusks toward $N, but instead dips $s head in reverence.
+
+M43 b 27 
+tusks gore~
+~
+You gore $N with a brutal tusk strike, tearing deep -- $E is dead!
+$n gores you with a brutal tusk strike, tearing deep -- you are dead!
+$n gores $N with a brutal tusk strike, tearing deep -- $E is dead!
+You rush past $N with slashing tusks, missing entirely!
+$n rushes past you with slashing tusks, missing entirely!
+$n rushes past $N with slashing tusks, missing entirely!
+#
+#
+#
+You lower your tusks toward $N, but instead dip your head in reverence.
+$n lowers $s tusks toward you, but instead dips $s head in reverence.
+$n lowers $s tusks toward $N, but instead dips $s head in reverence.
+
+M44 abd 10 +
+massive claws~
+~
+claw~
+claws~
+massive claws~
+0 1 2.4 2.6 2.8
+You bring your massive claws down on $N, obliterating $S face in a single blow!
+$n brings $s massive claws down on you, obliterating your face in a single blow!
+$n brings $s massive claws down on $N, obliterating $S face in a single blow!
+You swing your massive claws at $N, but they crash down just short!
+$n swings $s massive claws at you, but they crash down just short!
+$n swings $s massive claws at $N, but they crash down just short!
+#
+#
+#
+You dummy! Not the claws, the claws!
+$n must be insane -- trying to claw at you!
+$n must be insane -- trying to claw at $N!
+
+M44 abd 10 
+massive claws~
+~
+Your colossal claws tear into $N, rending $M wide open!
+$n's colossal claws tear into you, rending you wide open!
+$n's colossal claws tear into $N, rending $M wide open!
+You heave your massive claws at $N, but nearly overbalance yourself!
+$n heaves $s massive claws at you, but nearly overbalances $mself!
+$n heaves $s massive claws at $N, but nearly overbalances $mself!
+#
+#
+#
+You dummy! Not the claws, the claws!
+$n must be insane -- trying to claw at you!
+$n must be insane -- trying to claw at $N!
+
+M45 b 9 +
+massive bite~
+~
+bite~
+bites~
+massive bite~
+0 1 2.2 2.4 2.6
+You clamp your massive jaws around $N's neck -- blood erupts as bone and flesh give way!
+$n clamps $s massive jaws around your neck, crushing bone and tearing flesh!
+$n clamps $s massive jaws around $N's neck, crushing bone and tearing flesh!
+You snap your enormous jaws at $N, but $E slips free just in time!
+$n snaps $s enormous jaws at you, but you slip free!
+$n snaps $s enormous jaws at $N, but $E slips free!
+#
+#
+#
+You attempt to bite $N, but only manage to snap your jaws shut harmlessly.
+$n tries to bite you, but only snaps $s jaws shut in the air.
+$n tries to bite $N, but only snaps $s jaws shut in the air.
+
+M45 b 9 
+massive bite~
+~
+You bite $N through $S ribcage and into $S heart -- $e falls to the ground in agony.
+$n bites down on you with titanic force, crushing through bone and into your heart -- you collapse in agony!
+$n's titanic jaws crush through $N's body and into $S heart -- $E collapses in agony!
+You lunge to bite $N, but your massive jaws snap shut too soon!
+$n lunges to bite you, but $s massive jaws snap shut too soon!
+$n lunges to bite $N, but $s massive jaws snap shut too soon!
+#
+#
+#
+Aren't you trying to bite off more than you can chew?
+$n snaps at you, then hesitates -- that bite was a bit much.
+$n snaps at $N, clearly biting off more than $e can chew.
 
 M50 e 0 
 Suffering~
@@ -2185,6 +2505,282 @@ $N sweats profusely as $E suffers in the heat.
 #
 #
 
+M9021 b 11 +
+donkey kick~
+~
+kick~
+kicks~
+hind kick~
+0 0 4.0 4.0 4.0
+You kick $N squarely in the chest and $E crumples beneath the force of your hooves!
+$n kicks you squarely in the chest and you crumple to the ground, dead!
+$n kicks $N squarely in the chest and $E crumples to the ground, dead!
+You kick backward, but strike only air.
+$n kicks backwards at you, but strikes only air.
+$n kicks backwards, but strikes only air.
+#
+#
+#
+You kick your heels up and shout at $N.
+$n kicks $s heels up and shouts at you.
+$n kicks $s heels up and shouts at $N.
+
+M9021 b 11 
+donkey kick~
+~
+You kick $N high into the air; by the end of the arc $E's already dead!
+$n kicks you high into the air; your vision goes black before you even land!
+$n kicks $N high into the air; by the end of the arc $E's already dead!
+You buck hard, but your hooves miss their mark.
+$n bucks hard, but $s hooves miss you as you dodge.
+$n bucks hard, but $s hooves miss their mark.
+#
+#
+#
+You buck around like bronco for $N's amusement.
+$n bucks around like a bronco for your amusement.
+$n bucks around like a horse for $N's amusement.
+
+M9021 b 11 
+donkey kick~
+~
+You buck hard, slamming your rear hooves into $N and sending $M sprawling lifeless!
+$n bucks hard, slamming $s rear hooves into you and sending you lifeless to the ground!
+$n bucks hard, slamming $s rear hooves into $N and sending $M sprawling lifeless!
+You kick backward, but $N twists aside at the last moment.
+You twist aside at the last moment as $n kicks backward at you.
+$n kicks backward, but $N twists aside at the last moment.
+#
+#
+#
+You dance around, heels in the air, wishing you could hit $N.
+$n dances around, heels in the air, wishing $e could hit you.
+$n dances around, heels in the air, wishing $e could hit $N.
+
+M9043 b 5 +
+trunk pound~
+~
+pound~
+pounds~
+trunk~
+0 0 3.6 4.0 4.4
+You slam your trunk into $N's chest with a crushing CRACK!
+$n slams $s trunk into your chest with a crushing CRACK!
+$n slams $s trunk into $N's chest with a crushing CRACK!
+You slam you trunk down onto the ground but miss $N.
+$n slams $s trunk down onto the ground, narrowly missing you.
+$n slams $s trunk down onto the ground, narrowly missing $N.
+#
+#
+#
+You spin your trunk madly, unable to hit $N.
+$n spins $s trunk madly, unable to hit you.
+$n spins $s trunk madly, unable to hit $N.
+
+M9043 b 5 
+trunk pound~
+~
+You slam your trunk down onto $N one final time, ending $S struggle for good.
+$n slams $s trunk down onto you one final time, and it's the last thing you see.
+$n slams $s trunk down onto $N one final time, ending $S struggle for good.
+You swing your trunk, but $N ducks out of reach.
+You duck at the precise second to feel $n's trunk swing right over your head.
+$N ducks out of reach as $n swings $s trunk right over $S head.
+#
+#
+#
+$N laughs as you swing your trunk everywhere but into $M.
+You laugh as $n swings $s trunk wildly but can't seem to hit you.
+$N laughs as $n swings $s trunk wildly but fails to land a hit.
+
+M9043 b 5 
+trunk pound~
+~
+You grab $N in your trunk and bash $M against the ground... to death!
+$n grabs you in $s trunk and bashes you against the ground until you lose consciousness for the last time.
+$n grabs $N in $s trunk and bashes $M against the ground... to death!
+$N slips free just as your trunk closes around $M.
+You slip free just as $n's trunk tries to close around you.
+$N slips free just as $n's trunk tries to grab $M.
+#
+#
+#
+You tickle $N with your trunk.
+$n tickles you with $s trunk.
+$n tickles $N with $s trunk.
+
+M9044 b 5 +
+trunk and tusk pound~
+~
+pound~
+pounds~
+trunk~
+0 0 3.6 4.0 4.4
+You slam your trunk into $N's chest with a crushing CRACK!
+$n slams $s trunk into your chest with a crushing CRACK!
+$n slams $s trunk into $N's chest with a crushing CRACK!
+You slam you trunk down onto the ground but miss $N.
+$n slams $s trunk down onto the ground, narrowly missing you.
+$n slams $s trunk down onto the ground, narrowly missing $N.
+#
+#
+#
+You spin your trunk madly, unable to hit $N.
+$n spins $s trunk madly, unable to hit you.
+$n spins $s trunk madly, unable to hit $N.
+
+M9044 b 5 
+trunk and tusk pound~
+~
+You slam your trunk down onto $N one final time, ending $S struggle for good.
+$n slams $s trunk down onto you one final time, and it's the last thing you see.
+$n slams $s trunk down onto $N one final time, ending $S struggle for good.
+You swing your trunk, but $N ducks out of reach.
+You duck at the precise second to feel $n's trunk swing right over your head.
+$N ducks out of reach as $n swings $s trunk right over $S head.
+#
+#
+#
+$N laughs as you swing your trunk everywhere but into $M.
+You laugh as $n swings $s trunk wildly but can't seem to hit you.
+$N laughs as $n swings $s trunk wildly but fails to land a hit.
+
+M9044 b 5 
+trunk and tusk pound~
+~
+You grab $N in your trunk and bash $M against the ground... to death!
+$n grabs you in $s trunk and bashes you against the ground until you lose consciousness for the last time.
+$n grabs $N in $s trunk and bashes $M against the ground... to death!
+$N slips free just as your trunk closes around $M.
+You slip free just as $n's trunk tries to close around you.
+$N slips free just as $n's trunk tries to grab $M.
+#
+#
+#
+You tickle $N with your trunk.
+$n tickles you with $s trunk.
+$n tickles $N with $s trunk.
+
+M9044 b 5 
+trunk and tusk pound~
+~
+You drive your tusk deep into $N, shattering $S ribs!
+$n drives $s tusk deep into you as things go red and then black!
+$n drives $s tusk deep into $N, shattering $S ribs!
+You lower your head to gore $N but $E leaps away.
+You leap out of the way as $n lowers $s head to gore you.
+$n lowers $s head to gore $N but $E leaps away.
+#
+#
+#
+You can't bring yourself to gore $N.
+$n stands in awe as $e can't bring $mself to gore you.
+$n can't seem to bring $mself to gore $N.
+
+M9044 b 5 
+trunk and tusk pound~
+~
+You gore $N clean through, leaving $M shattered and broken!
+$n gores you clean through! It's the last thing you feel.
+$n goes $N clean through, leaving $M shattered and broken!
+You charge forward, tusks slicing empty air where $N was.
+$n charges forward at you but $s tusks slice empty air.
+$n charges forward at $N but $s tusks slice empty air.
+#
+#
+#
+You show your gleaming tusks to $N.
+$n shows you $s gleaming tusks.
+$n shows $N $s gleaming tusks.
+
+M9044 b 5 
+trunk and tusk pound~
+~
+You thrust your tusks upward, tossing $N's lifeless body aside!
+$n thrusts $s tusks upward, and it's the last thing you see!
+$n thrusts $s tusks upward, tossing $N's lifeless body aside!
+You hook $N with your tusks but $E slips free.
+$n hooks you with $s tusks but you slip free.
+$n hooks $N with $s tusks but $E slips free.
+#
+#
+#
+You try to bash $N with your tusks but an invisible force stops you.
+$n tries to bash you with $s tusks but can't seem to hit.
+$n tries to bash $N with $s tusks but something stops $m.
+
+M9114 b 9 +
+crocodilian bite~
+~
+bite~
+bites~
+bite~
+0 0 3.8 4.2 6.0
+You clamp your jaws on $N and spin like a whirlpool -- when you let go, $E no longer moves.
+$n clamps $s jaws on you and spins like a whirlpool -- your vision goes red and then black!
+$n clamps $s jaws on $N and spins like a whirlpool -- by the time $e lets go, $N is dead!
+You snap your jaws at $N, but $E slips away at the last moment.
+$n snaps $s jaws at you, but you slip away at the last moment.
+$n snaps $s jaws at $N, but $E slips away at the last moment.
+#
+#
+#
+Your teeth tremble as you rethink your urge to bite $N.
+$n's teeth tremble at the thought of biting you.
+$n's teeth tremble at the thought of biting $N.
+
+M9114 b 9 
+crocodilian bite~
+~
+Your teeth find a major artery; blood fountains out as $N collapses!
+$n's teeth find a major artery! Blood fountains out of you as you collapse.
+$n's teeth find a major artery; blood fountains out as $N collapses!
+You lunge and bite, but clamp your maw on empty air.
+$n lunges and bites, but clamps $s maw on empty air.
+$n lunges and bites, but clamps $s maw on empty air.
+#
+#
+#
+Your bite falters mid-lunge as some inexplicable shame stops you from chomping $N.
+$n's bite falters mid-lunge as some inexplicable shame stops $m from chomping you.
+$n's bite falters mid-lunge as some inexplicable shame stops $m from chomping $N.
+
+M9138 b 5 +
+neck pound~
+~
+pound~
+pounds~
+swinging neck~
+0 0 3.6 4.0 4.2
+You swing your neck with brutal force, and $N collapses under the blow!
+$n swings $s neck into you with brutal force -- you're dead!
+$n swings $s neck into $N with brutal force!
+You swing your neck wide and $N dodges easily.
+$n swings $s neck wide but you easily dodge.
+$n swings $s neck wide and $N dodges easily.
+#
+#
+#
+You swing your neck in $N's direction but can't get close.
+$n swings $s neck around but can't seem to get close to you.
+$n swings $s neck around but can't seem to get near $N.
+
+M9138 b 5 
+neck pound~
+~
+You swing your neck hard enough to toss $N into the air; $E comes down dead!
+$n swings $s neck hard enough to toss you into the air; you don't remember the landing.
+$n swings $s neck hard enough to toss $N into the air; $E comes down dead!
+You overextend your neck trying to pound $N.
+$n overextends $s neck trying to pound you and failing.
+$n overextends $s neck trying to pound $N.
+#
+#
+#
+You whip your neck in circles for $N's amusement.
+$n whips $s neck in circles for your amusement.
+$n whips $s neck in circles for $N's amusement.
+
 M11815 b 0 +
 Uncaged Goblin~
 ~
@@ -2288,5 +2884,1369 @@ $n stumbles as $e tries to read from $s grimoire.
 #
 $n raises $s staff at you, but you feel nothing.
 $n raises $s staff at $N, but it seems to have no effect.
+
+M12200 b 0 +
+Ribbon Serragons~
+has been ground to pulp at~
+thrash~
+thrashes~
+entwined fury~
+0 1 3.0 4.0 5.0
+You entwine your coils around $N, tightening until $E gasps for air!
+$n entwines its coils around you, crushing the air from your lungs!
+$n entwines its coils around $N, squeezing $M until bones creak!
+You coil toward $N, but $E slips out before you can tighten.
+$n coils toward you, but you slip free before it can tighten.
+$n coils toward $N, but $E slips free.
+#
+#
+#
+You try to crush $N, but your coils tangle against a tree.
+$n tries to crush you, but its coils tangle awkwardly.
+$n tries to crush $N, but tangles itself instead.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+You braid your coils tight around $N, grinding bone to powder as $E collapses lifelessly!
+$n braids its coils tight around you, grinding bone to powder -- your body goes limp!
+$n braids its coils tight around $N, grinding bones to powder until $E collapses lifelessly!
+You braid your coils around $N but end up knotting yourself clumsily.
+$n braids its coils around you but knots itself clumsily.
+$n braids its coils around $N but knots itself clumsily.
+#
+#
+#
+You writhe violently, but only crush dirt and roots.
+$n writhes violently, but only crushes dirt and roots.
+$n writhes violently, crushing nothing but earth.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+You scissor your twin ribbons across $N, sawing scales into $S flesh!
+$n scissors its twin ribbons across you, sawing scales deep into your flesh!
+$n scissors its twin ribbons across $N, scales sawing into $S flesh with ease!
+You twist your ribbons across $N, but only scrape dirt.
+$n twists its ribbons across you, but only scrapes dirt.
+$n twists its ribbons across $N, but only scrapes dirt.
+#
+#
+#
+You shear toward $N but only shred bark.
+$n shears toward you but only shreds bark.
+$n shears toward $N but only shreds bark.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+You scissor your coils together, slicing $N clean in half as blood sprays everywhere!
+$n scissors its coils together, slicing you clean in half -- your blood sprays everywhere!
+$n scissors its coils together, slicing $N in half as gore sprays everywhere!
+You shear at $N but your coils scrape each other instead.
+$n shears at you but scrapes its own coils instead.
+$n shears at $N but scrapes itself instead.
+#
+#
+#
+You scissor wildly, gouging deep furrows in the ground.
+$n scissors wildly, gouging furrows in the ground.
+$n scissors wildly, gouging the earth instead.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+You thrash your braided body in all directions, battering $N with overwhelming force!
+$n thrashes its braided body in all directions, battering you mercilessly!
+$n thrashes its braided body in all directions, battering $N mercilessly!
+You thrash violently, but $N ducks beneath the chaos.
+$n thrashes violently, but you duck beneath the chaos.
+$n thrashes violently, but $N ducks beneath the chaos.
+#
+#
+#
+You thrash in fury, but only send dirt and branches flying.
+$n thrashes in fury, but only sends dirt and branches flying.
+$n thrashes in fury, but only sends debris flying.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+You thrash wildly, smashing $N into the ground again and again until $E lies still in a broken heap!
+$n thrashes wildly, smashing you into the ground again and again until you lie still in a broken heap!
+$n thrashes wildly, smashing $N into the ground again and again until $E lies still in a broken heap!
+You thrash with abandon, but tangle yourself in your own coils.
+$n thrashes with abandon, but tangles itself in its own coils.
+$n thrashes with abandon, but tangles itself in its own coils.
+#
+#
+#
+You thrash in fury, but only send dirt and branches flying.
+$n thrashes in fury, but only sends dirt and branches flying.
+$n thrashes in fury, but only sends debris flying.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+Your head whips out from the tangle and buries its teeth deep into $N's side!
+$n's head whips out from the tangle and buries its teeth deep into your side!
+$n's head whips out from the tangle and buries its teeth deep into $N's side!
+Your head darts at $N, but snaps shut on empty air.
+$n's head darts at you, but snaps shut on empty air.
+$n's head darts at $N, but misses cleanly.
+#
+#
+#
+One ribbon darts out, but only sinks its teeth into a tree trunk.
+One ribbon darts out, but only sinks its teeth into a tree trunk.
+One ribbon darts out, but only sinks its teeth into a tree trunk.
+
+M12200 b 0 
+Ribbon Serragons~
+has been ground to pulp at~
+Your head smashes forward without warning, crushing $N's skull between its jaws in a single, brutal bite!
+$n's head smashes forward without warning, crushing your skull between its jaws in a single, brutal bite!
+$n's head smashes forward without warning, crushing $N's skull between its jaws in a single, brutal bite!
+Your head smashes forward at $N, but only crunches down on your own coils.
+$n's head smashes forward at you, but only crunches down on its own coils.
+$n's head smashes forward at $N, but only crunches down on its own coils.
+#
+#
+#
+Your head snaps forward wildly, smashing face-first into the dirt.
+$n's head snaps forward wildly, smashing face-first into the dirt.
+$n's head snaps forward wildly, smashing face-first into the dirt.
+
+M12201 b 0 +
+Vermilion Ribbon Serragon~
+has been charred and eaten at~
+bite~
+bites~
+fiery bite~
+0 1 3.0 4.0 5.0
+You lash $N with your serrated coils, scales ripping off $S flesh!
+$n lashes you with $s serrated coils, scales ripping off your skin!
+$n lashes $N with $s serrated coils, scales ripping off $S flesh!
+You whip your coils at $N but $E slips away.
+$n whips $s coils at you but you dodge aside.
+$n whips $s coils at $N but $E slips away.
+#
+#
+#
+You whip your coils at $N but only manage to knock loose some dirt.
+$n whips $s coils at you, but only knocks dirt in your face.
+$n whips $s coils at $N, but only sends up a spray of dirt.
+
+M12201 b 0 
+Vermilion Ribbon Serragon~
+has been charred and eaten at~
+You lash $N full across the chest, scales sawing through bone and muscle!
+$n lashes you full across the chest, scales sawing through bone as agony consumes you!
+$n lashes $N full across the chest, scales sawing deep into $S body.
+You whip your tail at $N but $E ducks under them.
+$n whips $s tail at you but you duck under it.
+$n whips $s tail at $N but $E ducks under it.
+#
+#
+#
+You lash wildly at $N, but only succeed in tangling yourself briefly.
+$n lashes wildly at you, but only tangles $mself up.
+$n lashes wildly at $N, but only tangles $mself up.
+
+M12201 b 0 
+Vermilion Ribbon Serragon~
+has been charred and eaten at~
+You sink your blazing jaws through $N's flesh, leaving smoking wounds!
+$n sinks $s blazing jaws through your flesh, searing you with burning pain!
+$n sinks $s blazing jaws through $N, smoke curling from the wounds!
+You snap your jaws at $N but bite only air.
+$n snaps $s fiery jaws at you but misses.
+$n snaps $s jaws at $N but misses cleanly.
+#
+#
+#
+Your blazing teeth just graze $N, leaving a singed mark.
+$n's blazing teeth graze you, leaving only a singe.
+$n grazes $N with $s blazing teeth, leaving a faint scorch.
+
+M12201 b 0 
+Vermilion Ribbon Serragon~
+has been charred and eaten at~
+You bite down on $N's neck with such force that blood and smoke burst forth!
+$n bites into your neck with such force that blood and smoke burst from the wound -- you collapse in agony!
+$n bites $N's neck with such force that smoke and blood spray in every direction!
+You try to bite $N but nearly scorch your own tongue.
+$n tries to bite you but nearly scorches $s own tongue.
+$n tries to bite $N but only singes $s own mouth.
+#
+#
+#
+You snap at $N with fiery jaws, but the heat just makes $M laugh.
+$n snaps at you with fiery jaws, but the heat barely singes you.
+$n snaps at $N with fiery jaws, but the attack only makes $M laugh.
+
+M12201 b 0 
+Vermilion Ribbon Serragon~
+has been charred and eaten at~
+You drive your jagged crest into $N's skull, crushing it with a sickening crack!
+$n drives $s jagged crest into your skull, shattering bone with a sickening crack -- darkness consumes you!
+$n drives $s jagged crest into $N's skull, shattering it with a sickening crack!
+You lower your crest and lunge at $N, but miss wide.
+$n lowers $s crest and lunges at you, but misses wide.
+$n lowers $s crest and lunges at $N, but misses completely.
+#
+#
+#
+You slam forward at $N but only bash dirt and splinters aside.
+$n slams forward at you but only bashes dirt and splinters aside.
+$n slams forward at $N but only sends bark and splinters flying.
+
+M12202 b 0 +
+Veridian Ribbon Serragon~
+has been torn to shreds at~
+rake~
+rakes~
+scale rake~
+0 1 2.8 3.9 5.1
+You rake your jagged scales across $N's flesh, tearing deep grooves!
+$n rakes $s jagged scales across your body, tearing into your flesh!
+$n rakes $s jagged scales across $N, leaving bloody grooves behind!
+You twist your body toward $N, but your scales scrape only air.
+$n twists toward you, but $s scales scrape only air.
+$n twists toward $N, but only slices past harmlessly.
+#
+#
+#
+You rake your scales at $N, but only shear bark.
+$n rakes $s scales at you, but only shears bark.
+$n rakes $s scales at $N, but only scars the ground.
+
+M12202 b 0 
+Veridian Ribbon Serragon~
+has been torn to shreds at~
+You twist your body hard and rake $N from neck to waist, splitting $M open!
+$n twists violently and rakes you from neck to waist -- your body splits open as agony overwhelms you!
+$n rakes $N from neck to waist, splitting $M open in a spray of blood!
+You twist hard toward $N but lose your balance in the motion.
+$n twists hard toward you but loses $mself in the motion.
+$n twists hard toward $N but loses $mself in the motion.
+#
+#
+#
+You rake wildly at $N, but only scar your own scales.
+$n rakes wildly at you, but only scrapes $s own scales.
+$n rakes wildly at $N, but only cuts into $mself.
+
+M12202 b 0 
+Veridian Ribbon Serragon~
+has been torn to shreds at~
+You sink your needle-like teeth deep into $N's arm, piercing to the bone!
+$n sinks $s needle-like teeth deep into your arm, piercing to the bone!
+$n sinks $s needle-like teeth into $N's arm, driving them deep into flesh and bone!
+You snap your jaws at $N, but clamp down on nothing.
+$n snaps $s needle teeth at you but misses.
+$n snaps $s jaws at $N but misses.
+#
+#
+#
+You nip at $N, but only scratch the surface.
+$n nips at you with sharp teeth, but only scratches the surface.
+$n nips at $N, but only scratches $M.
+
+M12202 b 0 
+Veridian Ribbon Serragon~
+has been torn to shreds at~
+You bite straight into $N's throat -- your needle teeth punch through veins and cartilage!
+$n's needle teeth punch straight into your throat -- blood fountains as you collapse!
+$n's needle teeth punch through $N's throat -- $E collapses in a fountain of blood!
+You bite at $N, but end up snapping at your own tongue.
+$n bites at you, but snaps $s own tongue painfully.
+$n bites at $N, but bites $mself instead.
+#
+#
+#
+You bite furiously at $N, but your teeth stick in a tree!
+$n bites furiously at you, but $s teeth stick in a tree!
+$n bites furiously at $N, but $s teeth stick into a tree!
+
+M12202 b 0 
+Veridian Ribbon Serragon~
+has been torn to shreds at~
+You smash $N full in the skull with your frill, caving it in with brutal force!
+$n smashes you full in the skull with $s frill, caving it in with brutal force -- darkness swallows you!
+$n smashes $N full in the skull with $s frill, caving it in with brutal force!
+You swing your frill toward $N but miss entirely.
+$n swings $s frill toward you but misses.
+$n swings $s frill toward $N but misses entirely.
+#
+#
+#
+You sweep your frill, but only stir dust and leaves.
+$n sweeps $s frill, but only stirs dust and leaves.
+$n sweeps $s frill, but only stirs dust and leaves around.
+
+M12211 e 0 
+jagged wounds DoT~
+~
+$N stumbles, then collapses, red and still.
+The saw-edged gouges bleed slower with every breath, until you can no longer stand... or see.
+$N stumbles, then collapses, red and still.
+#
+#
+#
+Blood runs freely from the deep gouges in $N's skin.
+Blood runs freely from the deep gouges in your flesh.
+Blood runs freely from the deep gouges in $N's skin.
+#
+#
+#
+
+M12211 e 0 
+jagged wounds DoT~
+~
+$N staggers, then collapses lifelessly in a spreading pool of red.
+Your vision blurs for the final time as the dripping blood from your wounds slows and the world goes dark.
+$N staggers, then collapses lifelessly in a spreading pool of red.
+#
+#
+#
+Streams of blood run down $N's body.
+With each breath, a hot stream of blood runs down your body.
+Streams of blood run down $N's body.
+#
+#
+#
+
+M12212 e 0 
+puncture wounds DoT~
+~
+$N collapses, unmoving, as the puncture wounds overtake $M.
+Darkness closes in around you as the hot flow of blood from your puncture wounds slows to a drizzle.
+$N collapses, unmoving, as the puncture wounds overtake $M.
+#
+#
+#
+Blood wells from $N's puncture wounds.
+Blood wells from the puncture wounds with each heartbeat sending a hot trickle down your skin.
+Blood wells from $N's puncture wounds.
+#
+#
+#
+
+M12212 e 0 
+puncture wounds DoT~
+~
+$N shuddles and collapses as the blood from $S puncture wounds ebbs.
+Everything seems so cold as blood drizzles ffrom your puncture wounds...
+$N shuddles and collapses as the blood from $S puncture wounds ebbs.
+#
+#
+#
+Blood wells from $N's puncture wounds.
+Blood wells from your puncture wounds.
+Blood wells from $N's puncture wounds.
+#
+#
+#
+
+M12808 abc 21 +
+magic shock (disarmable)~
+~
+shock~
+shocks~
+shock~
+1 2 2.6 2.8 3.0
+You create an arc of electricity straight through $N, stopping $S heart!
+$n creates an arc of electricity straight through you, stopping your heart!
+$n creates an arc of electricity straight through $N, stopping $S heart!
+You shoot sparks at $N, but nothing connects.
+$n shoots sparks at you, to no effect.
+$n shoots sparks at $N, to no effect.
+#
+#
+#
+Your bolt of electricity hits $N, to no avail.
+$n's bolt of electricity hits you, to no avail.
+$n's bolt of electricity hits $N, to no avail.
+
+M12808 abc 21 
+magic shock (disarmable)~
+~
+You hurl sparks at $N, cutting through $M, killing $M!
+$n hurls sparks at you, cutting through you, until it kills you!
+$n hurls sparks at $N, cutting through $M, until it kills $M!
+You try to shock $N, but $E dodges!
+$n tries to shock you, but you dodge!
+$n tries to shock $N, but $E dodges!
+#
+#
+#
+Your bolt of electricity hits $N, to no avail.
+$n's bolt of electricity hits you, to no avail.
+$n's bolt of electricity hits $N, to no avail.
+
+M12859 e 0 
+Scald DoT~
+~
+$N collapses as $S scalded flesh gives out, and dies.
+You collapse as your scalded flesh gives out, and die.
+$N collapses as $S scalded flesh gives out, and dies.
+#
+#
+#
+$N cries out as $S burns sear deeper into $S skin.
+You cry out as your burns sear deeper into your skin.
+$N cries out as $S burns sear deeper into $S skin.
+#
+#
+#
+
+M12859 e 0 
+Scald DoT~
+~
+$N succumbs to the agony of $S burns, and dies.
+You succumb to the agony of your burns, and die.
+$N succumbs to the agony of $S burns, and dies.
+#
+#
+#
+$N winces as $s blistered skin smolders painfully.
+You wince as your blistered skin smolders painfully.
+$N winces as $s blistered skin smolders painfully.
+#
+#
+#
+
+M12897 b 0 +
+resonant peal~
+has been defeated by the Echo Serragon at~
+screech into~
+screeches into~
+resonant peal~
+0 0 2.2 3.2 4.2
+Your jaws unfold and release a peal so profound that $N's heart simply stops.
+$n's jaws unfold and release a peal so profound that your heart simply stops.
+$n's jaws unfold and release a peal so profound that $N's heart simply stops.
+The frills around your jaws flare wide, but your devastating peal washes harmlessly past $N.
+The frills around $n's jaws flare wide, but the devastating peal washes harmlessly past you.
+The frills around $n's jaws flare wide, but the devastating peal washes harmlessly past $N.
+#
+#
+#
+You unleash an earth-shaking peal at $N. Fortunately, divinity has excellent hearing protection.
+$n unleashes an earth-shaking peal at you. Fortunately, divinity has excellent hearing protection.
+$n unleashes an earth-shaking peal at $N. Fortunately, divinity has excellent hearing protection.
+
+M12897 b 0 
+resonant peal~
+has been defeated by the Echo Serragon at~
+Your resonant cry shatters every bone in $N's chest... $E collapses in a heap!
+$n's resonant cry shatters every bone in your chest... you collapse in a heap!
+$n's resonant cry shatters every bone in $N's chest... $E collapses in a heap!
+You open your immense jaws and release a rolling wave of brutal resonance, but $N slips clear.
+$n opens $s immense jaws and releases a rolling wave of brutal resonance, but you slip clear.
+$n opens $s immense jaws and releases a rolling wave of brutal resonance, but $N slips clear.
+#
+#
+#
+You try to unleash a world-rending shriek, but only bruise your dignity.
+$n tries to unleash a world-rending shriek, but only bruises $s dignity.
+$n tries to unleash a world-rending shriek, but only bruises $s dignity.
+
+M12897 b 0 
+resonant peal~
+has been defeated by the Echo Serragon at~
+You strike $N with a perfect harmonic -- flesh, bone, and blood vibrate themselves apart!
+$n strikes you with a perfect harmonic -- flesh, bone, and blood vibrate themselves apart!
+$n strikes $N with a perfect harmonic -- flesh, bone, and blood vibrate themselves apart!
+Your peal reverberates across the battlefield, but fails to find $N's true frequency.
+$n's peal reverberates across the battlefield, but fails to find your true frequency.
+$n's peal reverberates across the battlefield, but fails to find $N's true frequency.
+#
+#
+#
+You attempt a perfect harmonic against $N. The result is considerably less than perfect.
+$n attempts a perfect harmonic against you. The result is considerably less than perfect.
+$n attempts a perfect harmonic against $N. The result is considerably less than perfect.
+
+M12897 b 0 
+resonant peal~
+has been defeated by the Echo Serragon at~
+You strike the perfect note and $N rings like a bell before collapsing!
+You ring like a bell as $n strikes the perfect note through your body!
+$N rings like a bell as $n strikes the perfect note through $S body!
+Your peal circles the battlefield before fading into nothing.
+$n's peal circles the battlefield before fading into nothing.
+$n's peal circles the battlefield before fading into nothing.
+#
+#
+#
+You unleash a reality-rending shriek. Reality politely declines to rend.
+$n unleashes a reality-rending shriek. Reality politely declines to rend.
+$n unleashes a reality-rending shriek. Reality politely declines to rend.
+
+M12897 b 0 
+resonant peal~
+has been defeated by the Echo Serragon at~
+Your peal turns $N's skeleton into a tuning fork... and $E vibrates to pieces!
+$n's peal turns your skeleton into a tuning fork... and you vibrate to pieces!
+$n's peal turns $N's skeleton into a tuning fork... and $E vibrates to pieces!
+You unleash a terrible shriek, but fail to catch $N's resonance.
+$n unleashes a terrible shriek, but fails to catch your resonance.
+$n unleashes a terrible shriek, but fails to catch $N's resonance.
+#
+#
+#
+You find $N's perfect resonance. Unfortunately, $N is a god.
+$n finds your perfect resonance. Fortunately, you're a god.
+$n finds $N's perfect resonance. Fortunately, $N is a god.
+
+M12897 b 0 
+resonant peal~
+has been defeated by the Echo Serragon at~
+You find the resonance hidden within $N and shatter $M completely!
+$n finds the resonance hidden within you and shatters you completely!
+$n finds the resonance hidden within $N and shatters $M completely!
+Your echoes return empty-handed.
+$n's echoes return empty-handed.
+$n's echoes return empty-handed.
+#
+#
+#
+You attempt to silence $N forever. Forever proves optimistic.
+$n attempts to silence you forever. Forever proves optimistic.
+$n attempts to silence $N forever. Forever proves optimistic.
+
+M12897 b 0 
+resonant peal~
+has been defeated by the Echo Serragon at~
+A thousand echoes of your epic peal converge upon $N at once -- and $E is torn apart!
+A thousand echoes of $n's epic peal converge upon you at once -- and you are torn apart!
+A thousand echoes of $n's epic peal converge upon $N at once -- and $E is torn apart!
+You release a perfect peal, but $N slips between its harmonics.
+$n releases a perfect peal, but you slip between its harmonics.
+$n releases a perfect peal, but $N slips between its harmonics.
+#
+#
+#
+You ring $N like a bell. Nothing else happens.
+$n rings you like a bell. Nothing else happens.
+$n rings $N like a bell. Nothing else happens.
+
+M13510 ab 14 +
+cyclopean minotaur gore/crush~
+has been ground to dust by the Cyclopean Minotaur at~
+crush~
+crushes~
+massive fists~
+0 0 3.6 3.8 4.0
+You seize $N and impale $M upon your massive horns!
+$n seizes you and impales you upon $s massive horns!
+$n seizes $N and impales $M upon $s massive horns!
+You thrust your horns at $N, but $E leaps out of the way!
+You leap aside as $n thrusts $s massive horns at you!
+$n thrusts $s massive horns at $N, but $E leaps out of the way!
+#
+#
+#
+You thrust your horns at $N, but $E is beyond your reach.
+$n thrusts $s massive horns at you, but they cannot touch you.
+$n thrusts $s massive horns at $N, but cannot reach $M.
+
+M13510 ab 14 
+cyclopean minotaur gore/crush~
+has been ground to dust by the Cyclopean Minotaur at~
+You hurl $N onto your horns, impaling $M with tremendous force!
+You are hurled onto $n's massive horns and impaled by the impact!
+$n hurls $N onto $s massive horns, impaling $M with tremendous force!
+You lower your horns and charge at $N, but $E dodges aside!
+You dodge aside as $n charges at you with lowered horns!
+$n charges at $N with $s horns lowered, but $N dodges aside!
+#
+#
+#
+You charge at $N with your horns lowered, but $E remains untouched.
+$n charges at you with lowered horns, but cannot touch you.
+$n charges at $N with $s horns lowered, but $N remains untouched.
+
+M13510 ab 14 
+cyclopean minotaur gore/crush~
+has been ground to dust by the Cyclopean Minotaur at~
+You smash your massive fist down upon $N, crushing $M beneath it!
+$n's massive fist smashes you into the ground!
+$n smashes $s massive fist down upon $N, crushing $M beneath it!
+You swing your massive fist at $N, but $E ducks beneath it!
+You duck beneath $n's massive fist as it swings toward you!
+$n swings $s massive fist at $N, but $N ducks beneath it!
+#
+#
+#
+You smash your massive fist at $N, but $E is completely unaffected.
+$n smashes at you with a massive fist, but you remain unharmed.
+$n smashes at $N with a massive fist, but $N remains unharmed.
+
+M13510 ab 14 
+cyclopean minotaur gore/crush~
+has been ground to dust by the Cyclopean Minotaur at~
+You seize $N and slam $M into the stone floor with your colossal fist!
+$n's colossal fist drives you into the stone floor!
+$n seizes $N and slams $M into the stone floor with a colossal fist!
+You take a tremendous swing at $N, but $E slips out of reach!
+You scramble away as $n takes a tremendous swing at you!
+$n takes a tremendous swing at $N, but $N slips out of reach!
+#
+#
+#
+You bring your colossal fist down upon $N, but $E cannot be harmed.
+$n brings a colossal fist down upon you, but it cannot harm you.
+$n brings a colossal fist down upon $N, but the blow cannot harm $M.
+
+M13512 b 0 +
+Nightmare Queen dark harvest~
+has succumbed to the Nightmare Queen at~
+reap~
+reaps~
+dark harvest~
+0 0 3.0 3.5 4.0
+You unleash a torrent of dark magic that crushes $N against the stone floor!
+A torrent of dark magic crushes you against the stone floor!
+$n unleashes a torrent of dark magic that crushes $N against the stone floor!
+You send bolts of darkness streaking toward $N, but $E slips between them!
+You dodge between bolts of darkness streaking toward you from $n!
+Bolts of darkness streak from $n toward $N, but $E slips between them!
+#
+#
+#
+You send bolts of darkness toward $N, but $E remains untouched.
+Bolts of darkness streak toward you, but they cannot harm you.
+$n sends bolts of darkness streaking toward $N, but they pass harmlessly around $M.
+
+M13512 b 0 
+Nightmare Queen dark harvest~
+has succumbed to the Nightmare Queen at~
+You hurl $N against the wall with a terrible gesture, splattering $M across the stone!
+A terrible force hurls you against the wall, splattering you across the stone!
+$n gestures terribly, hurling $N against the wall and splattering $M across the stone!
+You send a wave of nothingness crashing toward $N, but $E escapes its reach!
+A wave of nothingness crashes toward you, but you escape its reach!
+A wave of nothingness crashes from $n toward $N, but $E escapes its reach!
+#
+#
+#
+You send a wave of blackness toward $N, but $E cannot be touched by your magic.
+A wave of blackness washes over you, but you remain untouched.
+A wave of blackness washes over $N, but $n's magic cannot touch $M.
+
+M13512 b 0 
+Nightmare Queen dark harvest~
+has succumbed to the Nightmare Queen at~
+You unleash a blast of death magic that drives $N into the floor hard enough to crack the stone!
+A blast of death magic drives you into the stone floor with tremendous force!
+$n's blast of death magic drives $N into the floor, cracking the stone beneath $M!
+You send a curtain of darkness toward $N, but $E emerges from it unharmed!
+A curtain of darkness falls around you, but somehow you emerge unharmed!
+A curtain of darkness falls around $N, but $E emerges unharmed!
+#
+#
+#
+You unleash a blast of death magic at $N, but $E stands beyond its reach.
+$n's death magic crashes into you, but you stand beyond its reach.
+$n unleashes a blast of death magic at $N, but $E stands beyond its reach.
+
+M13512 b 0 
+Nightmare Queen dark harvest~
+has succumbed to the Nightmare Queen at~
+You sweep your hand through the air, smashing $N into the stone with overwhelming force!
+$n smashes you into the stone with a sweep of $s hand!
+$n sweeps her hand through the air, smashing $N into the stone with overwhelming force!
+You send a lance of black fire tearing toward $N, but $E dodges aside!
+A lance of black fire tears toward you, but you dodge aside!
+A lance of black fire tears through the chamber toward $N, narrowly missing $M!
+#
+#
+#
+You send a lance of black fire toward $N, but $E remains untouched.
+A lance of black fire tears toward you, but cannot harm you.
+$n sends a lance of black fire screaming toward $N, but it passes harmlessly through $M.
+
+M13513 e 0 
+Accursed Fate DoT~
+~
+$N succumbs to $S accursed fate, and dies!
+You succumb to your accursed fate and die!
+$N succumbs to $S accursed fate, and dies!
+#
+#
+#
+$N shudders as $S accursed fate takes hold!
+You shudder as your accursed fate takes hold!
+$N shudders as $S accursed fate takes hold!
+#
+#
+#
+
+M13513 e 0 
+Accursed Fate DoT~
+~
+$N tears apart as $S accursed fate claims $M, and dies!
+You tear apart as your accursed fate claims you, and die!
+$N tears apart as $S accursed fate claims $M, and dies!
+#
+#
+#
+$N's body begins to come apart under $S accursed fate!
+Your body begins to come apart under your accursed fate!
+$N's body begins to come apart under $S accursed fate!
+#
+#
+#
+
+M13520 bc 12 +
+crazy torch burn~
+has been torched at~
+burn~
+burns~
+torch~
+2 0 2.0 2.4 3.0
+You thrust your blazing torch into $N's chest, setting $S clothes ablaze!
+$n's blazing torch catches your clothes on fire, burning you alive!
+$n thrusts a blazing torch into $N's chest, setting $S clothes ablaze!
+You swing your blazing torch at $N, but $E ducks away from the flames!
+You duck away as $n swings the blazing torch at you!
+$n swings a blazing torch at $N, but $E ducks away from the flames!
+#
+#
+#
+You thrust your blazing torch at $N, but $E seems immune to the flames.
+$n thrusts a blazing torch at you, but the flames cannot harm you.
+$n thrusts a blazing torch at $N, but the flames have no effect on $M.
+
+M13520 bc 12 
+crazy torch burn~
+has been torched at~
+You cackle madly as you thrust your burning torch into $N, setting $M ablaze!
+$n cackles madly as $s burning torch sets you ablaze!
+$n cackles madly as $s burning torch sets $N ablaze!
+You scream incoherently and swing your torch at $N, but $E slips effortlessly away!
+You slip away from $n's torch as $e screams incoherently.
+$n screams incoherently and swings $s torch at $N, but $E slips away!
+#
+#
+#
+You jab your burning torch at $N with a wild cackle, but $E is unharmed.
+$n jabs a burning torch at you while cackling wildly, but it does nothing.
+$n jabs $s burning torch at $N with a wild cackle, but $N remains unharmed.
+
+M13520 bc 12 
+crazy torch burn~
+has been torched at~
+You howl with laughter as you beat $N with your burning torch, engulfing $M in flames!
+$n howls with laughter as $s burning torch engulfs you in flames!
+$n howls with laughter as $e beats $N with $s burning torch and engulfs $M in flames!
+You swing wildly at $N, shouting, 'STAND STILL' as $E dodges!
+You dodge $n's wild swing as $E screams, 'STAND STILL!'
+$n swings wildly at $N, screaming, 'STAND STILL' when $E dodges!
+#
+#
+#
+You wave your burning torch at $N while laughing hysterically, but $E cannot be harmed.
+$n waves a burning torch at you while laughing hysterically, but you remain untouched.
+$n waves $s burning torch at $N while laughing hysterically, but $N remains untouched.
+
+M13520 bc 12 
+crazy torch burn~
+has been torched at~
+You shriek with delight as you shove your burning torch into $N and roast $M alive!
+$n shrieks with delight as $s burning torch roasts you alive!
+$n shrieks with delight as $e shoves $s burning torch into $N and roasts $M alive!
+You lash out at $N with your burning torch, screaming in frustration as $E dodges again!
+You dodge the burning torch as $n screams in frustration!
+$n lashes out at $N with $s burning torch, screaming when $E dodges again!
+#
+#
+#
+You thrust your burning torch at $N with a delighted shriek, but $E cannot be burned.
+$n thrusts a burning torch at you with a delighted shriek, but you cannot be burned.
+$n thrusts $s burning torch at $N with a delighted shriek, but $E cannot be burned.
+
+M13530 bc 5 +
+horned champion pound and gore~
+has been gored to death at~
+pound~
+pounds~
+fierce swing~
+0 0 3.2 3.6 4.0
+You charge into $N and toss $M onto your horns, impaling $M!
+$n charges into you and tosses you onto $s horns, impaling you!
+$n charges into $N and tosses $M onto $s horns, impaling $M!
+You swing your club mightily at $N, but $E steps aside!
+You step aside as $n's club swings toward you!
+$n swings $s club mightily at $N, but $E steps aside!
+#
+#
+#
+You swing your club at $N, but $E is far beyond your reach.
+$n swings $s club at you, but the blow cannot touch you.
+$n swings $s club at $N, but the blow cannot touch $M.
+
+M13538 b 0 +
+shadow of the dead~
+~
+drain~
+drains~
+icy fingers of death~
+1 2 3.4 4.0 4.6
+You reach out with tendrils of darkness and grasp $N, draining the last of $S life away!
+$n's tendrils of darkness grasp you, draining the last of your life away!
+Tendrils of darkness reach out from $n and grasp $N, draining the last of $S life away!
+You reach out with tendrils of darkness toward $N, but $E slips away!
+You recoil as tendrils of darkness reach out from $n to grasp you!
+Tendrils of darkness reach out from $n toward $N, but $E slips away!
+#
+#
+#
+You reach out with tendrils of darkness and grasp $N, but $E's life force cannot be drained.
+$n's tendrils of darkness grasp you, but fail to drain your life.
+$n's tendrils of darkness grasp $N, but fail to drain $S life force.
+
+M13538 b 0 
+shadow of the dead~
+~
+You wrap tendrils of darkness around $N and draw the life from $S body!
+Tendrils of darkness coil around you as $n draws the life from your body!
+Tendrils of darkness coil around $N as $n draws the life from $S body!
+You lash out with tendrils of darkness, but $N pulls away!
+You pull away as dark tendrils lash toward you!
+Dark tendrils lash out from $n toward $N, but $E escapes their grasp!
+#
+#
+#
+You wrap tendrils of darkness around $N, but $E has no life for you to drain.
+Tendrils of darkness coil around you, but fail to drain your life.
+Tendrils of darkness coil around $N, but cannot drain $S life force.
+
+M13539 b 0 +
+wailing shadow~
+~
+wail~
+wails~
+terrible wail~
+1 2 3.4 4.0 4.6
+You unleash a terrible wail that tears the life from $N!
+$n's terrible wail tears the life from you!
+$n unleashes a terrible wail that tears the life from $N!
+You unleash a terrible wail, but $N withstands the dreadful sound!
+You cover your ears as $n's terrible wail washes over you!
+$n unleashes a terrible wail that echoes through the labyrinth, but $N withstands it!
+#
+#
+#
+You unleash a terrible wail at $N, but $E seems utterly unaffected.
+$n unleashes a terrible wail at you, to no apparent effect.
+$n's terrible wail washes over $N, but $E seems completely unaffected.
+
+M13539 b 0 
+wailing shadow~
+~
+You reach into $N with your shadowy tendrils and extinguish $S life!
+$n's shadowy tendrils reach into you, extinguishing your life!
+$n reaches into $N with $s shadowy tendrils, extinguishing $S life!
+You reach for $N with your shadowy tendrils, but $E slips away!
+You recoil as $n's shadowy tendrils reach toward you!
+$n reaches toward $N with $s shadowy tendrils, but $N slips away!
+#
+#
+#
+You reach for $N with your shadowy tendrils, but $E cannot be touched by death.
+$n's shadowy tendrils reach into you, but fail to take your life.
+$n's shadowy tendrils reach into $N, but fail to take $S life.
+
+M13541 b 45 +
+oversized rodent bite~
+~
+bite~
+bites~
+bite~
+0 1 2.4 2.8 3.2
+You sink your enormous incisors into $N and bite down with bone-crushing force!
+$n's enormous incisors sink into you with bone-crushing force! It's too much!
+$n sinks $s enormous incisors into $N and bites down with bone-crushing force!
+You lunge at $N with your jaws wide, but $E dodges your bite!
+You leap aside as $n lunges at you with $s jaws wide!
+$n lunges at $N with $s jaws wide, but $N dodges the bite!
+#
+#
+#
+You bite down on $N, but $E seems impossible to injure.
+$n's enormous jaws clamp down on you, but fail to injure you.
+$n clamps $s enormous jaws down on $N, but cannot seem to hurt $M.
+
+M13541 b 45 
+oversized rodent bite~
+~
+You seize $N in your jaws and tear $S body apart with your enormous incisors!
+$n's enormous incisors tear through you, ripping your body apart!
+$n seizes $N in $s jaws and tears $S body apart with enormous incisors!
+You lunge at $N and snap your massive incisors together, but $E dodges!
+You leap aside as $n lunges at you with snapping incisors!
+$n lunges at $N and snaps $s massive incisors together, but $N dodges!
+#
+#
+#
+You clamp your massive incisors onto $N, but $E is too tough to chew!
+$n's massive incisors clamp onto you, but cannot penetrate you.
+$n clamps $s massive incisors onto $N, but they fail to penetrate $S defenses.
+
+M13541 b 45 
+oversized rodent bite~
+~
+You seize $N in your jaws and snap your massive incisors through $S body!
+$n's massive incisors snap through you with devastating force!
+$n seizes $N in $s jaws and snaps $s massive incisors through $S body!
+You snap your massive incisors at $N, but $E scurries out of reach!
+You scramble away as $n's massive incisors snap shut beside you!
+$n snaps $s massive incisors at $N, but $E scurries out of reach!
+#
+#
+#
+You snap your massive incisors at $N, but $E is impervious to your bite.
+$n's massive incisors snap shut on you, but leave you unharmed.
+$n snaps $s massive incisors at $N, but they cannot penetrate $S defenses.
+
+M13542 e 61 
+Acid Spray DoT~
+~
+$N succumbs to the acid and puddles to the ground!
+You succumb to the acid and fall to the ground in a puddle!
+$N succumbs to the acid and puddles to the ground!
+#
+#
+#
+$N cries out as acid dissolves $S flesh.
+You cry out involuntarily as acid dissolves your flesh.
+$N cries out as acid dissolves $S flesh.
+#
+#
+#
+
+M13542 e 61 
+Acid Spray DoT~
+~
+$N crumples in agony as the acid overwhelms $M!
+You crumple in agony as the acid overwhelms you!
+$N crumples in agony as the acid overwhelms $M!
+#
+#
+#
+$N winces as the searing acid bites at $S skin
+You wince as the searing acid bites at your skin.
+$N winces as the searing acid bites at $S skin
+#
+#
+#
+
+M13544 b 0 +
+acid spray for slimes~
+~
+spray~
+sprays~
+acid spray~
+0 0 2.5 3.0 3.5
+You spray $N with a stream of sizzling acid, dissolving $S body!
+A stream of sizzling acid sprays over you, dissolving your body!
+$n sprays $N with a stream of sizzling acid, dissolving $S body!
+You spray a stream of acid at $N, but $E slips out of the way!
+You leap aside as $n sprays a stream of acid at you!
+$n sprays a stream of sizzling acid at $N, but $E dodges the attack!
+#
+#
+#
+You spray $N with sizzling acid, but $E is completely unaffected.
+$n sprays you with sizzling acid, but it fails to harm you.
+$n sprays $N with sizzling acid, but it has no effect on $M.
+
+M13544 b 0 
+acid spray for slimes~
+~
+You spew corrosive slime over $N, melting flesh from $S bones!
+Corrosive slime covers you, melting the flesh from your bones!
+$n spews corrosive slime over $N, melting the flesh from $S bones!
+You spray a stream of acid at $N, but $E slips out of the way!
+You leap aside as $n sprays a stream of acid at you!
+$n sprays a stream of sizzling acid at $N, but $E dodges the attack!
+#
+#
+#
+You spray $N with sizzling acid, but $E is completely unaffected.
+$n sprays you with sizzling acid, but it fails to harm you.
+$n sprays $N with sizzling acid, but it has no effect on $M.
+
+M13544 b 0 
+acid spray for slimes~
+~
+You drench $N in searing acid, stripping the flesh from $S bones!
+Searing acid drenches you, stripping the flesh from your bones!
+$n drenches $N in searing acid, stripping the flesh from $S bones!
+You spray $N with a stream of searing acid, but $E dodges!
+You recoil as $n sprays searing acid toward you!
+$n sprays a stream of searing acid at $N, but $E dodges!
+#
+#
+#
+You drench $N in searing acid, but $E remains unharmed.
+Searing acid splashes over you, but leaves you unharmed.
+$n drenches $N in searing acid, but it fails to harm $M.
+
+M13545 b 0 +
+acid digestion for gelatinous cube~
+has dissolved in a gelatinous cube at~
+crush~
+crushes~
+crushing mass~
+0 0 3.0 3.5 4.0
+You squeeze $N tighter within your acidic mass, crushing $M as you digest $M alive!
+The crushing pressure of $n's acidic mass becomes unbearable as the slime digests you!
+$n's gelatinous body contracts around $N, crushing $M as its acidic mass digests $M alive!
+You loosen your crushing grip on $N as $E struggles against your acidic mass!
+The crushing pressure suddenly eases, giving you a brief moment of relief!
+$n's gelatinous body relaxes slightly around $N, giving $E a brief respite from its crushing pressure!
+#
+#
+#
+You squeeze $N within your acidic mass, but $E remains completely unharmed.
+The crushing pressure of $n's acidic mass surrounds you, but cannot harm you.
+$n's gelatinous body contracts around $N, but its crushing pressure has no effect on $M.
+
+M13545 b 0 
+acid digestion for gelatinous cube~
+has dissolved in a gelatinous cube at~
+You sear $N within your acidic mass, dissolving $S flesh as you digest $M!
+Your flesh sears and burns as $n's acidic body digests you alive!
+$n's acidic mass sears $N, dissolving $S flesh as the gelatinous cube digests $M!
+You churn $N within your acidic mass, but $E endures the searing pain!
+The searing pain suddenly fades, giving you a precious moment of relief!
+The burning within $n's acidic mass briefly subsides around $N, giving $N a moment of relief!
+#
+#
+#
+You sear $N within your acidic mass, but $E remains unaffected by your corrosive slime.
+$n's acidic mass sears against you, but its corrosive slime cannot harm you.
+$n's acidic mass sears around $N, but its corrosive slime has no effect on $M.
+
+M13547 b 9 +
+giant arachnid bite~
+~
+bite~
+bites~
+bite~
+0 1 2.0 2.2 3.0
+You clamp your mandibles around $N and crush $S body with your bite!
+$n's mandibles crush you with a sickening snap!
+$n clamps $s mandibles around $N and crushes $S body with a sickening snap!
+You snap your mandibles at $N, but $E darts out of the way!
+You scramble aside as $n's mandibles snap shut where you stood!
+$n lunges at $N with snapping mandibles, but misses!
+#
+#
+#
+You bite $N, but $E seems rather difficult to chew.
+$n's mandibles snap shut around you, but fail to make a dent.
+$n bites down on $N, only to discover that $E is considerably harder than $n expected.
+
+M13547 b 9 
+giant arachnid bite~
+~
+You seize $N in your mandibles and tear $S body apart!
+$n's mandibles rip through you, tearing you apart!
+$n seizes $N in $s mandibles and tears $S body apart!
+You snap your mandibles at $N, but $E jerks away just in time!
+You jerk away as $n's mandibles snap shut beside you!
+$n snaps $s mandibles at $N, but $E jerks out of reach!
+#
+#
+#
+You bite $N, but $E is far too tough for your mandibles!
+$n's mandibles clamp down on you, but can't seem to hurt you.
+$n bites down on $N, but $E remains completely unharmed.
+
+M13548 e 0 
+Mirror Spider Venom DoT~
+~
+$N screams and writhes in agony on the ground... and then $E is still.
+You scream and writhe in agony as the burning poison overtakes you!
+$N screams and writhes in agony on the ground... and then $E is still.
+#
+#
+#
+$N grits $S teeth in agony and clutches $S bite wound.
+Your blood burns as the venom spreads through your veins!
+$N grits $S teeth in agony and clutches $S bite wound.
+#
+#
+#
+
+M13548 e 0 
+Mirror Spider Venom DoT~
+~
+$N screams and writhes in agony on the ground... and then $E is still.
+You scream and writhe in agony as the burning poison overtakes you!
+$N screams and writhes in agony on the ground... and then $E is still.
+#
+#
+#
+$N scratches at $S skin trying to stop the pain.
+You scratch involuntarily at your skin as the venom burns you from inside!
+$N scratches at $S skin trying to stop the pain.
+#
+#
+#
+
+M13553 b 9 +
+cluster of cave pixies bite~
+~
+bite~
+bites~
+tiny bites~
+0 1 2.0 2.2 2.6
+Your swarm of pixies descends upon $N, biting $M from every direction until $E falls!
+A swarm of blind cave pixies overwhelms you, biting you from every direction!
+The blind cave pixies swarm over $N, biting $M from every direction until $E falls!
+Your swarm of pixies scrambles over $N, but $E manages to fight them off!
+You desperately fend off the swarm of pixies as they scramble over you!
+The blind cave pixies swarm over $N, but $E manages to fight them off!
+#
+#
+#
+Your swarm of pixies bites $N from every direction, but $E is completely unharmed.
+The blind cave pixies swarm over you and bites furiously, but cannot harm you.
+The blind cave pixies swarm over $N, biting from every direction, but $E remains unharmed.
+
+M13553 b 9 
+cluster of cave pixies bite~
+~
+Your swarm of pixies bites $N from every direction, their strange magic draining $S life until $E collapses!
+The pixies swarm over you, their strange magic draining your life as their tiny teeth tear at you!
+The pixies swarm over $N, their strange magic draining $S life as countless tiny teeth tear at $M!
+Your swarm of pixies scrambles over $N, but $E manages to fight them off!
+You desperately fend off the swarm of pixies as they scramble over you!
+A swarm of blind cave pixies swarms over $N, but $N manages to fight them off!
+#
+#
+#
+Your swarm of pixies bites $N from every direction, but $E is completely unharmed.
+A swarm of blind cave pixies swarms over you and bites furiously, but cannot harm you.
+A swarm of blind cave pixies swarms over $N, biting from every direction, but $E remains unharmed.
+
+M13553 b 9 
+cluster of cave pixies bite~
+~
+Your pixies surround $N in a cloud of strange magic, draining $S life until $E collapses!
+You are engulfed by a cloud of strange pixy magic that drains the life from you!
+A cloud of strange magic surrounds $N as the pixies drain $S life away!
+Your pixies surround $N in a cloud of strange magic, but $E stumbles free!
+You stumble free from the cloud of strange pixy magic surrounding you!
+Pixies surround $N in a cloud of strange magic, but $E stumbles free!
+#
+#
+#
+Your pixies surround $N in a cloud of strange magic, but $E remains unaffected.
+Strange pixy magic washes over you, but cannot harm you.
+Pixies surround $N in a cloud of strange magic, but $N remains unaffected.
+
+M13584 b 27 +
+horned champion~
+~
+gore~
+gores~
+long horns~
+0 1 3.7 4.1 4.5
+You charge into $N and impale $M upon your massive horns!
+$n charges into you, impaling you upon $s massive horns!
+$n charges into $N, impaling $M upon $s massive horns!
+You charge toward $N, but $E leaps aside at the last moment!
+You leap aside as $n charges toward you!
+$n charges toward $N, but $N leaps aside at the last moment!
+#
+#
+#
+You charge toward $N with your horns lowered, but $E is beyond your reach.
+$n charges toward you with $s horns lowered, but you remain untouched.
+$n charges toward $N with $s horns lowered, but $N remains untouched.
+
+M13584 b 27 
+horned champion~
+~
+You charge into $N horns-first, tackling $M to the ground with bone-crushing force!
+$n charges into you horns-first, crushing you beneath the impact!
+$n charges into $N horns-first, tackling $M to the ground with bone-crushing force!
+You charge toward $N, but stumble and go sprawling before you can reach $M!
+You watch as $n charges toward you, only to stumble and go sprawling!
+$n charges toward $N, but stumbles and goes sprawling before reaching $M!
+#
+#
+#
+You charge toward $N horns-first, but stumble to a halt before reaching $M.
+$n charges toward you horns-first, but somehow stumbles to a halt before reaching you.
+$n charges toward $N horns-first, but stumbles to a halt before reaching $M.
+
+M13585 b 27 +
+horned percipient~
+~
+hex~
+hexes~
+horned magic~
+1 2 3.8 4.2 4.6
+You bend the unseen forces of fate through your white horns, bringing $N's life to an abrupt end!
+$n's white horns glow with strange power as fate itself turns against you!
+$n's white horns glow with strange power as $N's fate is suddenly sealed!
+You invoke the power of fate through your white horns, but $N escapes your vision!
+A strange light gleams from $n's white horns, but somehow you escape its reach!
+A strange light gleams from $n's white horns as $n reaches into the unseen, but $N escapes!
+#
+#
+#
+You invoke the power of fate through your white horns, but $E's destiny cannot be altered.
+$n invokes strange power through $s white horns, but your destiny remains untouched.
+Strange power gathers around $n's white horns, but even $n cannot alter $N's destiny.
+
+M13585 b 27 
+horned percipient~
+~
+You unleash a terrible hex through your gleaming white horns, reducing $N to a lifeless husk!
+A terrible hex pours from $n's gleaming white horns, withering your body and stealing your life!
+A terrible hex pours from $n's gleaming white horns, withering $N into a lifeless husk!
+You unleash a terrible hex at $N, but $E breaks free of its grasp!
+A terrible hex washes over you from $n's gleaming white horns, but you break free of its grasp!
+A terrible hex washes over $N from $n's gleaming white horns, but $N breaks free!
+#
+#
+#
+You unleash a terrible hex through your gleaming white horns, but $E is beyond its power.
+A terrible hex pours from $n's gleaming white horns, but it cannot touch you.
+A terrible hex pours from $n's gleaming white horns, but even its ancient power cannot touch $N.
+
+M13586 b 27 +
+horned raider~
+~
+gore~
+gores~
+sharp horns~
+0 1 3.3 3.7 4.1
+You hook your sharp horns into $N and rip $M open!
+$n's sharp horns hook into you and rip you open!
+$n hooks $s sharp horns into $N and rips $M open!
+You slash at $N with your sharp horns, but $E twists away!
+You twist away as $n slashes at you with $s sharp horns!
+$n slashes at $N with $s sharp horns, but $N twists away!
+#
+#
+#
+You slash your sharp horns at $N, but $E is beyond harm.
+$n slashes at you with $s sharp horns, but they cannot harm you.
+$n slashes at $N with $s sharp horns, but $N remains unharmed.
+
+M13586 b 27 
+horned raider~
+~
+You gore $N with your sharp horns, lifting $M from the ground and tearing $M apart!
+$n's sharp horns gore you and lift you helplessly from the ground!
+$n gores $N with $s sharp horns, lifting $M from the ground and tearing $M apart!
+You sweep your horns toward $N, but $E ducks beneath them!
+You duck beneath $n's sweeping horns!
+$n sweeps $s horns toward $N, but $N ducks beneath them!
+#
+#
+#
+You sweep your sharp horns toward $N, but $E remains untouched.
+$n sweeps $s sharp horns toward you, but you remain untouched.
+$n sweeps $s sharp horns toward $N, but $N remains untouched.
+
+M13587 b 27 +
+horned disciple~
+~
+fracture~
+fractures~
+horned sorcery~
+1 2 3.4 3.8 4.2
+You flare with otherworldly light, and $N simply burns away beneath its radiance!
+Otherworldly light pours from $n's starlight horns, burning you away beneath its radiance!
+Otherworldly light pours from $n's starlight horns, and $N burns away beneath its radiance!
+You flare with otherworldly light, but $N slips beyond its reach!
+Otherworldly light pours from $n's horns, but you slip beyond its reach!
+Otherworldly light pours from $n's horns toward $N, but $N slips beyond its reach!
+#
+#
+#
+You flare with otherworldly light at $N, but $E remains beyond its power.
+Otherworldly light pours from $n's horns, but it cannot touch you.
+Otherworldly light pours from $n's horns toward $N, but $N remains beyond its power.
+
+M13587 b 27 
+horned disciple~
+~
+You call down a shower of stars upon $N, burying $M beneath celestial fire!
+A shower of burning stars crashes down upon you, engulfing you in celestial fire!
+A shower of burning stars crashes down upon $N, engulfing $M in celestial fire!
+You call down a shower of stars upon $N, but $E escapes the falling destruction!
+Burning stars rain down around you, but you escape the destruction!
+Burning stars rain down around $N, but $N escapes the falling destruction!
+#
+#
+#
+You call down a shower of stars upon $N, but $E remains untouched.
+Burning stars crash down around you, but somehow leave you unharmed.
+Burning stars crash down around $N, but leave $M completely unharmed.
+
+M16688 abc 32 +
+toy blaster~
+~
+blast~
+blasts~
+toy blaster~
+0 0 3.6 3.8 4.8
+$N jerks as your toy blaster fires a bolt of light straight through $S chest!
+You jerk as $n's toy blaster fires a bolt of light straight through your chest!
+$N jerks as $n's toy blaster fires a bolt of light straight through $S chest!
+Your toy blaster whines and fires, but the shot zips harmlessly past $N.
+$n's toy blaster whines and fires, but the shot zips past you.
+$n's toy blaster whines and fires, but the shot flies wide past $N.
+#
+#
+#
+Your glowing blast fizzles and stops cold before $N.
+A glowing blast from $n fizzles and stops before you.
+A glowing blast from $n fizzles and stops before $N.
+
+M16688 abc 32 
+toy blaster~
+~
+Your toy blaster rattles and fires, blasting through $N's chest in a spray of sparks!
+$n's toy blaster rattles and fires, blasting through your chest in a spray of sparks!
+$n's toy blaster rattles and fires, blasting through $N's chest in a spray of sparks!
+Your toy blaster rattles, but the shot skitters past $N.
+$n fires a rattling toy blaster at you, but misses.
+$n fires a rattling toy blaster at $N, but misses.
+#
+#
+#
+Your rattling toy blast sparks and halts before $N.
+A rattling toy blast from $n sparks and halts before you.
+A rattling toy blast from $n sparks and halts before $N.
+
+M16688 abc 32 
+toy blaster~
+~
+You unleash a festive barrage, blasting straight through $N's chest!
+$n unleashes a festive barrage, blasting straight through your chest!
+$n unleashes a festive barrage, blasting straight through $N's chest!
+Your toy blaster unleashes a festive barrage, but every shot misses $N.
+$n unleashes a festive barrage at you, but misses.
+$n unleashes a festive barrage at $N, but misses.
+#
+#
+#
+Your festive blasts stop short of $N, hanging uselessly in the air.
+Festive blasts from $n stop short of you, hanging uselessly in the air.
+Festive blasts from $n stop short of $N, hanging uselessly in the air.
 
 $

@@ -118,13 +118,13 @@ Guild.'
    2. Reach level 100,
    3. Pickpocket 50 people who are not members of your empire, and
    4. Aid the Guild by placing a bug in the Grand High Sorcerer's office in
-      the Tower Skycleave
+      the Tower Skycleave (this is part of the Guild of Adventurers questline)
 ~
    The guildmaster silently and covertly takes the iron coin back from you. No
 words are exchanged, but the two of you have an understanding. Your name shall
 go unknown, but your deeds will be legend among the shadows.
 ~
-6 df 100 0 -1
+7 d 100 0 -1
 A
 1 221
 A
@@ -305,7 +305,7 @@ interested in your reflections on the harsh beauty of nature. You can already
 tell these stories will be told in taverns throughout the land for years to
 come!
 ~
-7 f 100 0 -1
+8 f 100 0 -1
 A
 1 220
 P
@@ -325,9 +325,9 @@ W
 W
 14 20 0 1 a
 W
-14 28 0 1 a
+14 220 0 1 a
 W
-14 29 0 1 a
+14 250 0 1 a
 W
 14 58 0 1 a
 W
@@ -360,11 +360,13 @@ though, wouldn't it?'
 you have firmly established your family's legacy as prized artisans of the
 empire!
 ~
-9 f 100 0 -1
+10 f 100 0 -1
 A
 1 212
 A
 1 278
+A
+1 12800
 P
 9 6 0 51 -
 R
@@ -381,6 +383,8 @@ Z
 1 212
 Z
 1 278
+Z
+1 12800
 S
 #1507
 Vampire: Return After Dark~

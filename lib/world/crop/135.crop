@@ -1,0 +1,32 @@
+#13589
+pomegranates~
+A Grove of Red Pomegranates~
+9 k bc
+0 100 0 100
+D0
+&gW&?.&gW&?.~
+&y~
+D0
+&gW&?.&gW&?.~
+&y~
+D0
+&Ro&?.&gW&?.~
+&y~
+D0
+&gW&?.&Ro&?.~
+&y~
+I 6 13590 100.00 25  # FORAGE: juicy pomegranate
+I 7 13589 100.00 14  # PICK: basket of pomegranates
+I 9 132 100.00 50  # GATHER: thorny branches
+I 20 122 100.00 2 c  # CHOP: rough wood
+U
+0
+New bushes sprout up in rows and push out juicy red pomegranates.~
+X
+pomegranates orchard grove trees plants crop around~
+   Long, straight rows of bushes make this an orderly crop. The bushes are
+trimmed up off the ground to resemble little trees and all of them are covered
+in fresh pomegranates.
+~
+S
+$

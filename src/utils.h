@@ -127,6 +127,7 @@
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_MOVE_TYPE(abil)  ((abil)->move_type)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_NOTES(abil)  ((abil)->notes)
 #define ABIL_POOL_TYPE(abil)  ((abil)->pool_type)
 #define ABIL_REQUIRES_TOOL(abil)  ((abil)->requires_tool)
 #define ABIL_RESOURCE_COST(abil)  ((abil)->resource_cost)
@@ -166,6 +167,7 @@
 #define GET_ADV_MIN_LEVEL(adv)  ((adv)->min_level)
 #define GET_ADV_MAX_LEVEL(adv)  ((adv)->max_level)
 #define GET_ADV_MAX_INSTANCES(adv)  ((adv)->max_instances)
+#define GET_ADV_NOTES(adv)  ((adv)->notes)
 #define GET_ADV_RESET_TIME(adv)  ((adv)->reset_time)
 #define GET_ADV_FLAGS(adv)  ((adv)->flags)
 #define GET_ADV_LINKING(adv)  ((adv)->linking)
@@ -180,6 +182,7 @@
 // instance utils
 #define INSTANCE_FLAGGED(i, flg)  (IS_SET(INST_FLAGS(i), (flg)))
 #define INST_ADVENTURE(inst)  ((inst)->adventure)
+#define INST_AGE_TIMESTAMP(inst)  ((inst)->age_timestamp)
 #define INST_CREATED(inst)  ((inst)->created)
 #define INST_DIR(inst)  ((inst)->dir)
 #define INST_FAKE_LOC(inst)  ((inst)->fake_loc)
@@ -208,6 +211,7 @@
 #define GET_ARCH_LORE(arch)  ((arch)->lore)
 #define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
 #define GET_ARCH_NAME(arch)  ((arch)->name)
+#define GET_ARCH_NOTES(arch)  ((arch)->notes)
 #define GET_ARCH_SKILLS(arch)  ((arch)->skills)
 #define GET_ARCH_TYPE(arch)  ((arch)->type)
 #define GET_ARCH_VNUM(arch)  ((arch)->vnum)
@@ -222,6 +226,7 @@
 #define GET_AUG_APPLIES(aug)  ((aug)->applies)
 #define GET_AUG_FLAGS(aug)  ((aug)->flags)
 #define GET_AUG_NAME(aug)  ((aug)->name)
+#define GET_AUG_NOTES(aug)  ((aug)->notes)
 #define GET_AUG_RESOURCES(aug)  ((aug)->resources)
 #define GET_AUG_REQUIRES_OBJ(aug)  ((aug)->requires_obj)
 #define GET_AUG_TYPE(aug)  ((aug)->type)
@@ -253,6 +258,7 @@
 #define BOOK_FLAGS(book)		((book)->flags)
 #define BOOK_ITEM_DESC(book)	((book)->item_description)
 #define BOOK_ITEM_NAME(book)	((book)->item_name)
+#define BOOK_NOTES(book)		((book)->notes)
 #define BOOK_PARAGRAPHS(book)	((book)->paragraphs)
 #define BOOK_TITLE(book)		((book)->title)
 
@@ -290,6 +296,7 @@
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
 #define GET_BLD_REGULAR_MAINTENANCE(bld)  ((bld)->regular_maintenance)
+#define GET_BLD_NOTES(bld)  ((bld)->notes)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -446,14 +453,14 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define CAN_RIDE_WATERWALK_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_UPGRADE))
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_player_tech((ch), PTECH_SEE_IN_MAGIC_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
-#define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
+#define CAST_BY_ID(ch)  (char_script_id(ch))
 #define EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch)  (AFF_FLAGGED(ch, AFF_FLYING))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch))
 #define EFFECTIVELY_SWIMMING_WITHOUT_MOUNT(ch)  (EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch) || HAS_WATERWALKING(ch) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
 #define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_SWIMMING_WITHOUT_MOUNT(ch) || EFFECTIVELY_FLYING(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))))
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
-#define HAS_WATERWALKING(ch)  (AFF_FLAGGED((ch), AFF_WATERWALKING) || MOUNT_FLAGGED((ch), MOUNT_WATERWALKING))
+#define HAS_WATERWALKING(ch)  (AFF_FLAGGED((ch), AFF_WATERWALKING) || (IS_RIDING(ch) && MOUNT_FLAGGED((ch), MOUNT_WATERWALKING)))
 #define IS_HASTENED(ch)  (AFF_FLAGGED((ch), AFF_HASTE) && !AFF_FLAGGED((ch), AFF_SLOW))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
@@ -486,6 +493,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 
 #define CLASS_VNUM(cls)  ((cls)->vnum)
 #define CLASS_NAME(cls)  ((cls)->name)
+#define CLASS_NOTES(cls)  ((cls)->notes)
 #define CLASS_ABBREV(cls)  ((cls)->abbrev)
 #define CLASS_FLAGS(cls)  ((cls)->flags)
 #define CLASS_POOL(cls, type)  ((cls)->pools[type])
@@ -505,6 +513,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_CRAFT_FLAGS(craft)  ((craft)->flags)
 #define GET_CRAFT_MIN_LEVEL(craft)  ((craft)->min_level)
 #define GET_CRAFT_NAME(craft)  ((craft)->name)
+#define GET_CRAFT_NOTES(craft)  ((craft)->notes)
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)
 #define GET_CRAFT_REQUIRES_OBJ(craft)  ((craft)->requires_obj)
@@ -531,6 +540,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_CROP_INTERACTIONS(crop)  ((crop)->interactions)
 #define GET_CROP_MAPOUT(crop)  ((crop)->mapout)
 #define GET_CROP_NAME(crop)  ((crop)->name)
+#define GET_CROP_NOTES(crop)  ((crop)->notes)
 #define GET_CROP_SPAWNS(crop)  ((crop)->spawns)
 #define GET_CROP_TITLE(crop)  ((crop)->title)
 #define GET_CROP_VNUM(crop)  ((crop)->vnum)
@@ -724,8 +734,11 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define FCT_MAX_REP(fct)  ((fct)->max_rep)
 #define FCT_MIN_REP(fct)  ((fct)->min_rep)
 #define FCT_NAME(fct)  ((fct)->name)
+#define FCT_NOTES(fct)  ((fct)->notes)
 #define FCT_RELATIONS(fct)  ((fct)->relations)
+#define FCT_REP_LOSS_PER_KILL(fct)  ((fct)->rep_loss_per_kill)
 #define FCT_STARTING_REP(fct)  ((fct)->starting_rep)
+
 
 // helpers
 #define FACTION_FLAGGED(fct, flag)  IS_SET(FCT_FLAGS(fct), (flag))
@@ -765,6 +778,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GEN_COMPUTED_RELATIONS(gen)  ((gen)->computed_relations)
 #define GEN_FLAGS(gen)  ((gen)->flags)
 #define GEN_NAME(gen)  ((gen)->name)
+#define GEN_NOTES(gen)  ((gen)->notes)
 #define GEN_RELATIONS(gen)  ((gen)->relations)
 #define GEN_STRING(gen, pos)  ((gen)->string[(pos)])
 #define GEN_TYPE(gen)  ((gen)->type)
@@ -855,6 +869,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_GLOBAL_TYPE_FLAGS(glb)  ((glb)->type_flags)
 #define GET_GLOBAL_MIN_LEVEL(glb)  ((glb)->min_level)
 #define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
+#define GET_GLOBAL_NOTES(glb)  ((glb)->notes)
 #define GET_GLOBAL_VAL(glb, pos)  ((glb)->value[(pos)])
 #define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
 #define GET_GLOBAL_SPARE_BITS(glb)  ((glb)->spare_bits)
@@ -916,29 +931,39 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // ch->mob_specials: mob_special_data
 #define GET_CURRENT_SCALE_LEVEL(ch)  ((ch)->mob_specials.current_scale_level)
-#define GET_MAX_SCALE_LEVEL(ch)  ((ch)->mob_specials.max_scale_level)
 #define GET_MOB_VNUM(mob)  (IS_NPC(mob) ? (mob)->vnum : NOTHING)
-#define GET_MIN_SCALE_LEVEL(ch)  ((ch)->mob_specials.min_scale_level)
-#define MOB_NAME_SET(ch)  ((ch)->mob_specials.name_set)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
-#define MOB_CUSTOM_CORPSE(ch)  ((ch)->mob_specials.custom_corpse)
-#define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
 #define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
-#define MOB_INTERACTIONS(ch)  ((ch)->interactions)
 #define MOB_LANGUAGE(ch)  ((ch)->mob_specials.language)
-#define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
 #define MOB_PURSUIT_LEASH_LOC(ch)  ((ch)->mob_specials.pursuit_leash_loc)
 #define MOB_TAGGED_BY(ch)  ((ch)->mob_specials.tagged_by)
 #define MOB_SPAWN_TIME(ch)  ((ch)->mob_specials.spawn_time)
 #define MOB_TO_DODGE(ch)  ((ch)->mob_specials.to_dodge)
 #define MOB_TO_HIT(ch)  ((ch)->mob_specials.to_hit)
-#define MOB_QUEST_LOOKUPS(ch)  ((ch)->quest_lookups)
-#define MOB_SHOP_LOOKUPS(ch)  ((ch)->shop_lookups)
+
+// prototype data
+#define MOB_CUSTOM_CORPSE(ch)  (IS_NPC(ch) ? (ch)->proto_data->custom_corpse : NOTHING)
+#define MOB_CUSTOM_MSGS(ch)  ((ch)->proto_data->custom_msgs)
+#define MOB_INTERACTIONS(ch)  ((ch)->proto_data->interactions)
+#define GET_MAX_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->max_scale_level : 0)
+#define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
+#define MOB_MOVE_TYPE(ch)  (IS_NPC(ch) ? (ch)->proto_data->move_type : MOB_MOVE_WALK)
+#define MOB_NAME_SET(ch)  (IS_NPC(ch) ? (ch)->proto_data->name_set : 0)
+#define MOB_NOTES(ch)  ((ch)->proto_data->notes)
+#define MOB_QUEST_LOOKUPS(ch)  ((ch)->proto_data->quest_lookups)
+#define MOB_SHOP_LOOKUPS(ch)  ((ch)->proto_data->shop_lookups)
+
+// protected data (regular getter won't allow set)
+#define SET_CUSTOM_CORPSE(ch, val)  ((ch)->proto_data->custom_corpse = (val))
+#define SET_MAX_SCALE_LEVEL(ch, val)  ((ch)->proto_data->max_scale_level = (val))
+#define SET_MIN_SCALE_LEVEL(ch, val)  ((ch)->proto_data->min_scale_level = (val))
+#define SET_MOVE_TYPE(ch, val)  ((ch)->proto_data->move_type = (val))
+#define SET_NAME_SET(ch, val)  ((ch)->proto_data->name_set = (val))
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
@@ -967,6 +992,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MORPH_LOOK_DESC(mph)  ((mph)->look_desc)
 #define MORPH_MAX_SCALE(mph)  ((mph)->max_scale)
 #define MORPH_MOVE_TYPE(mph)  ((mph)->move_type)
+#define MORPH_NOTES(mph)  ((mph)->notes)
 #define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
 #define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)
 #define MORPH_SIZE(mph)  ((mph)->size)
@@ -1012,6 +1038,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->proto_data ? (obj)->proto_data->max_scale_level : 0)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->proto_data ? (obj)->proto_data->min_scale_level : 0)
 #define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->quest_lookups : NULL)
+#define GET_OBJ_NOTES(obj)  ((obj)->proto_data ? (obj)->proto_data->notes : NULL)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_quest : NOTHING)
 #define GET_OBJ_REQUIRES_TOOL(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_tool : NOTHING)
 #define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->shop_lookups : NULL)
@@ -1025,6 +1052,9 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // definitions
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
+#define IS_STOLEN_FROM(obj, ch)  (!IS_NPC(ch) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch)))
+#define IS_STOLEN_FROM_EMPIRE(obj, emp)  ((emp) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(emp))
+#define OBJ_IS_NOWHERE(obj)  (!IN_ROOM(obj) && !((obj)->in_obj) && !((obj)->in_vehicle) && !((obj)->carried_by) && !((obj)->worn_by))
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))
@@ -1034,13 +1064,13 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define TOOL_FLAGGED(obj, flag)  IS_SET(GET_OBJ_TOOL_FLAGS(obj), (flag))
 #define WORN_OR_CARRIED_BY(obj, ch)  ((obj)->worn_by == (ch) || (obj)->carried_by == (ch))
 
-// for stacking, sotring, etc
+// for stacking, sorting, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
 #define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_BASIC_STORAGE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define OBJ_IS_IN_WORLD(obj)  (IN_ROOM(obj) || (obj)->in_obj || (obj)->in_vehicle || ((obj)->carried_by && IN_ROOM((obj)->carried_by)) || ((obj)->worn_by && IN_ROOM((obj)->worn_by)))
 #define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || (!OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_BIND_ON_PICKUP))) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_WAREHOUSE | OBJ_JUNK) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj) && (!IS_LIGHT(obj) || !LIGHT_IS_LIT(obj) || (LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE) && !LIGHT_FLAGGED(obj, LIGHT_FLAG_DESTROY_WHEN_DOUSED))))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)
-#define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (!IS_LIGHT(o1) || !IS_LIGHT(o2) || GET_LIGHT_IS_LIT(o1) == GET_LIGHT_IS_LIT(o2) || GET_LIGHT_HOURS_REMAINING(o1) == GET_LIGHT_HOURS_REMAINING(o2) || (GET_LIGHT_HOURS_REMAINING(o1) > 0 && GET_LIGHT_HOURS_REMAINING(o2) > 0)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
+#define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && (LIGHT_IS_LIT(o1) == LIGHT_IS_LIT(o2)) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (!IS_LIGHT(o1) || !IS_LIGHT(o2) || GET_LIGHT_IS_LIT(o1) == GET_LIGHT_IS_LIT(o2) || GET_LIGHT_HOURS_REMAINING(o1) == GET_LIGHT_HOURS_REMAINING(o2) || (GET_LIGHT_HOURS_REMAINING(o1) > 0 && GET_LIGHT_HOURS_REMAINING(o2) > 0)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1306,6 +1336,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LAST_AFF_WEAR_OFF_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_id))
 #define GET_LAST_AFF_WEAR_OFF_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_vnum))
 #define GET_LAST_AFF_WEAR_OFF_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_time))
+#define GET_LAST_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_coins_amount))
+#define GET_LAST_COINS_EMPIRE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_coins_empire))
 #define GET_LAST_COLD_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cold_time))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
 #define GET_LAST_COND_MESSAGE_TIME(ch, cond)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cond_message_time[(cond)]))
@@ -1416,6 +1448,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
+// protocol helpers
+#define CAN_NAWS(ch)  ((ch)->desc && (ch)->desc->pProtocol->bNAWS)
+#define GET_SCREEN_WIDTH(ch)  (((ch)->desc && (ch)->desc->pProtocol->ScreenWidth > 0) ? (ch)->desc->pProtocol->ScreenWidth : 80)
+#define GET_SCREEN_HEIGHT(ch)  (((ch)->desc && (ch)->desc->pProtocol->ScreenHeight > 0) ? (ch)->desc->pProtocol->ScreenHeight : 24)
+
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
 #define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!is_spammy || !PRF_FLAGGED((ch), PRF_NOSPAM)) && (!is_animal_move || IS_NPC(ch) || SHOW_STATUS_MESSAGES((ch), SM_ANIMAL_MOVEMENT)))
 
@@ -1428,6 +1465,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define PRG_DESCRIPTION(prg)  ((prg)->description)
 #define PRG_FLAGS(prg)  ((prg)->flags)
 #define PRG_NAME(prg)  ((prg)->name)
+#define PRG_NOTES(prg)  ((prg)->notes)
 #define PRG_PERKS(prg)  ((prg)->perks)
 #define PRG_PREREQS(prg)  ((prg)->prereqs)
 #define PRG_TASKS(prg)  ((prg)->tasks)
@@ -1451,6 +1489,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define QUEST_MAX_LEVEL(quest)  ((quest)->max_level)
 #define QUEST_MIN_LEVEL(quest)  ((quest)->min_level)
 #define QUEST_NAME(quest)  ((quest)->name)
+#define QUEST_NOTES(quest)  ((quest)->notes)
 #define QUEST_PREREQS(quest)  ((quest)->prereqs)
 #define QUEST_REPEATABLE_AFTER(quest)  ((quest)->repeatable_after)
 #define QUEST_REWARDS(quest)  ((quest)->rewards)
@@ -1484,6 +1523,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define ROOM_PATHFIND_KEY(room)  ((room)->pathfind_key)
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_UNLOAD_EVENT(room)  ((room)->unload_event)
+#define ROOM_SMALL_VEHICLES(room)  ((room)->small_vehicles)
+#define ROOM_VEHICLE_SIZE(room)  ((room)->vehicle_size)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
@@ -1537,7 +1578,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define BLD_BASE_AFFECTS(room)  (GET_BUILDING(HOME_ROOM(room)) ? GET_BLD_BASE_AFFECTS(GET_BUILDING(HOME_ROOM(room))) : NOBITS)
 
 // definitions
-#define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)
+#define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR | RMT_ALLOW_MOUNTS)) : TRUE)
 #define CAN_CHOP_ROOM(room)  (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || can_interact_room((room), INTERACT_CHOP) || (ROOM_SECT_FLAGGED((room), SECTF_CROP) && ROOM_CROP_FLAGGED((room), CROPF_IS_ORCHARD)))
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
@@ -1569,7 +1610,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // helpers
 #define BLD_FLAGGED(bld, flag)  IS_SET(GET_BLD_FLAGS(bld), (flag))
 #define BLD_DESIGNATE_FLAGGED(room, flag)  (GET_BUILDING(HOME_ROOM(room)) && IS_SET(GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(HOME_ROOM(room))), (flag)))
-#define CHECK_CHAMELEON(from_room, to_room)  (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && compute_distance(from_room, to_room) >= 2)
+#define CHECK_CHAMELEON(from_room, to_room)  (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && !HAS_MAJOR_DISREPAIR(to_room) && compute_distance(from_room, to_room) >= 2)
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
 #define ROOM_AFF_FLAGGED(r, flag)  (IS_SET(ROOM_AFF_FLAGS(r), (flag)))
 #define ROOM_BLD_FLAGGED(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FLAGS(GET_BUILDING(room)), (flag)))
@@ -1636,6 +1677,7 @@ static inline int GET_SEASON(room_data *room) {
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 #define GET_RMT_SUBZONE(rmt)  ((rmt)->subzone)
 #define GET_RMT_TEMPERATURE_TYPE(rmt)  ((rmt)->temperature_type)
+#define GET_RMT_NOTES(rmt)  ((rmt)->notes)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1674,6 +1716,7 @@ static inline int GET_SEASON(room_data *room) {
 #define SHOP_ITEMS(shop)  ((shop)->items)
 #define SHOP_LOCATIONS(shop)  ((shop)->locations)
 #define SHOP_NAME(shop)  ((shop)->name)
+#define SHOP_NOTES(shop)  ((shop)->notes)
 #define SHOP_OPEN_TIME(shop)  ((shop)->open_time)
 
 // helpers
@@ -1690,6 +1733,7 @@ static inline int GET_SEASON(room_data *room) {
 #define SKILL_MAX_LEVEL(skill)  ((skill)->max_level)
 #define SKILL_MIN_DROP_LEVEL(skill)  ((skill)->min_drop_level)
 #define SKILL_NAME(skill)  ((skill)->name)
+#define SKILL_NOTES(skill)  ((skill)->notes)
 #define SKILL_SYNERGIES(skill)  ((skill)->synergies)
 #define SKILL_VNUM(skill)  ((skill)->vnum)
 
@@ -1706,6 +1750,7 @@ static inline int GET_SEASON(room_data *room) {
 #define SOC_MIN_CHAR_POS(soc)  ((soc)->min_char_position)
 #define SOC_MIN_VICT_POS(soc)  ((soc)->min_victim_position)
 #define SOC_NAME(soc)  ((soc)->name)
+#define SOC_NOTES(soc)  ((soc)->notes)
 #define SOC_REQUIREMENTS(soc)  ((soc)->requirements)
 #define SOC_VNUM(soc)  ((soc)->vnum)
 
@@ -1726,9 +1771,9 @@ static inline int GET_SEASON(room_data *room) {
 #define REAL_HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
 #define REAL_HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
 
-#define AN(string)  (strchr("aeiouAEIOU", *string) ? "an" : "a")
-#define SANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
-#define ANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
+#define AN(string)  (strchr("aeiouAEIOU", *(string)) ? "an" : "a")
+#define SANA(obj)  (strchr("aeiouyAEIOUY", *((obj)->name)) ? "an" : "a")
+#define ANA(obj)  (strchr("aeiouyAEIOUY", *((obj)->name)) ? "An" : "A")
 
 #define LOWER(c)  (((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
 #define UPPER(c)  (((c)>='a'  && (c) <= 'z') ? ((c)+('A'-'a')) : (c) )
@@ -1785,11 +1830,9 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
 #define VEH_QUARTER_ICON(veh)  ((veh)->quarter_icon)
-#define VEH_QUEST_LOOKUPS(veh)  ((veh)->quest_lookups)
 #define VEH_ROOM_AFFECTS(veh)  ((veh)->room_affects)
 #define VEH_ROOM_LIST(veh)  ((veh)->room_list)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
-#define VEH_SHOP_LOOKUPS(veh)  ((veh)->shop_lookups)
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
 #define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
 #define VEH_VNUM(veh)  ((veh)->vnum)
@@ -1814,9 +1857,12 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_MILITARY(veh)  ((veh)->attributes->military)
 #define VEH_MIN_SCALE_LEVEL(veh)  ((veh)->attributes->min_scale_level)
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
+#define VEH_NOTES(veh)  ((veh)->attributes->notes)
+#define VEH_QUEST_LOOKUPS(veh)  ((veh)->attributes->quest_lookups)
 #define VEH_RELATIONS(veh)  ((veh)->attributes->relations)
 #define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
 #define VEH_REGULAR_MAINTENANCE(veh)  ((veh)->attributes->regular_maintenance)
+#define VEH_SHOP_LOOKUPS(veh)  ((veh)->attributes->shop_lookups)
 #define VEH_SIZE(veh)  ((veh)->attributes->size)
 #define VEH_SPAWNS(veh)  ((veh)->attributes->spawns)
 #define VEH_SPEED_BONUSES(veh)  ((veh)->attributes->veh_move_speed)
@@ -1826,6 +1872,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
 #define VEH_HAS_ANY_ICON(veh)  (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
+#define VEH_IS_PRIVATE(veh)  (VEH_INTERIOR_HOME_ROOM(veh) ? ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_PRIVATE) : (IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PRIVATE)))
 #define VEH_IS_PUBLIC(veh)  (VEH_INTERIOR_HOME_ROOM(veh) ? ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_PUBLIC) : (IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC)))
 #define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_HAS_ANY_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
@@ -1836,6 +1883,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 #define VEH_PAINT_COLOR(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_PAINT_COLOR)
 #define VEH_PATRON(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_DEDICATE_ID)
+#define VEH_PURGES_WHEN_TILE_RUINS(veh)  (!VEH_OWNER(veh) && !VEH_CONTAINS(veh) && !VEH_REGULAR_MAINTENANCE(veh) && !VEH_FLAGGED((veh), VEH_IS_RUINS))
 #define VEH_PROVIDES_LIGHT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && (VEH_OWNER(veh) || (IN_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_UNCLAIMABLE))))
 
 
@@ -1876,6 +1924,7 @@ extern struct weather_data weather_info;	// db.c
 void add_pair_hash(struct pair_hash **hash, int id, int value);
 void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+bool ends_in_punct(const char *string);
 struct pair_hash *find_in_pair_hash(struct pair_hash *hash, int id);
 struct string_hash *find_in_string_hash(struct string_hash *hash, const char *string);
 struct vnum_hash *find_in_vnum_hash(struct vnum_hash *hash, any_vnum vnum);
@@ -1931,6 +1980,7 @@ void run_delayed_refresh();
 
 // empire utils from utils.c
 bool can_claim(char_data *ch);
+void check_empire_imm_only(empire_data *emp);
 int count_members_online(empire_data *emp);
 int count_tech(empire_data *emp);
 bool empire_can_claim(empire_data *emp);
@@ -1954,6 +2004,7 @@ void comma_args(char *string, char *arg1, char *arg2);
 int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
 int is_abbrev(const char *arg1, const char *arg2);
+bool is_abbrev_ignore_hyphen(const char *arg, const char *string);
 bool is_multiword_abbrev(const char *arg, const char *phrase);
 int is_number(const char *str);
 char *one_argument(char *argument, char *first_arg);
@@ -2011,7 +2062,7 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
-room_data *find_load_room(char_data *ch);
+room_data *find_load_room(char_data *ch, int *load_room_type);
 room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
@@ -2031,6 +2082,7 @@ bool wake_and_stand(char_data *ch);
 // resource functions from utils.c
 void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc);
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list);
+int count_resource_list_quantity(struct resource_data *list);
 void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list);
 struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 char *get_resource_name(struct resource_data *res);
@@ -2066,7 +2118,7 @@ char *show_color_codes(char *string);
 char *str_dup(const char *source);
 char *str_replace(const char *search, const char *replace, const char *subject);
 char *str_str(const char *cs, const char *ct);
-char *strip_color(char *input);
+char *strip_color(const char *input);
 char *stripcr(char *dest, const char *src);
 void strip_crlf(char *buffer);
 char *strtolower(char *str);
@@ -2110,6 +2162,7 @@ bitvector_t get_climate(room_data *room);
 bitvector_t get_climate_map(struct map_data *map);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_depletion_max(room_data *room, int depletion_type);
+int get_depletion_max_vehicle(vehicle_data *veh, int depletion_type);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
 const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
@@ -2124,6 +2177,7 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter);
 sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
 
 // misc functions from utils.c
+const char *color_name_by_code(const char *color_code_string, bool include_underline);
 char *simple_time_since(time_t when);
 unsigned long long microtime(void);
 bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
@@ -2133,11 +2187,12 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
-void do_burn_area(char_data *ch);
+void do_burn_area(char_data *ch, bool confirmed);
 void end_action(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void process_build_action(char_data *ch);
+void show_prospect_result(char_data *ch, room_data *room);
 void start_action(char_data *ch, int type, int timer);
 void stop_room_action(room_data *room, int action);
 
@@ -2159,7 +2214,8 @@ void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entr
 // act.empire.c
 void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank);
 bool check_in_city_requirement(room_data *room, bool check_wait);
-void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
+void clean_empire_history(empire_data *emp);
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter, bool confirmed);
 void do_customize_island(char_data *ch, char *argument);
 char *empire_history_filename(empire_data *emp);
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
@@ -2196,6 +2252,7 @@ void survey_city(char_data *ch, char *argument);
 
 // act.item.c
 bool can_take_obj(char_data *ch, obj_data *obj);
+bool check_douse_light_before_store(char_data *ch, obj_data *obj);
 int count_objs_in_room(room_data *room);
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
 bool douse_light(obj_data *obj);
@@ -2272,6 +2329,7 @@ bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
 int get_crafting_level(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
+bool obj_can_be_superior(obj_data *obj);
 
 // act.vampire.c
 bool cancel_biting(char_data *ch, bool preventable);
@@ -2290,7 +2348,7 @@ bool vampire_kill_feeding_target(char_data *ch, char *argument);
 // act.vehicles.c
 void do_customize_vehicle(char_data *ch, char *argument);
 void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
-void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint, bool confirmed);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
 bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
@@ -2358,6 +2416,7 @@ void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
 bool has_uncollected_event_rewards(char_data *ch);
+void log_active_events_to_char(char_data *ch);
 struct event_running_data *only_one_running_event(int *count);
 
 // faction.c
@@ -2381,6 +2440,8 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 time_t get_last_killed_by_empire(char_data *ch, empire_data *emp);
 double get_weapon_speed(obj_data *weapon);
+bool has_stolen_contents(obj_data *cont);
+bool has_stolen_items(char_data *ch);
 bool is_fight_ally(char_data *ch, char_data *frenemy);
 bool is_fight_enemy(char_data *ch, char_data *frenemy);
 void out_of_blood(char_data *ch);
@@ -2389,6 +2450,9 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 obj_data *player_death(char_data *ch);
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 void reset_combat_meters(char_data *ch);
+void return_stolen_item_one(obj_data *obj);
+void return_stolen_items_from_obj(obj_data *cont);
+void return_stolen_items(char_data *ch);
 int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attack_message_data *custom_fight_messages);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -2410,6 +2474,7 @@ bool liquid_flagged(any_vnum generic_liquid_vnum, bitvector_t flag);
 
 // instance.c
 int adjusted_instance_limit(adv_data *adv);
+struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
 bool can_enter_instance(char_data *ch, struct instance_data *inst);
 bool can_instance(adv_data *adv);
 void check_instance_is_loaded(struct instance_data *inst);
@@ -2417,6 +2482,7 @@ int count_instances(adv_data *adv);
 int delete_all_instances(adv_data *adv);
 void delete_instance(struct instance_data *inst, bool run_cleanup);
 void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
+room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
 room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum);
 room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
@@ -2434,6 +2500,7 @@ bool same_subzone(room_data *a, room_data *b);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
+void update_instance_world_size();
 
 // limits.c
 bool can_mount_in_room(char_data *ch, room_data *room);
@@ -2455,6 +2522,7 @@ void schedule_all_obj_timers(char_data *ch);
 void schedule_heal_over_time(char_data *ch);
 void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
 void schedule_obj_timer_update(obj_data *obj, bool override);
+bool should_reset_bonus_traits(char_data *ch);
 bool tick_obj_timer(obj_data *obj);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
@@ -2462,28 +2530,76 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness);
 int distance_can_see_in_dark(char_data *ch);
 struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-int get_map_radius(char_data *ch);
+int get_map_radius(char_data *ch, bool reduce_for_movement);
 char *get_mine_type_name(room_data *room);
 char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
 char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
-void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
-#define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, vehicle_data *view_from_veh);
+#define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS, NULL)
 void look_in_direction(char_data *ch, int dir);
 char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 
 #define HOLYLIGHT_OR_TILE_OWNER(ch, room)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !ROOM_OWNER(room) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)))
 #define HOLYLIGHT_OR_VEH_OWNER(ch, veh)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !VEH_OWNER(veh) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == VEH_OWNER(veh)))
 
-void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool private, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define INFORMATIVE_MINE_VALUE(ch, room)  ((get_room_extra_data((room), ROOM_EXTRA_MINE_GLB_VNUM) > 0) ? ((PRF_FLAGGED((ch), PRF_HOLYLIGHT) || room_has_function_and_city_ok(GET_LOYALTY(ch), (room), FNC_MINE) || (GET_LOYALTY(ch) && get_room_extra_data((room), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch)))) ? (get_room_extra_data((room), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0) : 0)
-#define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), INFORMATIVE_MINE_VALUE(ch, room), ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)))
-#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) ? (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) : FALSE, VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), VEH_IS_PUBLIC(veh), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)))
+#define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), \
+	/* dismantling */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, \
+	/* unfinished */ HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, \
+	/* major_disrepair */ HAS_MAJOR_DISREPAIR(room), \
+	/* minor_disrepair */ HAS_MINOR_DISREPAIR(room), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, room), \
+	/* public */ ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC) ? TRUE : FALSE, \
+	/* private */ ROOM_AFF_FLAGGED((room), ROOM_AFF_PRIVATE) ? TRUE : FALSE, \
+	/* no_work */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK)) ? TRUE : FALSE, \
+	/* no_abandon */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, \
+	/* no_dismantle */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) \
+)
+#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), \
+	/* dismantling */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, \
+	/* unfinished */ HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) ? (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) : FALSE, \
+	/* major_disrepair */ VEH_HAS_MAJOR_DISREPAIR(veh), \
+	/* minor_disrepair */ VEH_HAS_MINOR_DISREPAIR(veh), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), \
+	/* public */ VEH_IS_PUBLIC(veh), \
+	/* private */ VEH_IS_PRIVATE(veh), \
+	/* no_work */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), \
+	/* no_abandon */ FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, \
+	/* no_dismantle */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ((ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) && IS_COMPLETE(IN_ROOM(veh))) || vehicle_is_chameleon(veh, IN_ROOM(ch))) \
+)
 
-char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool private, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define simple_distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
-#define get_informative_color_room(ch, room)  get_informative_color((ch), (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), INFORMATIVE_MINE_VALUE(ch, room), ROOM_AFF_FLAGGED(room, ROOM_AFF_PUBLIC) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > 2)
-#define get_informative_color_veh(ch, veh)  get_informative_color((ch), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), VEH_IS_PUBLIC(veh), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /* no-abandon */, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
+#define get_informative_color_room(ch, room)  get_informative_color((ch), \
+	/* dismantling */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, \
+	/* unfinished */  HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, \
+	/* major_disrepair */ HAS_MAJOR_DISREPAIR(room), \
+	/* minor_disrepair */ HAS_MINOR_DISREPAIR(room), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, room), \
+	/* public */ ROOM_AFF_FLAGGED(room, ROOM_AFF_PUBLIC) ? TRUE : FALSE, \
+	/* private */ ROOM_AFF_FLAGGED(room, ROOM_AFF_PRIVATE) ? TRUE : FALSE, \
+	/* no_work */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) ? TRUE : FALSE, \
+	/* no_abandon */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, \
+	/* no_dismantle */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > (2 * 2) \
+)
+#define get_informative_color_veh(ch, veh)  get_informative_color((ch), \
+	/* dismantling */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, \
+	/* unfinished */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)), \
+	/* major_disrepair */ VEH_HAS_MAJOR_DISREPAIR(veh), \
+	/* minor_disrepair */ VEH_HAS_MINOR_DISREPAIR(veh), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), \
+	/* public */ VEH_IS_PUBLIC(veh), \
+	/* private */ VEH_IS_PRIVATE(veh), \
+	/* no_work */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), \
+	/* no_abandon */ FALSE, \
+	/* no_dismantle */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ((ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) && IS_COMPLETE(IN_ROOM(veh)) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2*2) || vehicle_is_chameleon(veh, IN_ROOM(ch))) \
+)
 
 // mobact.c
 void add_pursuit(char_data *ch, char_data *target);
@@ -2496,6 +2612,9 @@ int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 struct generic_name_data *get_best_name_list(int name_set, int sex);
+int get_block_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags);
+int get_dodge_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags);
+int get_hit_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
 void reschedule_all_despawns();
@@ -2513,6 +2632,7 @@ void schedule_scavenge_event(char_data *ch, bool randomize);
 void set_mob_spawn_time(char_data *mob, long when);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void spawn_mobs_from_center(room_data *center);
+void spawn_one_room(room_data *room, bool only_artisans);
 bool try_mobile_movement(char_data *ch);
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
@@ -2627,6 +2747,7 @@ void qt_empire_players_vehicle(empire_data *emp, void (*func)(char_data *ch, veh
 void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_gain_tile_sector(char_data *ch, sector_vnum vnum);
 void qt_change_coins(char_data *ch);
+void qt_change_companion(char_data *ch, any_vnum companion, bool gain);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
 void qt_change_language(char_data *ch, any_vnum vnum, int level);
 void qt_empire_wealth(char_data *ch, any_vnum amount);
@@ -2644,6 +2765,7 @@ void qt_remove_obj(char_data *ch, obj_data *obj);
 void qt_start_quest(char_data *ch, any_vnum vnum);
 void qt_triggered_task(char_data *ch, any_vnum vnum, int specific_val);
 void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all);
+void qt_update_progress(char_data *ch, any_vnum only_vnum);
 void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 
@@ -2664,6 +2786,7 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total);
 void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
+void et_update_progress(empire_data *emp, any_vnum only_vnum);
 
 // random.c
 unsigned long empire_random();
@@ -2765,7 +2888,7 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
 void free_workforce_where_log(struct workforce_where_log **to_free);
 int *get_ordered_chores();
-void log_workforce_where(empire_data *emp, char_data *mob, int chore);
+void log_workforce_where(empire_data *emp, char_data *mob, int chore, vehicle_data *veh);
 void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 int sort_einv_by_amount(struct empire_storage_data *a, struct empire_storage_data *b);
@@ -2783,6 +2906,11 @@ void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 #define GROUP(ch)  (ch->group)
 #define GROUP_LEADER(group)  (group->leader)
 #define GROUP_FLAGS(group)  (group->group_flags)
+
+// LOAD_ROOM_x: used by find_load_room()
+#define LOAD_ROOM_START_LOC  0
+#define LOAD_ROOM_MY_TOMB  1
+#define LOAD_ROOM_ANY_TOMB  2
 
 // handy
 #define SELF(sub, obj)  ((sub) == (obj))

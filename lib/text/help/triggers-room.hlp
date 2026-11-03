@@ -111,6 +111,7 @@ Variables:
   &c%direction%&0 - The direction the character came from, if any.
   &c%method%&0 - Type of movement (see METHOD LIST).
   &c%room%&0 - The room being entered.
+  &c%was_in%&0 - Room the character was in before, if any (may be empty).
 
 You can add the "Player-in-Room" modifier.
 
@@ -141,14 +142,21 @@ Rooms can trigger on the following events:
 &cBuy&0 - Triggers when someone tries to buy in the room.
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command trigs).
 
 For each type, there is a help file named &yRTRIG <type>&0.
 #d
 "RTRIG VARS" "RTRIG VARIABLES" ROOM-VARS TRIGEDIT-ROOM-VAR TRIGEDIT-VARIABLES-ROOMS
 
-All room scripts provide the &c%room%&0 variable.
+Room Variables
+
+All room scripts provide the &c%room%&0 variable. Other ways of getting a room
+variable include %actor.room% or %obj.room%. Access the below fields from a
+room variable like this: %room.coords%
 
 When using field - The variable returns:
+&cadd_built_with(vnum,amount,level)&0 - For buildings, adds to the list of
+   items used to build them (for later dismantle).
 &caff_flagged(AFF)&0 - True if the room has an affect flag on it.
    If called with no argument, lists current flags instead.
 &cbld_dir(dir)&0 - Rotates the given direction based on which way the building
@@ -158,10 +166,13 @@ When using field - The variable returns:
 &cbuilding&0 - The name of the building on the room, if any.
 &cbuilding_vnum&0 - The vnum of the building on the room, if any.
 &ccan_build(FLAG)&0 - True if the room has the given build flags.
+&cclimate&0 or &cclimate(FLAG)&0 - Get the list of climates or check if 1 climate
+   is in the list (CLIMATE FLAGS).
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
 &ccontents(vnum)&0 - The id of the first obj in the room that has that vnum.
-&ccoords&0 - The (x, y) location of the room on the map.
+&ccoords&0 - The (x, y) location of the room on the map, also &ccoords(x)&0 or
+   &ccoords(y)&0 to get either coord. Returns "(???, ???)" in unknown locations.
 &ccrop&0 - The name of the crop on the map room, if any.
 &ccrop_flagged(FLG)&0 - True if it's a crop and a given crop flag is present.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.
@@ -169,6 +180,7 @@ When using field - The variable returns:
 &cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
    room, or change it with %room.depletion(type,amount)%; 0 is not-depleted.
 &cdirection(target)&0 - The approximate direction to the target.
+&cdismantling&0 - True if the room is being dismantled.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
 &cempire_adjective&0 - The owner empire's adjective form, if any.
@@ -186,15 +198,24 @@ When using field - The variable returns:
       %room.north(map)% - room variable for the map location in the dir
 &chas_evolution(type)&0 - Room has a given evolution available (SECTEDIT EVO).
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
+&chealth&0 - Current buildings or their interiors, remaining health/damage.
 &cheight&0 - Get the current height of a map tile or set it with &cheight(num)&0.
    Use &cview_height&0 instead if you want to include things built on it.
+&chomeroom&0 - For interiors of buildings, the starting/entrance room. For
+   interiors of ships, the room where you board the ship.
 &cid&0 - The unique id of the room.
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
+&cisland, island(for)&0 - The name of the island the room is on, if any. If the
+   subfield is a person or empire, instead gives their custom name for it.
+&cisland_flagged(FLAG)&0 - See ISLAND FLAGS for a list.
+&cis_ocean&0 - Room is an ocean tile.
 &cis_on_map&0 - True if the room is on the map (including closed buildings).
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
+&cis_water&0 - Room is any type of water location that requires swimming.
 &cis_zenith_day&0 - True if it's the day of the sun's zenith passage here.
+&cmaxhealth&0 - For buildings or their interiors, maximum health/damage.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.
 &cmine_type&0 - If the room is a mine, gets the type name ("gold mine").
 &cmoon_phase(moon,*)&0 - Current phase of the moon (vnum or name). Optional 2nd
@@ -204,15 +225,17 @@ When using field - The variable returns:
 &cname&0 - The name of the room.
 &cpainted&0 - The color the building is painted, if any.
 &cpeople&0 - The id of the first character in the room, or an empty return.
-   Note that this will skip !SEE mobs.
+   Note that this will skip NO-SEE-IN-ROOM mobs.
 &cpeople(VNUM)&0 - The id of the first instance of that mob vnum in the room.
 &cplayers_present&0 - Number of players in the room; 0/false if none.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
    If called with no argument, lists current flags instead.
 &cseason&0 - The local season (spring, summer, autumn, winter).
-&csector&0 - The sector type of the room.
-&csector_flagged(FLG)&0 - True if a given sector flag is present.
-&csector_vnum&0 - The sector vnum of the room.
+&csector&0 - The sector type of the room. (Also: &cbase_sector&0, &cnatural_sector&0)
+&csector_flagged(FLG)&0 - True if a given sector flag is present. (Also:
+   &cbase_sector_flagged&0, &cnatural_sector_flagged&0)
+&csector_vnum&0 - The sector vnum of the room. (Also: &cbase_sector_vnum&0,
+   &cnatural_sector_vnum&0)
 &csubzone&0 - The subzone id of the room template, if any (-1 if none).
 &csun&0 - Sun status at the room (regardless of indoor/outdoor): dark, rising,
    light, setting (only 'dark' makes the room dark).

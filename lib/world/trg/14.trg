@@ -1,6 +1,7 @@
 #1400
 Paint Quest: Alchemist Research~
-1 c 2
+1 c 2 1
+L t 1400
 research~
 if !%actor.on_quest(1400)%
   return 0
@@ -22,7 +23,15 @@ end
 ~
 #1401
 Paint Quests: Starting Items~
-2 u 0
+2 u 0 8
+L c 1496
+L c 1497
+L c 1499
+L t 1400
+L t 1402
+L t 1403
+L t 1404
+L t 1406
 ~
 switch %questvnum%
   case 1400
@@ -47,7 +56,8 @@ done
 ~
 #1404
 Paint Quest: Library Research~
-1 c 2
+1 c 2 1
+L t 1404
 research~
 if !%actor.on_quest(1404)%
   return 0
@@ -69,7 +79,10 @@ end
 ~
 #1496
 Teach secondary paint recipes~
-2 v 0
+2 v 0 3
+L a 1406
+L a 1408
+L a 1410
 ~
 nop %actor.add_learned(1406)%
 nop %actor.add_learned(1408)%
@@ -77,7 +90,10 @@ nop %actor.add_learned(1410)%
 ~
 #1497
 Experimental Paint quest finish~
-2 v 0
+2 v 0 3
+L a 1400
+L a 1402
+L a 1404
 ~
 rdelete painting_level %actor.id%
 nop %actor.add_learned(1400)%
@@ -86,7 +102,8 @@ nop %actor.add_learned(1404)%
 ~
 #1498
 Experimental Paint consume~
-1 s 100
+1 s 100 1
+L t 1402
 ~
 * Does not block use
 return 1

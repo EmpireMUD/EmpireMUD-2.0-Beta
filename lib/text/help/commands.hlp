@@ -64,7 +64,7 @@ completed.
 
 See also: TOGGLE
 #
-AFFECTS
+AFFECTS EFFECTS
 
 Usage:  affects [person]
 
@@ -166,8 +166,9 @@ give a "switch" mortlog (instead of elogs).
 You can't use alternate again within 60 seconds of a previous use. Please don't
 spam players by logging in and out more rapidly than this.
 
-You can't alt (or quit) in hostile territory. You can choose to disconnect
-instead, but this will leave your character vulnerable.
+You can't alt (or quit) in hostile territory or with stolen items in your
+inventory. You can choose to disconnect instead, but this will leave your
+character vulnerable.
 
 You should read the multiplaying/alts rules on the POLICY command for more
 information on these rules.
@@ -292,12 +293,14 @@ Inviting a player to a group automatically beckons them to follow.
 
 See also: FOLLOW
 #
-BOARD
+BOARD EMBARK
 
 Usage:  board <vehicle>
 
 This command is used to board a ship or other vehicle in the same room. Not
 all vehicles can be boarded.
+
+If you were looking for message boards, try HELP BOARDS.
 
 See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
@@ -402,7 +405,7 @@ See also: BUILD, RECIPES
 #
 BURN
 
-Usage:  burn <building | vehicle | area | direction>
+Usage:  burn <building | vehicle | area | direction> [confirm]
 
 To burn something, you must have fire sticks or some other lighter. You can use
 this command to light a building on fire, either from the same tile as the
@@ -421,9 +424,14 @@ You can also burn down some vehicles. You cannot burn other players' property
 if you are not a member of an empire. Burning your own buildings and vehicles
 requires the 'dismantle' privilege.
 
+In the tropics, burning stumps or grassland will create fertile soil for
+planting.
+
+You must type 'confirm' after the target to burn something you own.
+
 To light torches or other items, use 'light'.
 
-See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
+See also: DOUSE, LIGHT, LIGHTERS, TORCH, PLANT, PRIVILEGES
 #
 BUTCHER
 
@@ -435,6 +443,9 @@ This command succeeds about 60% of the time unskilled, and 100% of the time
 with the Huntsman ability -- at least, when there's something to be butchered
 from the corpse. Not all corpses can be butchered, and some corpses only have
 rare results even with Huntsman.
+
+Smaller corpses are butchered away to nothing. Larger corpses remain, but can
+still only be butchered one time.
 
 See also: HUNTSMAN, SKIN COMMAND
 #
@@ -587,7 +598,9 @@ You can dismiss your companion from anywhere using 'dismiss companion'. If you
 log out with a companion active, it will automatically be re-summoned when you
 log back in (but you will have to re-cast any buffs on it).
 
-See also: DISMISS, BODYGUARD, FAMILIAR
+View your companion's health pool with the 'summary' command.
+
+See also: DISMISS, BODYGUARD, FAMILIAR, SUMMARY
 #
 COMPARE "COMPARE ITEMS"
 
@@ -738,7 +751,7 @@ you have come prepared.
 
 Boss:
 For four players, which should include a tank, a healer, and two dps. This is
-the highest difficulty setting and will more damage to defeat in a longer
+the highest difficulty setting and will take more damage to defeat in a longer
 fight. Players are usually only able to handle boss difficulty alone if they
 are significantly above the mob's level and have strong gear and skills.
 
@@ -898,7 +911,7 @@ You can also do the following complex emotes:
  - Use @target to insert another person (e.g. "@wolf")
  - Use #item to insert an item (e.g. "#sword")
 
-See also: SOCIALS
+See also: RECOLOR, SOCIALS
 #
 EMPTY
 
@@ -915,6 +928,7 @@ Usage:  equipment [-all]  -- see your current gear
         equipment set <name>  -- save an equipment set
         equipment delete <name>  -- delete an equipment set
         equipment list  -- list your equipment sets
+        equipment list <name>  -- list items in the set
         equipment <name>  -- change to an equipment set
         equipment analyze  -- see help about your equipment
         equipment summary  -- see a summary of stats
@@ -1054,6 +1068,7 @@ See also: DIRECTIONS, DISEMBARK, ENTER, EXIT
 FACTION FACTIONS REPUTATIONS REP "FACTION REP"
 
 Usage:  factions [name]
+        reputations [name]
 
 Factions are groups of NPCs and adventures with whom players can gain or lose
 reputation. The consequences of higher or lower reputation depend on the
@@ -1284,7 +1299,7 @@ Usage:  gsay <message>
 Tell something to all the members of your group, even if they're not in the
 room. You can also use the older psay/ptell command, which does the same thing.
 
-See also: DISPLAY, IGNORE, GROUP, TELL, SAY
+See also: DISPLAY, IGNORE, GROUP, TELL, RECOLOR, SAY
 #
 HELP
 
@@ -1301,7 +1316,21 @@ Examples:
 
 Immortals may view mortal help files with: help -m <topic>
 
+Help files are also available in a web browser at http://empiremud.net/help.php
+
 See also: COMMANDS, HELPSEARCH, SOCIALS
+#
+HELPINDEX "HELP INDEX"
+
+Usage:  helpindex
+        helpindex <keywords>
+
+This command shows a rather long list of all help files available to you.
+
+If you provide one or more keywords, it looks for help files that have a
+keyword similar to the keywords you provided.
+
+See also: HELP, HELPSEARCH
 #
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
@@ -1311,7 +1340,19 @@ This command lets you search the body of help files, instead of just their
 keywords. You can search for multiple words at a time. If a single search
 term has multiple word, put it "in quotes".
 
-See also: HELP
+See also: HELP, HELPINDEX
+#
+HIDE-KEEP "TOGGLE HIDE-KEEP" "HIDE KEEP"
+
+Usage:  toggle hide-keep [on/off]
+
+This option will hide items with (keep) flags from your basic inventory
+command, allowing you to see a much shorter version of your inventory without
+the items you always keep with you.
+
+You can still use 'inventory -k' to see (keep) items with this flag on.
+
+See also: INVENTORY, KEEP, TOGGLES
 #
 IDENTIFY
 
@@ -1332,7 +1373,12 @@ trying to figure out what to drop or give away, since the numbering (2.bag)
 will be the same for identify and drop (instead of also checking your equipment
 for the identify command).
 
-See also: EIDENTIFY, COMPARE, LEVEL COLORS, EQUIPMENT
+Weapons show damage in two ways. The first number is the damage per attack. The
+second number, in parentheses, gives the base DPS (damage per second) for the
+weapon, which is expressed as an attribute plus a number. DPS is a combination
+of the weapon's damage and speed.
+
+See also: EIDENTIFY, COMPARE, LEVEL COLORS, EQUIPMENT, DPS
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -1353,6 +1399,7 @@ map see tiles in color:
   &g/[]\&0  has minable ore (mine-status)
   &r/\/\&0  depleted/no ore (mine-status)
   &o{LL}&0  public
+  &P(PP)&0  private
   &B^^^^&0  no-work
   &VW*WW&0  no-abandon
   &J.().&0  no-dismantle
@@ -1372,11 +1419,11 @@ This will block tells, says, whispers, emotes, socials, and public channels.
 If you want to stop ignoring someone, you can use the ignore command on them
 again.
 
-If you have ignored at 2 of a player's alts (other characters), none of their
-characters will be able to communicate with you (even though you don't see
-those other alts on your ignore list). Your ignore list is NOT automatically
-shared to your own alts, but you can use 'alt import' to copy the list from
-character to character.
+If you have ignored at least 2 of a player's alts (other characters), none of
+their characters will be able to communicate with you (even though you don't
+see those other alts on your ignore list). Your ignore list is NOT
+automatically shared to your own alts, but you can use 'alt import' to copy the
+list from character to character.
 
 Typing "ignore" with no argument will list who you're ignoring. You can't
 choose to ignore an immortal player, and immortals cannot use the ignore
@@ -1388,7 +1435,7 @@ See also: ALTERNATE, ALT IMPORT, DIPLOMACY
 #
 INFO POLICY VERSION RULES CREDITS
 
-Type these commands to see you important information about EmpireMUD. It is a
+Type these commands to see important information about EmpireMUD. It is a
 good idea to read them every once in a while.
 
    info     - quickstart information for new players
@@ -1406,7 +1453,8 @@ Usage:  inventory
 
 Use this command if you're uncertain about what you're carrying, or simply want
 to check that no thieves have got to your backpack. When in a storage building,
-this also checks the stored items there.
+this also checks the stored items there (use 'linventory' to see only stored
+items here, or 'einventory' to see items stored anywhere).
 
 You can also search your inventory by keyword, or use the following flags:
   &c-#&0 Only show the first # items.
@@ -1426,8 +1474,11 @@ If you're trying to see what you're wearing instead, type EQUIPMENT. Items do
 not take up inventory space when equipped (except containers and their
 contents).
 
+Several toggles affect your inventory display including hide-keep,
+item-details, and item-quality.
+
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
-   TOGGLE, LEVEL COLORS
+   TOGGLE, LEVEL COLORS, EINVENTORY, LINVENTORY
 #
 INTERLINK INTERLINKING
 
@@ -1466,6 +1517,9 @@ When junking coins, if you don't specify an empire, it will default to your
 generic coins. If you need to use an empire with a multi-word name, put it in
 "quotes". You can use the empire's full name, adjective name, or number.
 
+To offer an item to a god for its resource value, use "sacrifice". To break
+down unneeded gear for shards, use "shatter".
+
 Examples:
 
   > junk cup
@@ -1474,7 +1528,7 @@ Examples:
 Were you looking for the 'JUNK' item flag? This indicates an item that cannot
 be stored anywhere. It will disappear if left on the ground too long.
 
-See also: COINS, DROP
+See also: COINS, DROP, SACRIFICE, SHATTER
 #
 KILL HIT MURDER
 
@@ -1564,6 +1618,18 @@ This command was formerly called "boatload".
 
 See also: UNLOAD, BOARD, PUT, SAIL, SHIPS
 #
+"LOCAL INVENTORY" LOCALINVENTORY LINVENTORY LINV
+
+Usage: localinventory
+       linventory
+       linv
+
+This command lets you view items your empire has stored at your current
+location. This is the same information shown at the bottom of the regular
+'inventory' command.
+
+See also: INVENTORY, EINVENTORY, STORE, RETRIEVE
+#
 LOOK EXAMINE
 
 Usage:  look
@@ -1633,7 +1699,7 @@ of 3, while the radius has a minimum of 1.
 The standard mapsize is radius 7 (width 15).
 
 If you set your map size to 'auto', the game will attempt to detect the size of
-your client window.
+your client window. This requires a client that supports NAWS.
 
 When you move very fast on the map, your map size will start to shrink as it
 becomes more difficult for your character to pay attention to all his/her
@@ -1641,7 +1707,7 @@ surroundings (and saves the game time rendering large views repeatedly). You
 can restore your original map size if you stop and type 'look', or wait a few
 seconds.
 
-See also: MAP, TOGGLE
+See also: MAP, NAWS, TOGGLE
 #
 MAIL CHECK RECEIVE SEND "PIGEON MAIL"
 
@@ -1698,7 +1764,7 @@ See also: CLEARMETERS, DAMAGE, DAMAGE NUMBERS
 MINIPET MINIPETS MINI-PET MINI-PETS "MINI PET" "MINI PETS" PET PETS
 
 Usage:  minipets
-        minipet <name>
+        minipet <name | random>
         minipet dismiss
 
 This command lists, summons, and dismisses your minipets. A minipet is a
@@ -1883,15 +1949,19 @@ This toggle changes your map colors from environmental to political. You will
 see each tile colored with the banner of the empire who owns it. Screenreader
 users will see empire names next to claimed tiles.
 
-Dimly lit tiles do not appear in 'informative' mode.
+If your MUD client doesn't show enough contrast with the background color of
+your city on the ascii map, try "toggle gray-city-bg on".
+
+Dimly lit tiles do not appear in 'political' mode.
 
 See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
-Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (High Sorcery ability)
+Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (Portalmancy goal)
 Built on:  plains, desert
 Fame:  1
+
 Commands:  portal [coordinates | number | keywords]
            portal -all
            portal -near <coordinates>
@@ -2080,6 +2150,8 @@ mountain reset. For more info on mountain resets, see HELP MINE.
 Prospecting happens instantly if your empire was the last one to prospect the
 tile.
 
+See WORKFORCE PROSPECTING for information about the workforce version.
+
 See also: MINE, DEEP MINES, RARE METALS
 #
 PUT
@@ -2111,8 +2183,9 @@ will see a message that you quit, unless public logins are enabled.
 
 You can use "alt" to quickly change characters, rather than quitting.
 
-You can't quit (or alt) in hostile territory. You can choose to disconnect
-instead, but this will leave your character vulnerable.
+You can't quit (or alt) in hostile territory or have stolen items in your
+inventory. You can choose to disconnect instead, but this will leave your
+character vulnerable.
 
 If your character is dying or dead, you must type 'quit confirm' as it will
 kill your character. If you are editing any text, this will also require you
@@ -2131,6 +2204,10 @@ In addition to channels, you can also recolor 'status' which includes cooldowns
 and affect-wear-off messages, to make them easier to see in combat.
 
 Type 'recolor' by itself to see your current custom colors.
+
+You can recolor:
+ Channels and messages: emote, etalk, gsay, oocsay, say, slash-channels, tell
+ Status messages: status, sun, temperature, weather
 
 See HELP COLOR to see a list of color codes.
 
@@ -2231,6 +2308,14 @@ Usage:  respawn
 When your character has died, you can still observe for a short time. When you
 are ready to respawn, use this command.
 
+When your respawn cooldown expires, you will automatically respawn. However,
+the respawn cooldown will reset instead if other players are still in combat
+when the cooldown ends.
+
+You will come back at your tomb if it's on the same island or within 100 tiles
+of where you died. Otherwise, you'll come back at a random tomb your empire
+owns on the same island, or at a starting location if no tomb was available.
+
 See also: BRIEF RESPITE, DEATH, TOMB
 #
 RITUAL RITE
@@ -2258,6 +2343,9 @@ The message on the sign can be no longer than 70 characters, and you can only
 set up a sign on a road, bridge, swamp walk, or mountain path. If the road is
 removed, the sign will be lost. Each road tile can only have one sign at a
 time, and using this ability again will replace the old sign.
+
+In addition to regular roads, you can also put roadsigns up on some open
+buildings that act like roads, such as steps.
 
 Gain Customize Building experience when you place a road sign.
 
@@ -2368,7 +2456,8 @@ Examples:
  > pilot east 3, north 4, northwest 7
  > drive (415,780)
 
-Many vehicles cannot move through portals.
+Note: Only certain vehicles can pass through portals. Most, like carts and
+wagons, cannot.
 
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
 STATUS MESSAGES, STOP, TOGGLE, RUN
@@ -2414,7 +2503,7 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
   > 'hello there.
 
 See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS,
-   SPEAK
+   RECOLOR, SPEAK
 #
 SAYHISTORY
 
@@ -2479,12 +2568,12 @@ The "mapsize" command will determine how far away you can see things. It sets
 the number of tiles you see in each direction on commands like look and scan.
 
 Available options:
- * toggle informative - If on, tiles will indicate if they are being built
+ - toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
- * toggle political - Indicates who owns each map tile.
- * fightmessages - Reduce combat spam.
- * statusmessages - Turn off some status messages.
- * /leave and /join - Control which slash-channels you're on.
+ - toggle political - Indicates who owns each map tile.
+ - fightmessages - Reduce combat spam.
+ - statusmessages - Turn off some status messages.
+ - /leave and /join - Control which slash-channels you're on.
 
 Tips:
  - If you're having trouble finding the entrance to a building, try looking in
@@ -2525,13 +2614,17 @@ See also: HIDE, SEARCH ABILITY, SENSE LIFE RITUAL
 #
 SEED SEEDS SEEDING DESEED DE-SEED "REMOVE SEEDS" "SEED COMMAND"
 
-Usage:  seed <fruit>
+Usage:  seed <fruit | flower>
+        seed all
 
-This command allows you to remove the seeds from a fruit, usually to plant
-them. Most fruits can still be eaten afterwards. Some fruits can also be
+This command allows you to remove the seeds from a fruit or flower, usually to
+plant them. Most fruits can still be eaten afterwards. Some fruits can also be
 planted without removing the seeds first.
 
-See also: PLANT, CROPS, SEED COMPONENT
+Automatically junk (discard) items after seeding them by adding 'junk' as the
+final argument, e.g. 'seed all.flower junk'.
+
+See also: PLANT, CROPS, JUNK, SEED COMPONENT
 #
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE
 
@@ -2859,7 +2952,7 @@ Sweltering penalties: distracted from timed actions, damage over time
 
 You can turn off alerts about changes in temperature with "smessages".
 
-See also: SURVEY, STATUS MESSAGES, TIME, WEATHER
+See also: RECOLOR, SURVEY, STATUS MESSAGES, TIME, WEATHER
 #
 THROW
 
@@ -2933,10 +3026,13 @@ Toggles:
   compact - no extra newlines
   exits - shows or hides exits and directions when you 'look'
   extra-spacing - adds an extra blank line after you type a command
+  gray-city-bg - changes the background color for cities on the political map
+  hide-keep - basic inventory command won't show items with (keep) flags
   informative - informative map coloring -- HELP INFORMATIVE
   item-details - shows level and some other information in inventory/equipment
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
+  no-columns - turns off column view and shows one thing per line instead
   no-empire - will not create a new empire when you try to claim or build
   no-friends - this alt is hidden from friends lists
   no-paint - turns off custom paint colors on buildings
@@ -2966,7 +3062,17 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, FRIENDS, STATUS MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, FRIENDS, MANAGE, STATUS MESSAGES, TOGGLE <type>,
+  WORKFORCE
+#
+"TOGGLE NO-COLUMNS" "TOGGLE NOCOLUMNS" "NO COLUMNS" NO-COLUMNS NOCOLUMNS
+
+Usage:  toggle no-columns [on/off]
+
+This toggle turns off column display and shows one item per line instead. Some
+commands do not support this toggle yet.
+
+This toggle defaults to 'on' for screen-reader users.
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
@@ -3119,7 +3225,7 @@ the sun or moon are up.
 You also receive alerts as the weather changes when you're outdoors or near a
 window. These messages can be disabled with the "smessages" command.
 
-See also: STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
+See also: RECOLOR, STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
 #
 WHO
 
@@ -3146,8 +3252,9 @@ WHOIS
 Usage:  whois <name>
 
 Used to find vital information on a person. You cannot abbreviate the name
-because it draws the information from the player file. This allows it to be
-used on players who are not logged in.
+for offline players, only online ones.
+
+See also: LORE
 #
 WIELD
 

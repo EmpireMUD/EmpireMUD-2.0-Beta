@@ -1,0 +1,35 @@
+#12221
+snake gourds~
+A Viny Field of Snake Gourds~
+33 j ch
+0 100 0 100
+D0
+o8oo~
+&g~
+D0
+oo8o~
+&g~
+D0
+o8.o~
+&g~
+D0
+o.8o~
+&g~
+I 6 12222 100.00 25  # FORAGE: fresh snake gourd
+I 8 12221 50.00 2 h  # HARVEST: bundle of coiled snake gourds
+I 8 12221 40.00 3 h  # HARVEST: bundle of coiled snake gourds
+I 8 12221 10.00 4 h  # HARVEST: bundle of coiled snake gourds
+M
+12221 20.00 b
+U
+0
+Vines coil up from the soil, twisting and writhing as they stretch out broad leaves and gourds snake out from underneath.~
+X
+gourds snake vines plants crop field viny~
+   A tangle of vines sprawls across the clearing, tendrils curling up every
+post and pole. Long, pale green gourds dangle in the loose coils, some twisting
+like serpents in mid-slither with their mottled and striped skins. Broad leaves
+cast a patchwork of shade over the ground, and few weeds are found beneath.
+~
+S
+$

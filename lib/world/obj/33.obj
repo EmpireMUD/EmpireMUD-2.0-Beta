@@ -169,7 +169,7 @@ a wood ear mushroom~
 A wood ear mushroom is growing here.~
 The mushroom looks good enough to eat, somehow.
 ~
-6 gC a 0 0 5
+6 gC a 0 0 7
 6 0 0
 7 72
 O+ 1 6101
@@ -182,9 +182,21 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 lC a 0 0 8
+3 lC a 0 0 9
 0 0 0
 6 0
+M
+0
+You apply some olive oil to the building.~
+M
+1
+$n applies some olive oil to the building.~
+M
+6
+You apply some olive oil to $V.~
+M
+7
+$n applies some olive oil to $V.~
 O+ 1 6322
 R
 4 5134 0
@@ -194,12 +206,12 @@ R
 4 5619 0
 S
 #3312
-flour sack~
-a sack of flour~
-A sack of flour is sitting on the ground.~
+flour sack wheat~
+a sack of wheat flour~
+A sack of wheat flour is sitting on the ground.~
 Flour is used to bake bread.
 ~
-3 lC a 0 0 6
+3 lC a 0 0 7
 0 0 0
 7 0
 C
@@ -492,9 +504,11 @@ A flaky blackberry tart has been left here.~
    This small tart is stuffed full with blackberries. Flaky, honey baked crust
 surround a thick blackberry filling. It should be quite delicious.
 ~
-6 gE a 0 0 5
+6 gE a 0 0 6
 24 0 0
 7 336
+C
+1 1
 M
 4
 You take a bite of $p and dribble a little blackberry juice down your chin.~
@@ -663,13 +677,16 @@ a vial of pepper spray~
 A glass vial of pepper spray has been left here.~
 This small glass vial is filled with a bright red fluid that sizzles slightly.
 ~
-26 0 a 0 0 14
+26 0 a 0 0 15
 0 15 -1
 8 0
 C
 125 125
 I 26 808 100.00 1  # DECAYS-TO: glass vial
 I 27 808 100.00 1  # CONSUMES-TO: glass vial
+M
+33
+This poison stacks a damage-over-time effect on the target with each hit.~
 R
 4 5130 0
 T 1273
@@ -829,7 +846,7 @@ A bale of straw sits on the ground.~
    Straw is the byproduct of growing grains like barley, oats, rice, rye, and
 wheat. It has been used since ancient times in crafting and construction.
 ~
-3 l a 0 0 3
+3 l a 0 0 5
 0 0 0
 0 0
 C
@@ -847,6 +864,9 @@ You put some straw on $V.~
 M
 7
 $n puts some straw on $V.~
+M
+34
+This is a common building and crafting material.~
 O+ 1 6422
 R
 4 5118 0
@@ -1222,11 +1242,23 @@ There is a jar of lettuce seed oil here.~
 ceremonies (you can annoint someone with it). It is made from the pressed seeds
 of the lettuce plant.
 ~
-3 lC a 0 0 11
+3 lC a 0 0 12
 0 0 0
 6 0
 C
 1 1
+M
+0
+You apply some lettuce seed oil to the building.~
+M
+1
+$n applies some lettuce seed oil to the building.~
+M
+6
+You apply some lettuce seed oil to $V.~
+M
+7
+$n applies some lettuce seed oil to $V.~
 O+ 1 6321
 R
 4 5134 0
@@ -1266,11 +1298,23 @@ a jar of coconut oil~
 A jar of coconut oil is sitting on the ground.~
 The coconut oil inside the jar is a rich yellow-orange color.
 ~
-3 C a 0 0 13
+3 C a 0 0 14
 0 0 0
 6 0
 C
 1 1
+M
+0
+You apply some coconut oil to the building.~
+M
+1
+$n applies some coconut oil to the building.~
+M
+6
+You apply some coconut oil to $V.~
+M
+7
+$n applies some coconut oil to $V.~
 O+ 1 6322
 R
 4 5192 0

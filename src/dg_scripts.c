@@ -995,7 +995,7 @@ void script_trigger_check(void) {
 			case MOB_TRIGGER: {
 				mob = (char_data *)sc->attached_to;
 				in_room = IN_ROOM(mob);
-				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_SLEEPING || (IS_DEAD(mob) && !TRIGGER_CHECK(trig, MTRIG_DEAD_OK)) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
 					fail = TRUE;
 				}
 				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
@@ -1153,6 +1153,7 @@ EVENTFUNC(trig_wait_event) {
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
 	char buf[MAX_STRING_LENGTH];
+	char *attach;
 
 	if (!trig) {
 		log("SYSERR: NULL trigger passed to do_stat_trigger.");
@@ -1164,7 +1165,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 	// x_TRIGGER
 	switch (trig->attach_type) {
 		case OBJ_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Objects");
+			attach = "object";
 			sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
 			break;
 		}
@@ -1172,28 +1173,33 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		case RMT_TRIGGER:
 		case BLD_TRIGGER:
 		case ADV_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Rooms");
+			attach = "room";
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 		case MOB_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Mobiles");
+			attach = "mobile";
 			sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
 			break;
 		}
 		case VEH_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Vehicles");
+			attach = "vehicle";
 			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
 			break;
 		}
 		case EMP_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Empires");
+			attach = "empire";
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
+			break;
+		}
+		default: {
+			attach = "error";
 			break;
 		}
 	}
 
-	build_page_display(ch, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
+	build_page_display(ch, "Trigger Type: %s(%s), Numeric Arg: %d, Arg list: %s", buf, attach, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
+	build_trigger_link_page_display(ch, trig, "Links:");
 
 	build_page_display(ch, "Commands:"); 
 	
@@ -1239,6 +1245,7 @@ void script_stat(char_data *to, struct script_data *sc) {
 	char name[MAX_INPUT_LENGTH];
 	char namebuf[512];
 	char buf1[MAX_STRING_LENGTH];
+	char *attach;
 	
 	if (!to || !sc) {
 		return;
@@ -1262,27 +1269,27 @@ void script_stat(char_data *to, struct script_data *sc) {
 		build_page_display(to, "\r\n  Trigger: &y%s&0, VNum: [&g%5d&0]", GET_TRIG_NAME(t), GET_TRIG_VNUM(t));
 
 		if (t->attach_type==OBJ_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Objects");
+			attach = "object";
 			sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER || t->attach_type == BLD_TRIGGER || t->attach_type == ADV_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Rooms");
+			attach = "room";
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == VEH_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Vehicles");
+			attach = "vehicle";
 			sprintbit(GET_TRIG_TYPE(t), vtrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == EMP_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Empires");
+			attach = "empire";
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else {
-			build_page_display(to, "  Trigger Intended Assignment: Mobiles");
+			attach = "mobile";
 			sprintbit(GET_TRIG_TYPE(t), trig_types, buf1, TRUE);
 		}
 
-		build_page_display(to, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s",  buf1, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
+		build_page_display(to, "  Trigger Type: %s(%s), Numeric Arg: %d, Arg list: %s", buf1, attach, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
 
 		if (GET_TRIG_WAIT(t)) {
 			build_page_display(to, "    Wait: %ld, Current line: %s", dg_event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
@@ -2098,6 +2105,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		else {
 			safe_snprintf(str, slen, "0");
 		}
+		return TRUE;
 	}
 	else if (!str_cmp(field, "contains")) {            /* contains  */
 		if (str_str(vd->value, subfield)) {
@@ -2144,6 +2152,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		else {
 			safe_snprintf(str, slen, "-1");
 		}
+		return TRUE;
 	}
 	else if (!str_cmp(field, "mudcommand")) {
 		/* find the mud command returned from this text */
@@ -2158,11 +2167,46 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 			safe_snprintf(str, slen, "%s", cmd_info[cmd].command);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "skip_filler")) {
+		safe_snprintf(str, slen, "%s", skip_filler(vd->value));
+		return TRUE;
+	}
 	else if (!str_cmp(field, "process")) {
 		// processes substitutions
 		char temp[MAX_INPUT_LENGTH];
 		var_subst(go, sc, trig, type, vd->value, temp);
 		safe_snprintf(str, slen, "%s", temp);
+		return TRUE;
+	}
+	else if (!str_cmp(field, "substr")) {
+		// %string.substr(start,len)%
+		if (subfield && *subfield) {
+			char arg1[256], arg2[256];
+			int sub_start, sub_len;
+			
+			comma_args(subfield, arg1, arg2);
+			if (*arg1) {
+				if ((sub_start = atoi(arg1)) < strlen(vd->value)) {
+					safe_snprintf(str, slen, "%s", vd->value + sub_start);
+				}
+				else {
+					// past the end
+					strcpy(str,"");
+				}
+				
+				// cut short?
+				if (*arg2 && (sub_len = atoi(arg2)) > 0 && sub_len < strlen(str)) {
+					str[sub_len] = '\0';
+				}
+			}
+			else {
+				safe_snprintf(str, slen, "%s", vd->value);
+			}
+		}
+		else {
+			// no limits requested, send whole str
+			safe_snprintf(str, slen, "%s", vd->value);
+		}
 		return TRUE;
 	}
 	
@@ -2344,6 +2388,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				// %instance% with no field
 				struct instance_data *inst = get_instance_for_script(type, go);
 				safe_snprintf(str, slen, "%d", inst ? INST_ID(inst) : 0);
+			}
+			else if (!str_cmp(var, "_map")) {
+				// %_map% with no field
+				script_log("Trigger: %s, VNum %d, %%_map%% called with no field", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+				strcpy(str, "0");
 			}
 			else if (!str_cmp(var, "timestamp")) {
 				safe_snprintf(str, slen, "%ld", time(0));
@@ -2914,7 +2963,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			}
 			else if (!str_cmp(var, "temperature")) {
 				if (field && (*field == '-' || *field == '+' || isdigit(*field))) {
+					// WARNING: does not work with negatives like %temperature.-3% -- use %temperature.text(-3)%
 					safe_snprintf(str, slen, "%s", temperature_to_string(atoi(field)));
+				}
+				else if (field && !str_cmp(field, "text") && subfield && *subfield) {
+					safe_snprintf(str, slen, "%s", temperature_to_string(atoi(subfield)));
 				}
 				else {
 					strcpy(str, "");
@@ -2922,8 +2975,41 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 				return;
 			}
+			else if (!str_cmp(var, "world")) {
+				if (!str_cmp(field, "height")) {
+					safe_snprintf(str, slen, "%d", MAP_HEIGHT);
+				}
+				else if (!str_cmp(field, "width")) {
+					safe_snprintf(str, slen, "%d", MAP_WIDTH);
+				}
+				
+				else {
+					// bad field
+					script_log("Trigger: %s, VNum %d, unknown instance field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
+				}
+				return;
+			}
 			
 			// type helpers
+			else if (!str_cmp(var, "_abil")) {
+				ability_data *find_abil = NULL;
+				
+				// may still be NULL after this
+				if (subfield && *subfield) {
+					find_abil = find_ability(subfield);
+				}
+				
+				if (!str_cmp(field, "exists")) {
+					safe_snprintf(str, slen, "%d", find_abil ? 1 : 0);
+				}
+				else if (!str_cmp(field, "name")) {
+					safe_snprintf(str, slen, "%s", find_abil ? ABIL_NAME(find_abil) : "");
+				}
+				else {
+					strcpy(str, "");
+				}
+				return;
+			}
 			else if (!str_cmp(var, "_adv")) {
 				adv_data *find_adv = NULL;
 				
@@ -2937,6 +3023,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "name")) {
 					safe_snprintf(str, slen, "%s", find_adv ? GET_ADV_NAME(find_adv) : "");
+				}
+				else {
+					strcpy(str, "");
+				}
+				return;
+			}
+			else if (!str_cmp(var, "_map")) {
+				if (!str_cmp(field, "reverse")) {
+					int dir;
+					
+					// %_map.reverse(dir)%
+					if (subfield && *subfield && ((dir = search_block(subfield, dirs, FALSE)) != NOTHING || (dir = search_block(subfield, alt_dirs, FALSE)) != NOTHING)) {
+						safe_snprintf(str, slen, "%s", dirs[rev_dir[dir]]);
+					}
+					else {
+						strcpy(str, "");
+					}
 				}
 				else {
 					strcpy(str, "");
@@ -3032,7 +3135,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							ability_data *ab = find_ability(subfield);
 							if (ab && !IS_NPC(c)) {
 								add_bonus_ability(c, ABIL_VNUM(ab));
-								assign_class_and_extra_abilities(c, NULL, ROLE_NONE);
+								assign_class_and_extra_abilities(c, NULL, NOTHING);
 								safe_snprintf(str, slen, "1");
 							}
 							else {
@@ -3296,18 +3399,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// char.c*
-					/*
-					else if (!str_cmp(field, "coins")) {
-						// TODO possibly a way to specify coin type or do it by actor's loyalty?
-						// nop %c.coins(10)%
-						if (subfield && *subfield) {
-							int addition = atoi(subfield);
-							increase_coins(c, OTHER_COIN, addition);
-						}
-						// snprintf(str, slen, "%d", GET_GOLD(c));
-					}
-					*/
-					
 					if (!str_cmp(field, "can_act")) {
 						if (!AFF_FLAGGED(c, AFF_DISTRACTED) && GET_POS(c) == POS_STANDING && !FIGHTING(c) && (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) && !EXTRACTED(c) && !GET_FEEDING_FROM(c) && !GET_FED_ON_BY(c) && !IS_DEAD(c) && !AFF_FLAGGED(c, AFF_STUNNED | AFF_HARD_STUNNED)) {
 							strcpy(str, "1");
@@ -3324,6 +3415,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							else {
 								safe_snprintf(str, slen, "0");
 							}
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "can_fight")) {
+						if (subfield && *subfield) {
+							char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, NULL, FIND_CHAR_WORLD);
+							safe_snprintf(str, slen, "%d", (targ && can_fight(c, targ)) ? 1 : 0);
 						}
 						else {
 							safe_snprintf(str, slen, "0");
@@ -3525,6 +3625,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							safe_snprintf(str, slen, "0");
 						}
+					}
+					else if (!str_cmp(field, "can_see_in_room")) {
+						safe_snprintf(str, slen, "%d", (!AFF_FLAGGED(c, AFF_BLIND) && can_see_in_dark_room(c, IN_ROOM(c), FALSE)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "can_teleport_room")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
@@ -4107,7 +4210,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "himher")) {
 						safe_snprintf(str, slen, "%s", HMHR(c));
 					}
-					else if (!str_cmp(field, "hitp") || !str_cmp(field, "health")) {
+					else if (!str_cmp(field, "hitp") || !str_cmp(field, "health") || !str_cmp(field, "hitpoints")) {
 						safe_snprintf(str, slen, "%d", GET_HEALTH(c));
 					}	
 					else if (!str_cmp(field, "home")) {
@@ -4336,11 +4439,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "maxcarrying")) {
 						safe_snprintf(str, slen, "%d", CAN_CARRY_N(c));
 					}
-					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth")) {
+					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitpoints")) {
 						safe_snprintf(str, slen, "%d", GET_MAX_HEALTH(c));
 					}
 					else if (!str_cmp(field, "maxblood")) {
 						safe_snprintf(str, slen, "%d", GET_MAX_BLOOD(c));
+					}
+					else if (!str_cmp(field, "maxlevel")) {
+						safe_snprintf(str, slen, "%d", IS_NPC(c) ? GET_MAX_SCALE_LEVEL(c) : get_approximate_level(c));
 					}
 					else if (!str_cmp(field, "mana")) {
 						int amt;
@@ -4369,6 +4475,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							strcpy(str, "");
 						else
 							safe_snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_LEADER(c)));
+					}
+					else if (!str_cmp(field, "minlevel")) {
+						safe_snprintf(str, slen, "%d", IS_NPC(c) ? GET_MIN_SCALE_LEVEL(c) : get_approximate_level(c));
 					}
 					else if (!str_cmp(field, "mob_flagged")) {
 						if (subfield && *subfield) {
@@ -4454,6 +4563,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "nohassle")) {
 						safe_snprintf(str, slen,"%d", NOHASSLE(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "nohunger")) {
+						safe_snprintf(str, slen, "%d", (GET_COND(c, FULL) == -1 || HAS_BONUS_TRAIT(c, BONUS_NO_HUNGER) || has_player_tech(c, PTECH_NO_HUNGER)) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "noskill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							skill_data *sk;							
@@ -4465,6 +4577,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*str != '1') {							
 							safe_snprintf(str, slen, "0");
 						}
+					}
+					else if (!str_cmp(field, "nothirst")) {
+						safe_snprintf(str, slen, "%d", (GET_COND(c, THIRST) == -1 || HAS_BONUS_TRAIT(c, BONUS_NO_THIRST) || has_player_tech(c, PTECH_NO_THIRST)) ? 1 : 0);
 					}
 					break;
 				}
@@ -4483,6 +4598,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
 							if ((targ = get_obj_in_list_vis(c, subfield, NULL, c->carrying))) {
+								safe_snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
+							}
+						}
+					}
+					else if (!str_cmp(field, "obj_target_room")) {
+						obj_data *targ;
+						*str = '\0';	// default to no-target
+						if (subfield && *subfield) {
+							if ((targ = get_obj_in_list_vis(c, subfield, NULL, ROOM_CONTENTS(IN_ROOM(c))))) {
 								safe_snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 							}
 						}
@@ -4599,7 +4723,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							ability_data *ab = find_ability(subfield);
 							if (ab && !IS_NPC(c)) {
 								remove_bonus_ability(c, ABIL_VNUM(ab));
-								assign_class_and_extra_abilities(c, NULL, ROLE_NONE);
+								assign_class_and_extra_abilities(c, NULL, NOTHING);
 								safe_snprintf(str, slen, "1");
 							}
 							else {
@@ -4690,6 +4814,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							safe_snprintf(str, slen, "0");
 						}
+					}
+					else if (!str_cmp(field, "role")) {
+						safe_snprintf(str, slen, "%s", class_role[IS_NPC(c) ? ROLE_NONE : GET_CLASS_ROLE(c)]);
 					}
 					else if (!str_cmp(field, "room")) {
 						safe_snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(c)) + ROOM_ID_BASE);
@@ -5052,6 +5179,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									reduce_obj_binding(o, targ);
 									request_obj_save_in_world(o);
 								}
+								else if (targ && IS_NPC(targ)) {
+									free_obj_binding(&OBJ_BOUND_TO(o));
+									bind_obj_to_tag_list(o, MOB_TAGGED_BY(targ));
+									request_obj_save_in_world(o);
+								}
 								else {	// wasn't targeting a person, try an obj
 									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
 									if (oarg) {
@@ -5327,10 +5459,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_name")) {
 						if (subfield && *subfield && MATCH_ITEM_NAME(subfield, o)) {
 							safe_snprintf(str, slen, "1");
-						}
+						} 
 						else {
 							safe_snprintf(str, slen, "0");
 						}
+					}
+					
+					else if (!str_cmp(field, "is_stolen")) {
+						safe_snprintf(str, slen, "%d", IS_STOLEN(o) ? 1 : 0);
 					}
 					break;
 				}
@@ -5569,7 +5705,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// room.a*
-					if (!str_cmp(field, "aff_flagged")) {
+					if (!str_cmp(field, "add_built_with")) {
+						if (subfield && *subfield) {
+							char arg1[256], arg2[256], arg3[256], temp_arg[256];
+							int count, add;
+							
+							// add_built_with(vnum, amount, level)
+							comma_args(subfield, arg1, temp_arg);
+							comma_args(temp_arg, arg2, arg3);
+							
+							if (COMPLEX_DATA(r) && obj_proto(atoi(arg1)) && (add = atoi(arg2)) > 0) { 
+								count = count_resource_list_quantity(GET_BUILT_WITH(r));
+								if (count < 500) {
+									add_to_resource_list(&GET_BUILT_WITH(r), RES_OBJECT, atoi(arg1), MIN(add, 500 - count), atoi(arg3));
+									request_world_save(GET_ROOM_VNUM(r), WSAVE_ROOM);
+								}
+							}
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "aff_flagged")) {
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, room_aff_bits, FALSE);
 							if (pos != NOTHING) {
@@ -5590,7 +5745,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// room.b*
-					if (!str_cmp(field, "bld_dir")) {
+					if (!str_cmp(field, "base_sector")) {
+						safe_snprintf(str, slen, "%s", GET_SECT_NAME(BASE_SECT(r)));
+					}
+					else if (!str_cmp(field, "base_sector_flagged")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, sector_flags, FALSE);
+							if (pos != NOTHING) {
+								safe_snprintf(str, slen, "%d", ROOM_SECT_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {
+							sprintbit(GET_SECT_FLAGS(BASE_SECT(r)), sector_flags, buf, TRUE);
+							safe_snprintf(str, slen, "%s", buf);
+						}
+					}
+					else if (!str_cmp(field, "base_sector_vnum")) {
+						safe_snprintf(str, slen, "%d", GET_SECT_VNUM(BASE_SECT(r)));
+					}
+					else if (!str_cmp(field, "bld_dir")) {
 						int dir;
 						if (subfield && *subfield && ((dir = search_block(subfield, dirs, FALSE)) != NO_DIR || (dir = search_block(subfield, alt_dirs, FALSE)) != NO_DIR)) {
 							room_data *home = HOME_ROOM(r);
@@ -5653,6 +5829,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "climate")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, climate_flags, FALSE);
+							if (pos != NOTHING) {
+								safe_snprintf(str, slen, "%d", IS_SET(get_climate(r), BIT(pos)) ? 1 : 0);
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {	// no subfield
+							ordered_sprintbit(get_climate(r), climate_flags, climate_flags_order, TRUE, buf);
+							safe_snprintf(str, slen, "%s", buf);
+						}
+					}
 					else if (!str_cmp(field, "complete")) {
 						safe_snprintf(str, slen, "%d", IS_COMPLETE(r) ? 1 : 0);
 					}
@@ -5677,9 +5868,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
-					else if (!str_cmp(field, "coords")) {
+					else if (!str_cmp(field, "coord") || !str_cmp(field, "coords")) {
 						if (GET_MAP_LOC(r) && !NO_LOCATION(r)) {
-							safe_snprintf(str, slen, "(%d, %d)", MAP_X_COORD(GET_MAP_LOC(r)->vnum), MAP_Y_COORD(GET_MAP_LOC(r)->vnum));
+							if (subfield && LOWER(*subfield) == 'x') {
+								safe_snprintf(str, slen, "%d", MAP_X_COORD(GET_MAP_LOC(r)->vnum));
+							}
+							else if (subfield && LOWER(*subfield) == 'y') {
+								safe_snprintf(str, slen, "%d", MAP_Y_COORD(GET_MAP_LOC(r)->vnum));
+							}
+							else {
+								safe_snprintf(str, slen, "(%d, %d)", MAP_X_COORD(GET_MAP_LOC(r)->vnum), MAP_Y_COORD(GET_MAP_LOC(r)->vnum));
+							}
+						}
+						// otherwise no valid location
+						else if (subfield && (LOWER(*subfield) == 'x' || LOWER(*subfield) == 'y')) {
+							safe_snprintf(str, slen, "%s", "???");
 						}
 						else {
 							safe_snprintf(str, slen, "(%s, %s)", "???", "???");
@@ -5761,6 +5964,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "dismantling")) {
+						safe_snprintf(str, slen, "%d", IS_DISMANTLING(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "distance")) {
 						room_data *targ;
@@ -5868,11 +6074,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");	// no vnum provided
 						}
 					}
+					else if (!str_cmp(field, "hitp") || !str_cmp(field, "health") || !str_cmp(field, "hitpoints")) {
+						room_data *home = HOME_ROOM(r);
+						if (GET_BUILDING(home)) {
+							safe_snprintf(str, slen, "%d", GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) - (int)BUILDING_DAMAGE(home));
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "height")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							set_room_height(r, atoi(subfield));
 						}
 						safe_snprintf(str, slen, "%d", ROOM_HEIGHT(r));
+					}
+					else if (!str_cmp(field, "homeroom")) {
+						safe_snprintf(str, slen, "%c%d", UID_CHAR, room_script_id(HOME_ROOM(r)));
 					}
 					break;
 				}
@@ -5900,11 +6118,54 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "island")) {
+						char_data *for_ch;
+						empire_data *for_emp;
+						struct island_info *island;
+						
+						if (!RMT_FLAGGED(r, RMT_NO_LOCATION) && (island = GET_ISLAND(r))) {
+							// optional character/empire to get an island name for
+							if (subfield && *subfield == UID_CHAR && (for_emp = get_empire(subfield))) {
+								safe_snprintf(str, slen, "%s", get_island_name_for_empire(island->id, for_emp));
+							}
+							else if (subfield && *subfield && (for_ch = (*subfield == UID_CHAR ? get_char(subfield) : get_char_in_room(r, subfield)))) {
+								safe_snprintf(str, slen, "%s", get_island_name_for(island->id, for_ch));
+							}
+							else {
+								// basic name for island
+								safe_snprintf(str, slen, "%s", island->name);
+							}
+						}
+						else {
+							// not an island
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "island_flagged")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, island_bits, FALSE);
+							if (pos != NOTHING) {
+								safe_snprintf(str, slen, "%d", ISLAND_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "is_OCEAN")) {
+						safe_snprintf(str, slen, "%d", DEEP_WATER_SECT(r) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "is_on_map")) {
 						safe_snprintf(str, slen, "%d", (GET_ROOM_VNUM(r) < MAP_SIZE) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_outdoors")) {
 						safe_snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "is_water")) {
+						safe_snprintf(str, slen, "%d", WATER_SECT(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_zenith_day")) {
 						safe_snprintf(str, slen, "%d", is_zenith_day(r) ? 1 : 0);
@@ -5912,7 +6173,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// room.m*
-					if (!str_cmp(field, "max_citizens")) {
+					if (!str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitp") || !str_cmp(field, "maxhitpoints")) {
+						room_data *home = HOME_ROOM(r);
+						if (GET_BUILDING(home)) {
+							safe_snprintf(str, slen, "%d", GET_BLD_MAX_DAMAGE(GET_BUILDING(home)));
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "max_citizens")) {
 						safe_snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
 					}
 					else if (!str_cmp(field, "mine_type")) {
@@ -5962,6 +6232,30 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'n': {	// room.n*
 					if (!str_cmp(field, "name")) {
 						safe_snprintf(str, slen, "%s",  get_room_name(r, FALSE));
+					}
+					else if (!str_cmp(field, "natural_sector")) {
+						sector_data *sect = (GET_ROOM_VNUM(r) < MAP_SIZE ? world_map[X_COORD(r)][Y_COORD(r)].natural_sector : BASE_SECT(r));
+						safe_snprintf(str, slen, "%s", GET_SECT_NAME(sect));
+					}
+					else if (!str_cmp(field, "natural_sector_flagged")) {
+						sector_data *sect = (GET_ROOM_VNUM(r) < MAP_SIZE ? world_map[X_COORD(r)][Y_COORD(r)].natural_sector : BASE_SECT(r));
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, sector_flags, FALSE);
+							if (pos != NOTHING) {
+								safe_snprintf(str, slen, "%d", SECT_FLAGGED(sect, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {
+							sprintbit(GET_SECT_FLAGS(sect), sector_flags, buf, TRUE);
+							safe_snprintf(str, slen, "%s", buf);
+						}
+					}
+					else if (!str_cmp(field, "natural_sector_vnum")) {
+						sector_data *sect = (GET_ROOM_VNUM(r) < MAP_SIZE ? world_map[X_COORD(r)][Y_COORD(r)].natural_sector : BASE_SECT(r));
+						safe_snprintf(str, slen, "%d", GET_SECT_VNUM(sect));
 					}
 					else if (!str_cmp(field, "north")) {
 						direction_vars(r, NORTH, subfield, str, slen);
@@ -6251,7 +6545,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// veh.a*
-					if (!str_cmp(field, "animals_harnessed")) {
+					if (!str_cmp(field, "add_built_with")) {
+						if (subfield && *subfield) {
+							char arg1[256], arg2[256], arg3[256], temp_arg[256];
+							int count, add;
+							
+							// add_built_with(vnum, amount, level)
+							comma_args(subfield, arg1, temp_arg);
+							comma_args(temp_arg, arg2, arg3);
+							
+							count = count_resource_list_quantity(VEH_BUILT_WITH(veh));
+							if (obj_proto(atoi(arg1)) && (add = atoi(arg2)) > 0 && count < 500) {
+								add_to_resource_list(&VEH_BUILT_WITH(v), RES_OBJECT, atoi(arg1), MIN(add, 500 - count), atoi(arg3));
+								request_vehicle_save_in_world(v);
+							}
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "animals_harnessed")) {
 						safe_snprintf(str, slen, "%d", count_harnessed_animals(v));
 					}
 					else if (!str_cmp(field, "animals_required")) {
@@ -6340,6 +6651,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							set_vehicle_depletion(v, type, atoi(arg2));
 							safe_snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
 						}
+					}
+					else if (!str_cmp(field, "dismantling")) {
+						safe_snprintf(str, slen, "%d", VEH_IS_DISMANTLING(v) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "driver")) {
 						if (VEH_DRIVER(v)) {
@@ -6460,7 +6774,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");	// no vnum provided
 						}
 					}
-					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp")) {
+					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp") || !str_cmp(field, "hitpoints")) {
 						safe_snprintf(str, slen, "%d", (int) VEH_HEALTH(v));
 					}
 					break;
@@ -6534,7 +6848,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// veh.m*
-					if (!str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitp")) {
+					if (!str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitp") || !str_cmp(field, "maxhitpoints")) {
 						safe_snprintf(str, slen, "%d", VEH_MAX_HEALTH(v));
 					}
 					else if (!str_cmp(field, "maxrooms")) {
@@ -6735,7 +7049,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (!empire_has_completed_goal(e, vnum)) {
 									script_reward_goal(e, prg);
-									check_for_eligible_goals(e);
+									TRIGGER_DELAYED_REFRESH(e, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 								}
 								strcpy(str, "1");
 							}
@@ -6756,6 +7070,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'b': {	// emp.b*
 					if (!str_cmp(field, "banner")) {
 						safe_snprintf(str, slen, "%s", EMPIRE_BANNER(e));
+					}
+					else if (!str_cmp(field, "banner_name")) {
+						safe_snprintf(str, slen, "%s", color_name_by_code(EMPIRE_BANNER(e), TRUE));
+					}
+					else if (!str_cmp(field, "banner_name_simple")) {
+						safe_snprintf(str, slen, "%s", color_name_by_code(EMPIRE_BANNER(e), FALSE));
 					}
 					break;
 				}
@@ -7099,7 +7419,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									cancel_empire_goal(e, goal);
 								}
 								strcpy(str, "1");
-								check_for_eligible_goals(e);
+								TRIGGER_DELAYED_REFRESH(e, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 							}
 							else {
 								strcpy(str, "0");
@@ -7127,11 +7447,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									
 									if (goal) {
 										refresh_one_goal_tracker(e, goal);
-									}
-									// check if complete
-									count_quest_tasks(goal->tracker, &complete, &total);
-									if (complete == total) {
-										complete_goal(e, goal);
+										
+										// check if complete
+										count_quest_tasks(goal->tracker, &complete, &total);
+										if (complete == total) {
+											complete_goal(e, goal);
+										}
+										et_update_progress(e, PRG_VNUM(prg));
 									}
 								}
 								strcpy(str, "1");

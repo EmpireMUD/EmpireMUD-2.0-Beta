@@ -1,0 +1,68 @@
+#17600
+raspberries bunch berries~
+a bunch of raspberries~
+There is a bunch of raspberries scattered across the ground.~
+You can eat raspberries, or plant them.
+~
+6 bglC a 0 0 13
+12 17600 0
+7 336
+C
+1 1
+I 15 17601 100.00 4 x  # SEPARATE: few raspberries
+O+ 1 6132
+R
+4 5114 0
+S
+#17601
+raspberries few berries~
+a few raspberries~
+A few raspberries are scattered across the ground.~
+   There are only a few raspberries here, but if you get more, you can combine
+them and plant them as a crop.
+~
+6 gC a 0 0 14
+1 0 0
+7 336
+C
+1 1
+I 14 17600 100.00 4 x  # COMBINE: bunch of raspberries
+O+ 1 6122
+R
+4 5619 0
+S
+#17602
+tart raspberry flaky~
+a raspberry tart~
+A flaky raspberry tart has been left here.~
+A flaky, honey-glazed crust surrounds a thick and fragrant raspberry filling.
+~
+6 gmE a 0 0 12
+24 0 0
+7 336
+A
+7 1 0
+C
+1 1
+M
+4
+You take a bite of $p and dribble some raspberry juice down your chin.~
+M
+5
+$n takes a bite of $p. A thin stream of raspberry juice runs down $s chin.~
+R
+4 5619 0
+R
+4 5132 0
+S
+#17603
+recipe raspberry tarts~
+the raspberry tarts recipe~
+The raspberry tarts recipe is on the ground.~
+This recipe will teach you to bake: raspberry tarts.
+~
+7 0 a 0 0 1
+17602 0 0
+0 0
+S
+$

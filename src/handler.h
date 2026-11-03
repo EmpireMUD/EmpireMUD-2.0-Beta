@@ -51,8 +51,14 @@
 
 
 // global function types -- for run_globals
-#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
-#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
+#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, room_data *room, void *other_data)
+#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, room_data *room, void *other_data)
+
+
+// used by charge_stored_resource() and add_to_empire_storage_with_timer()
+#define NO_STORAGE_TIMERS  0		// won't update timers at all (you did this yourself)
+#define STORAGE_TIMERS_OLDEST  1	// will reduce the oldest timers (withdrawing near-expiry items)
+#define STORAGE_TIMERS_NEWEST  2	// will reduce the newest timers (withdrawing freshest items)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -66,8 +72,10 @@
 
 // affect handlers
 void affect_from_char(char_data *ch, any_vnum type, bool show_msg);
-void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg);
-void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg);
+void affect_from_char_by_apply_and_caster(char_data *ch, any_vnum type, int apply, char_data *caster, bool show_msg);
+#define affect_from_char_by_apply(ch, type, apply, show_msg)  affect_from_char_by_apply_and_caster((ch), (type), (apply), NULL, (show_msg))
+void affect_from_char_by_bitvector_and_caster(char_data *ch, any_vnum type, bitvector_t bits, char_data *caster, bool show_msg);
+#define affect_from_char_by_bitvector(ch, type, bits, show_msg)  affect_from_char_by_bitvector_and_caster((ch), (type), (bits), NULL, (show_msg))
 void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg);
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
 void affect_from_room(room_data *room, any_vnum type);
@@ -223,7 +231,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg);
 void stop_follower(char_data *ch);
 
 // global handlers
-bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data);
+bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, room_data *room, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data);
 
 // group handlers
 int count_group_members(struct group_data *group);
@@ -279,7 +287,7 @@ void extract_obj(obj_data *obj);
 room_data *find_room_obj_saves_in(obj_data *obj);
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level, bool keep_strings, bool keep_augments);
 bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
-bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
+bool objs_are_identical(obj_data *obj_a, obj_data *obj_b, bool ignore_timer);
 void remove_from_object_list(obj_data *obj);
 
 // object binding handlers
@@ -342,6 +350,7 @@ obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 obj_data *get_obj_in_list_num(int num, obj_data *list);
 obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
 obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list);
+obj_data *get_obj_in_list_vis_prefer_flag(char_data *ch, char *name, int *number, obj_data *list, bitvector_t want_flag);
 obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type);
 obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type);
 obj_data *get_obj_in_room(room_data *room, char *name);
@@ -476,10 +485,10 @@ bool has_evolution_value(sector_data *st, int val_type, any_vnum vnum);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
-struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, bool storage_timers);
-#define add_to_empire_storage(emp, island, vnum, amount, timer)  add_to_empire_storage_with_timer((emp), (island), (vnum), (amount), (timer), TRUE);
+struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, int storage_timers);
+#define add_to_empire_storage(emp, island, vnum, amount, timer)  add_to_empire_storage_with_timer((emp), (island), (vnum), (amount), (timer), STORAGE_TIMERS_NEWEST);
 bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
-bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, bool storage_timers);
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, int storage_timers);
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
 bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);

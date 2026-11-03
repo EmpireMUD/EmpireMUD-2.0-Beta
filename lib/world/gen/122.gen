@@ -1,0 +1,159 @@
+#12200
+difficult~
+4 0
+0 0 0 0
+T4
+Type 'difficulty <normal | hard | group | boss>' to fight it.~
+T5
+...type 'difficulty' to prepare to fight $m!~
+S
+#12202
+serragon combat~
+3 0
+0 0 0 0
+S
+#12203
+ribbon serragon~
+4 0
+0 0 0 0
+T5
+...$e's not looking -- now is the time to strike!~
+S
+#12204
+invoke the ribbon serragon~
+2 0
+0 0 0 0
+T0
+The trees whisper and the braided pillars shiver as you invoke the sacred name of the ribbon serragon.~
+T1
+The trees whisper and the braided pillars shiver as $n invokes the name of the ribbon serragon.~
+T4
+The trees whisper and the braided pillars shiver as you invoke the sacred name of the ribbon serragon.~
+T5
+The trees whisper and the braided pillars shiver as $n invokes the name of the ribbon serragon.~
+S
+#12205
+crushing coils~
+4 0
+0 0 0 0
+T5
+...$e's struggling to breath as $s body is crushed!~
+S
+#12206
+crushed legs~
+4 0
+0 0 0 0
+T0
+Your legs are starting to feel better.~
+S
+#12207
+leafblade sweep~
+4 0
+0 0 0 0
+T5
+...$e's sweeping $s crest around in a vicious arc!~
+S
+#12208
+timely dodge~
+4 0
+0 0 0 0
+S
+#12209
+serragon spines~
+4 0
+0 0 0 0
+T0
+You manage to remove some of the spines.~
+S
+#12211
+jagged wounds~
+4 0
+12211 0 0 0
+T0
+Your jagged wounds stop bleeding.~
+T2
+You're bleeding from the jagged wounds!~
+T5
+...$e's bleeding from jagged, saw-toothed wounds!~
+S
+#12212
+punctured~
+4 0
+12212 0 0 0
+T0
+Your punctured wounds stop bleeding.~
+T2
+You're bleeding from so many punctures!~
+T5
+...$e is bleeding from many puncture wounds.~
+S
+#12213
+chop~
+2 0
+0 0 0 0
+T0
+You chop and clear trees.~
+T1
+$n chops and clears trees.~
+T4
+You chop and clear trees.~
+T5
+$n chops and clears trees.~
+S
+#12214
+craft leaves~
+2 0
+0 0 0 0
+T0
+You hammer leaves from the bronze.~
+T1
+$n hammers leaves from the bronze.~
+T4
+You hammer leaves from the bronze.~
+T5
+$n hammers leaves from the bronze.~
+S
+#12215
+carve basin~
+2 0
+0 0 0 0
+T0
+You carve a wooden basin from a massive trunk.~
+T1
+$n carves a wooden basin from a massive trunk.~
+T4
+You carve a wooden basin from a massive trunk.~
+T5
+$n carves a wooden basin from a massive trunk.~
+S
+#12216
+annoint~
+2 0
+0 0 0 0
+T0
+You spread blood from the serragon heart across the basin.~
+T1
+$n spreads blood from the serragon heart across the basin.~
+T4
+You spread blood from the serragon heart across the basin.~
+T5
+$n spreads blood from the serragon heart across the basin.~
+S
+#12255
+consecrate~
+2 0
+0 0 0 0
+T0
+You consecrate the elephant graveyard.~
+T1
+$n consecrates the elephant graveyard.~
+T2
+You consecrate the elephant graveyard.~
+T3
+$n consecrates the elephant graveyard.~
+T4
+You re-consecrate the elephant graveyard.~
+T5
+$n re-consecrates the elephant graveyard.~
+S
+$

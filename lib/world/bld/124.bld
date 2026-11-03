@@ -31,7 +31,7 @@ Cliffside Docks~
 Some Cliffside Docks~
 @w&0==@e~
 24 0 bdnxD 0
-0 0 0 -1
+0 0 0 12426
 B0
 &0==~
 B1
@@ -50,8 +50,6 @@ The docks are attached directly to the cliffside.
 F
 g
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
-M
-12426 100.00 c
 R
 6000 1 1 0
 R
@@ -62,7 +60,7 @@ Smuggler's Wharf~
 A Smuggler's Wharf~
 @w&0==@e~
 24 0 bdnpxD 0
-0 0 0 -1
+0 0 0 12426
 A
 d
 B0
@@ -79,8 +77,6 @@ in the dark of night.
 F
 g
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
-M
-12426 100.00 c
 R
 6000 1 1 0
 R

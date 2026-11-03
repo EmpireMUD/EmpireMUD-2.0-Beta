@@ -63,7 +63,7 @@ S
 Small Forge~
 A Small Forge~
 ~
-0 0 a c
+0 0 az c
 0 0 0 212
 C
 forge, smelt~
@@ -378,7 +378,7 @@ S
 Laboratory~
 The Laboratory~
 ~
-0 0 a k
+0 0 az k
 0 0 0 231
 C
 brew, mix, retrieve, store~
@@ -453,7 +453,7 @@ S
 Trophy Room~
 The Trophy Room~
 ~
-0 0 a i
+0 0 az i
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -473,7 +473,7 @@ S
 Root Cellar~
 The Root Cellar~
 ~
-0 0 a m
+0 0 az m
 0 0 0 -1
 C
 inventory, retrieve, store~

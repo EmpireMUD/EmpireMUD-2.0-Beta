@@ -147,6 +147,10 @@ body {
 	z-index: 10;
 }
 
+.underline {
+	text-decoration: underline;
+}
+
 .pixelated {
 	image-rendering:optimizeSpeed;
 	image-rendering:-moz-crisp-edges;
@@ -163,10 +167,10 @@ body {
 <body>
 
 <div id="prefs">
-	<div title="Press 'p' to toggle the political map."><input type="checkbox" id="pol" name="pol" /> <label for="pol">Political Map</label></div>
-	<div title="Press 'g' to toggle the grid."><input type="checkbox" id="grid" name="grid" /> <label for="grid">Grid</label></div>
-	<div title="Press 'c' to toggle cities."><input type="checkbox" id="cities" name="cities" /> <label for="cities">Cities</label></div>
-	<div title="Press 'x' to toggle pixelation while zoomed."><input type="checkbox" id="pixelate" name="pixelate" checked /> <label for="pixelate">Pixelate When Zoomed</label></div>
+	<div title="Press 'p' to toggle the political map."><input type="checkbox" id="pol" name="pol" /> <label for="pol"><span class="underline">P</span>olitical Map</label></div>
+	<div title="Press 'g' to toggle the grid."><input type="checkbox" id="grid" name="grid" /> <label for="grid"><span class="underline">G</span>rid</label></div>
+	<div title="Press 'c' to toggle cities."><input type="checkbox" id="cities" name="cities" /> <label for="cities"><span class="underline">C</span>ities</label></div>
+	<div title="Press 'x' to toggle pixelation while zoomed."><input type="checkbox" id="pixelate" name="pixelate" checked /> <label for="pixelate">Pi<span class="underline">x</span>elate When Zoomed</label></div>
 	<div style="clear: both;"></div>
 </div>
 <div id="coords"></div>

@@ -79,14 +79,14 @@ W
 S
 #3021
 Strong Fleet~
-   Manufacture or purchase a total of 5 warships to unlock the brigantine, a
+   Manufacture or purchase a total of 3 warships to unlock the brigantine, a
 larger and stronger ship.
 ~
 2 3 0 25 0
 K 2 955
 P 3020
 W
-27 0 131076 5 -
+27 0 131076 3 -
 S
 #3030
 Vanguard~

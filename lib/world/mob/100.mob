@@ -4,7 +4,7 @@ a wildling~
 A spiny black wildling is crawling down the tree.
 ~
 0 0 bcdj ce 2
-0 0 1 10 -1
+0 0 1 10 -1 -1
 D
    This strange furry little creature is hard to see in in the shade beneath
 the canopy of trees. Long spines protrude from its black fur, and only its
@@ -22,7 +22,7 @@ a weaver of the Grove~
 A hooded figure is standing amongst the trees.
 ~
 0 0 abdvxzI c 3
-1 0 0 18 -1
+1 0 0 18 -1 -1
 D
    The mage is covered head-to-toe by a long brown robe, exposing only its
 face and hands. The face is bestial almost to the point of being inhuman, and
@@ -41,7 +41,7 @@ a hooded faun~
 A tall, antlered mage stands beneath the canopy of trees.
 ~
 0 0 abdvxzI c 3
-2 0 0 16 -1
+2 0 0 16 -1 -1
 D
    The mage's hood has been pulled back to reveal strange, branching antlers
 that protrude from the mage's forehead. Whatever this mage is, she's not
@@ -60,7 +60,7 @@ the badger shifter~
 A huge creature - half man, half badger - looms over you!
 ~
 0 0 abdvzI cq 3
-1 0 0 10 -1
+1 0 0 10 -1 -1
 D
    The mage's brown robe is in tatters, barely clinging to the shoulders of
 this half-man, half-badger creature.
@@ -78,7 +78,7 @@ Archweaver #n~
 Archweaver #n seems to glow with the energy of the Grove!
 ~
 0 0 abdvxyI c 3
-2 3 0 20 -1
+2 3 0 20 -1 -1
 D
    The archweaver's brown robe is woven with strands of glimmering gold and
 silver, which seem to pulse as she channels mana from the earth.
@@ -98,7 +98,7 @@ a wildling~
 A tame wildling is curled up on the ground.
 ~
 0 75 dej 0 4
-0 0 0 10 -1
+0 0 0 10 -1 -1
 D
    This huge black furry creature is hard to identify, but it appears tame
 enough that you might be able to ride it.
@@ -111,7 +111,7 @@ a colossal red dragon~
 A colossal red dragon looms over you!
 ~
 300 300 bdgxyzAB chm 6
-2 0 2 10 -1
+2 0 2 44 -1 -1
 I 0 3012 75.00 4  # BUTCHER: fillet of raw meat
 I 0 3012 75.00 4  # BUTCHER: fillet of raw meat
 I 0 3012 75.00 4  # BUTCHER: fillet of raw meat
@@ -132,7 +132,7 @@ a red dragon~
 A small red dragon is circling.
 ~
 100 125 dej m 5
-0 0 2 10 -1
+0 0 2 44 -1 -1
 I 0 3012 100.00 10  # BUTCHER: fillet of raw meat
 S
 #10011
@@ -141,7 +141,7 @@ a sewer rat~
 A rat stops and looks over at you.
 ~
 0 10 dj c 1
-0 0 7 9 -1
+0 0 7 9 -1 -1
 D
 Eeeeeeeeeeek!
 ~
@@ -157,7 +157,7 @@ a filthy rat~
 A rat is cleaning its paws in raw sewage.
 ~
 0 15 dj c 1
-0 0 7 9 -1
+0 0 7 9 -1 -1
 D
 Eeeewwwwwww!
 ~
@@ -173,7 +173,7 @@ a dire rat~
 A huge rat scurries past you!
 ~
 0 50 djA c 2
-0 0 7 9 -1
+0 0 7 9 -1 -1
 D
    This rat is terrifyingly larger than an ordinary rat. It's almost the size
 of a dog!
@@ -192,7 +192,7 @@ S
 #n is crouched in the corner, fiddling with a needle.
 ~
 0 50 bdvAIL 0 3
-1 0 0 4 -1
+1 0 0 4 -1 -1
 D
    True to his name, he's dressed head to foot in hand-stitched ratskin
 clothing. He probably doesn't smell too fresh but, hey, this is a sewer. You
@@ -212,7 +212,7 @@ a street urchin~
 A street urchin is chasing rats.
 ~
 0 20 dvI c 3
-1 0 7 4 -1
+1 0 7 4 -1 -1
 D
 This poor child seems to be hunting dinner.
 ~
@@ -230,7 +230,7 @@ S
 The master thief #n is leaning against the wall, flipping a dagger.
 ~
 20 50 bdvzBIL 0 3
-0 0 0 4 -1
+0 0 0 4 -1 -1
 D
    Though this doesn't seem to be a very likely hideout for a master thief,
 they've certainly made it a home.
@@ -248,7 +248,7 @@ S
 #n is stalking through the shadows.
 ~
 0 50 bdvzI c 3
-0 0 0 4 -1
+0 0 0 4 -1 -1
 D
 You clutch your coinpurse as you notice the thief looking back.
 ~
@@ -266,7 +266,7 @@ a rat-eating spider~
 A rat-eating spider is picking through a nest.
 ~
 0 50 bdjA cG 2
-0 0 8 9 -1
+0 0 8 9 -1 -1
 D
    On the short list of things more terrifying than a giant rat, the spider
 that eats giant rats surely takes the top spot.
@@ -281,7 +281,7 @@ a rat hunter~
 An amateur rat hunter is stalking his prey.
 ~
 0 50 bdvAI c 3
-1 0 0 2 -1
+1 0 0 2 -1 -1
 D
    You find yourself hoping he's hunting rats for their pelts, not meat. But
 you're forced to admit that it's not much better.
@@ -299,7 +299,7 @@ a baby dragon~
 A tiny dragon is flying after a rat.
 ~
 0 50 bdyA c 3
-0 0 2 9 -1
+0 0 2 9 -1 -1
 D
    Hopefully once the dragon has had his fill of rats, he'll move out of the
 sewer while he's still small enough to squeeze out the grate.
@@ -317,7 +317,7 @@ a city official~
 A city official is inspecting the sewer.
 ~
 0 40 dvI 0 3
-1 0 0 5 -1
+1 0 0 5 -1 -1
 D
 He's muttering something about being forced to catch rats himself.
 ~
@@ -332,7 +332,7 @@ gossiper #n~
 #n is standing here, gossipping.
 ~
 30 50 dvI 0 3
-0 0 0 15 -1
+0 0 0 15 -1 -1
 I 4 2015 40.00 1  # LOOT: tunic
 I 4 2021 40.00 1  # LOOT: cloth mantle
 I 4 2023 40.00 1  # LOOT: fine cloth gloves
@@ -355,7 +355,7 @@ a bustling page~
 A page is bustling past you.
 ~
 30 50 advxAI 0 3
-1 0 0 15 -1
+1 0 0 15 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10043 10.00 1 X  # LOOT: page robes
 I 4 10042 10.00 1 X  # LOOT: bustling shoes
@@ -379,7 +379,7 @@ barista #n~
 The barista is stirring a drink with a gnarled wand.
 ~
 30 50 bdvxAI 0 3
-0 0 0 16 -1
+0 0 0 16 -1 -1
 I 4 10034 10.00 1  # LOOT: gnarled wand
 T 10032
 T 10046
@@ -391,7 +391,7 @@ S
 #n is sitting at a cafe table.
 ~
 30 50 bdvI 0 3
-0 0 0 1 -1
+0 0 0 1 -1 -1
 S
 #10034
 master #n~
@@ -399,7 +399,7 @@ Master #n~
 Master #n is scribbling on the blackboard.
 ~
 50 70 bdvxAI 0 3
-0 2 0 17 -1
+0 2 0 17 -1 -1
 T 10034
 T 10035
 T 10046
@@ -410,7 +410,7 @@ S
 #n is writing furiously with a quill.
 ~
 30 50 bdvI 0 3
-0 0 0 5 -1
+0 0 0 5 -1 -1
 T 10046
 S
 #10036
@@ -419,7 +419,7 @@ S
 #n is standing behind the counter.
 ~
 30 50 bdvxAI 0 3
-0 0 0 1 -1
+0 0 0 1 -1 -1
 T 10036
 T 10037
 T 10046
@@ -430,7 +430,7 @@ Apprentice #n~
 An apprentice is staring intently at a glass case.
 ~
 50 70 advxAI 0 3
-0 0 0 16 -1
+0 0 0 16 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10045 10.00 1 X  # LOOT: apprentice robes
 I 4 10044 10.00 1 X  # LOOT: skycleaver spellbook
@@ -443,7 +443,7 @@ the goblin wrangler~
 The goblin wrangler snaps his whip at a cage.
 ~
 50 70 bdvxAI 0 2
-1 0 0 7 -1
+1 0 0 7 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10047 10.00 1 X  # LOOT: goblin wrangler pants
 I 4 10046 10.00 1 X  # LOOT: goblin wrangler whip
@@ -467,7 +467,7 @@ the goblin~
 A caged goblin is making a strange chirping noise.
 ~
 30 50 bdz 0 2
-0 0 0 1 -1
+0 0 0 1 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10049 10.00 1 X  # LOOT: goblin's vest
 I 4 10048 10.00 1 X  # LOOT: goblin shortsword
@@ -479,7 +479,7 @@ the goblin commando~
 A goblin commando is biting the cage bars.
 ~
 40 60 bdyz 0 2
-0 0 0 1 -1
+0 0 0 1 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10036 50.00 1  # LOOT: fractured skystone
 I 4 10051 50.00 1 X  # LOOT: pleated goblin armor
@@ -492,7 +492,7 @@ S
 #n is betting on the pixy races.
 ~
 50 70 bdvxAI 0 3
-0 0 0 17 -1
+0 0 0 17 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 T 10046
 S
@@ -502,7 +502,7 @@ the pixy~
 An escaped pixy is fluttering around your head.
 ~
 30 50 dxz 0 1
-0 0 2 9 -1
+0 0 2 9 -1 -1
 I 4 10052 100.00 1  # LOOT: vial of pixy dust
 I 4 10036 100.00 1  # LOOT: fractured skystone
 S
@@ -512,7 +512,7 @@ Watcher #n~
 #n is watching over the apprentices.
 ~
 70 90 advxAI 0 3
-0 2 0 1 -1
+0 2 0 1 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10054 10.00 1 X  # LOOT: glass shield
 I 4 10053 10.00 1 X  # LOOT: glass sword
@@ -525,7 +525,7 @@ the resident~
 A sorcerer resident looks rather busy.
 ~
 70 90 advxAI 0 3
-2 0 0 16 -1
+2 0 0 16 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10056 10.00 1 X  # LOOT: glimmering doublet
 I 4 10055 10.00 1 X  # LOOT: pointed earcuff
@@ -537,7 +537,7 @@ High Master #n~
 High Master #n is overseeing the residents.
 ~
 110 110 bdvxAI 0 3
-0 2 0 16 -1
+0 2 0 16 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10058 10.00 1 X  # LOOT: double-pocket
 I 4 10057 10.00 1 X  # LOOT: bone wand
@@ -550,7 +550,7 @@ the lab assistant~
 The lab assistant is fiddling with some crystals.
 ~
 70 90 bdvxAI 0 3
-1 0 0 15 -1
+1 0 0 15 -1 -1
 T 10048
 T 10046
 S
@@ -560,7 +560,7 @@ the otherworlder~
 A huge otherworlder is chained to the floor!
 ~
 50 90 bdyz 0 3
-1 0 0 5 -1
+1 0 0 5 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10060 10.00 1 X  # LOOT: otherworlder's wristbands
 I 4 10059 10.00 1 X  # LOOT: otherworlder's gauntlet
@@ -575,7 +575,7 @@ the lich Scaldorran~
 The lich Scaldorran is channelling a spell with his bony fingers.
 ~
 70 90 bdhwxzA G 3
-1 0 2 16 -1
+1 0 2 16 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10061 10.00 1 X  # LOOT: lich bindings
 I 4 10062 10.00 1 X  # LOOT: tattered lich cloak
@@ -589,7 +589,7 @@ a skeleton~
 A rusty, dusty skeleton is ambling around the room.
 ~
 50 75 abdh G 3
-0 0 0 10 -1
+0 0 0 10 -1 -1
 I 4 10063 10.00 1  # LOOT: bone club
 I 4 10036 100.00 1  # LOOT: fractured skystone
 T 10053
@@ -600,7 +600,7 @@ a shackled ghost~
 A ghost in chains floats about the room.
 ~
 50 75 abdh G 0
-0 0 0 7 -1
+0 0 0 7 -1 -1
 I 4 10064 10.00 1  # LOOT: ghastly chains
 I 4 10036 100.00 1  # LOOT: fractured skystone
 T 10054
@@ -611,7 +611,7 @@ an escaped experiment~
 An escaped experiment is running past you!
 ~
 30 100 dy 0 4
-0 0 0 15 -1
+0 0 0 15 -1 -1
 I 4 10036 100.00 1  # LOOT: fractured skystone
 I 4 10077 50.00 1 X  # LOOT: experimental handwraps
 I 4 10078 50.00 1 X  # LOOT: experimental aura
@@ -632,7 +632,7 @@ High Sorceress Celiya~
 High Sorceress Celiya is here.
 ~
 120 120 bdvxBI 0 3
-2 0 0 17 -1
+2 0 0 17 -1 -1
 I 4 10037 100.00 1  # LOOT: large, broken skystone
 I 4 10070 15.00 1 X  # LOOT: reverse impact ring
 I 4 10069 10.00 1 X  # LOOT: majestic silk belt
@@ -648,7 +648,7 @@ High Sorcerer Barrosh~
 High Sorcerer Barrosh is tinkering with a spell.
 ~
 150 150 bdvxyBI 0 3
-1 0 0 18 -1
+1 0 0 18 -1 -1
 I 4 10037 100.00 1  # LOOT: large, broken skystone
 I 4 10073 15.00 1 X  # LOOT: crystal-clear goggles
 I 4 10072 15.00 1 X  # LOOT: staff of Apollus
@@ -664,7 +664,7 @@ Grand High Sorcerer Knezz~
 Grand High Sorcerer Knezz appears to be meditating.
 ~
 200 200 bdvxyzBI 0 3
-1 0 0 19 -1
+1 0 0 19 -1 -1
 I 4 10037 100.00 1  # LOOT: large, broken skystone
 I 4 10076 15.00 1 X  # LOOT: phoenix bone earrings
 I 4 10075 15.00 1 X  # LOOT: arcane dagger

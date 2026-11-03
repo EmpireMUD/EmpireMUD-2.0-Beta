@@ -30,6 +30,7 @@ B1
 &0M~
 D
 10483 2 cm
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
 L kr 0
 P
 2
@@ -50,6 +51,7 @@ B1
 &0M~
 D
 10484 0 0
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
 L kr 0
 P
 2

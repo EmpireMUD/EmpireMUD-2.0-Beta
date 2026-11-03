@@ -1,0 +1,43 @@
+#9296
+platform war ruined~
+a ruined war platform~
+A ruined war platform lies in a heap.~
+   This was once a mighty war platform, with a strap to attach it to an even
+mightier beast. Now, it's just a heap of wood and nails. It looks rather
+flammable.
+~
+~
+huDF 19 1 0 0 0 -1 0 0 0 -1 0
+P
+2
+S
+#9297
+mammoth war platform dire-tusked diretusked tusked~
+a mammoth war platform~
+A mammoth war platform towers over you, blocking the scenery.~
+   Someone has built a full war platform on top of an absolutely enormous
+dire-tusked mammoth. The mammoth, armed with at least 6 tusks the size of
+trees, doesn't seem to mind. If anything, it relishes in the all-out
+destruction this vehicle is capable of. On the edges of the platform, someone
+has even mounted cannons!
+   You can sit on it, drive it, and fire heavy shot from it.
+~
+&wJ(=)~
+bfmrux 26 48 0 0 0 0 0 0 0 -1 0
+B0
+&wJM~
+B1
+&wJ~
+C
+125 125
+P
+1
+R
+6790 1 1 0
+R
+6000 1 1 0
+R
+9297 1 5 0
+T 9296
+S
+$

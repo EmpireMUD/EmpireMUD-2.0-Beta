@@ -67,7 +67,7 @@ T e 1
 S
 #6
 Ready Blood Weapons~
-0 314 1.00 0 bcn 0
+0 314 1.00 0 bn 0
 C
 unknown 5 w 3 15 0.00 -1 0 0 2 0
 D 4 1101 0
@@ -913,14 +913,14 @@ T f 1
 S
 #93
 Rescue~
-0 -1 1.00 0 0 0
+I -1 1.00 0 0 0
 C
-rescue 7 b 1 20 0.00 2010 6 0 2 0
+rescue 7 bh 1 20 0.00 2010 6 0 2 0
 D 64 16 0
 D 16 36 0
 M
 2
-You move to rescue $n...~
+You move to rescue $N...~
 M
 3
 *~

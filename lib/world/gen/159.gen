@@ -1,0 +1,69 @@
+#15915
+perform chant~
+2 0
+0 0 0 0
+T0
+You chant, 'From the jade we cut above it...'~
+T1
+$n chants, 'From the jade we cut above it...'~
+T2
+You chant, 'From the jade we cut above it...'~
+T3
+$n chants, 'From the jade we cut above it...'~
+T4
+You chant, 'From the jade we cut above it...'~
+T5
+$n chants, 'From the jade we cut above it...'~
+S
+#15916
+perform chant~
+2 0
+0 0 0 0
+T0
+You chant, 'Floating on the air like cloudy...'~
+T1
+$n chants, 'Floating on the air like cloudy...'~
+T2
+You chant, 'Floating on the air like cloudy...'~
+T3
+$n chants, 'Floating on the air like cloudy...'~
+T4
+You chant, 'Floating on the air like cloudy...'~
+T5
+$n chants, 'Floating on the air like cloudy...'~
+S
+#15917
+perform chant~
+2 0
+0 0 0 0
+T0
+You chant, 'Put the wind into the sky-lung...'~
+T1
+$n chants, 'Put the wind into the sky-lung...'~
+T2
+You chant, 'Put the wind into the sky-lung...'~
+T3
+$n chants, 'Put the wind into the sky-lung...'~
+T4
+You chant, 'Put the wind into the sky-lung...'~
+T5
+$n chants, 'Put the wind into the sky-lung...'~
+S
+#15918
+perform chant~
+2 0
+0 0 0 0
+T0
+You chant, 'Sail among the Godlins... proudy?'~
+T1
+$n chants, 'Sail among the Godlins... proudy?'~
+T2
+You chant, 'Sail among the Godlins... proudy?'~
+T3
+$n chants, 'Sail among the Godlins... proudy?'~
+T4
+You chant, 'Sail among the Godlins... proudy?'~
+T5
+$n chants, 'Sail among the Godlins... proudy?'~
+S
+$

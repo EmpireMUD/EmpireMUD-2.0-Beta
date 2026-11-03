@@ -1,0 +1,291 @@
+#15900
+Shipwreck: Gems for the Wavewhisperer~
+   'Goblins need gems,' the old wavewhisperer says. 'Not saying what for. Just
+need them. Don't care what color but green is best. Two hands of them. Bring
+them here and do it quick.'
+~
+   Though her legs creak as she gets up, her hands move like lightning as she
+snatches the gems from you. Her left eye watches you even as her right eye
+looks up through what you've brought her, one by one.
+   'Okay,' she says. 'Thought you would bring glass but okay to be wrong. Gonna
+remember you and your stupid face.'
+~
+3 d 75 175 0
+A
+1 15901
+P
+17 15900 0 1 a
+R
+7 15900 50
+W
+1 6600 0 10 -
+Z
+1 15901
+S
+#15901
+Shipwreck: Herbs for the Wavewhisperer~
+   'Going to need some herbs for this,' the wavewhisper says through clenched
+teeth. She wrinkles her nose and drops the hem of her violet robe, covering a
+gash on her leg. 'Dead captain hit the shore too fast. Lots of goblins needing
+herbs. You got some? Promise not to use them on you.'
+~
+   The wavewhisper's mouth stretches into a wide grin as she takes the herbs
+from you. 'These look fresh enough,' she says, holding them up to her nose for
+a loud sniff. 'Okay maybe you not so bad.'
+~
+3 d 75 175 0
+A
+1 15901
+P
+17 15900 0 1 a
+R
+7 15900 20
+W
+1 6650 0 10 -
+Z
+1 15901
+S
+#15902
+Shipwreck: Material for the Wavewhisperer~
+   The weary wavewhisper sighs and wipes her brow and says, 'This not a great
+place to crash. Goblins gonna need more stuff. You look like a smart man or
+whatever. Bring us stuffing. Sticks, straw, feathers, don't care what. Just
+gonna need it pretty soon.'
+~
+   'How you humans say it... Thanks you,' the old goblin says as she takes the
+supplies from you.
+~
+4 d 75 175 0
+A
+1 15901
+P
+17 15900 0 1 a
+R
+7 15900 10
+W
+1 6400 0 10 -
+Z
+1 15901
+S
+#15905
+Shipwreck: Meat for the Crabherd~
+   'Not believing how much these guys eat,' the crabherd says, turning a small
+pail upside-down and shaking it, but nothing comes out. She tosses it aside and
+tucks a stray lock of red hair behind her ear, smudging blood on her cheek in
+the process.
+   'Needs more meat. Got any?'
+~
+   She swipes the meat out of your hands and immediately starts portioning it
+out to the crabs. She shoots you a quick smile, twice, but seems too busy to
+talk about it.
+~
+3 d 75 175 0
+A
+1 15902
+P
+17 15900 0 1 a
+R
+7 15900 50
+W
+1 6200 0 10 -
+Z
+1 15902
+S
+#15906
+Shipwreck: Cloth for the Crabherd~
+   'Not lasting long,' says the goblin as she examines the bottom of her tent,
+tattered and torn by the incessant claws of her many, many crabs. 'Needing some
+cloth if you got it. Not many traders making it this far.'
+~
+   'Finally bringing me the cloth,' the crabherd mutters as she takes it from
+you. She unravels it and holds it out side. 'Okay, not being so bad. This is
+working. Almost starting to like you.'
+~
+4 d 75 175 0
+A
+1 15902
+P
+17 15900 0 1 a
+R
+7 15900 20
+W
+1 6800 0 10 -
+Z
+1 15902
+S
+#15907
+Shipwreck: Lumber for the Crabherd~
+   The young goblin looks exasperated.
+   'Having a lot of need for more crab boxes and pens,' she says. 'Scrapboss
+gonna want some too, but just be bringing it here. Fastly.'
+~
+   'Good human doing what it's told. Maybe needing more lumber, though. Nice
+to see human being useful.'
+~
+5 d 75 175 0
+A
+1 15902
+P
+17 15900 0 1 a
+R
+7 15900 10
+W
+1 6000 0 10 -
+Z
+1 15902
+S
+#15910
+Shipwreck: Silver for the Raidscribe~
+   The little raidscribe barely moves his wrinkled mouth as he speaks, so at
+first you don't even realize he's talking. He elbows you in the thigh.
+   'You even listening?' he says, barely above a mutter. 'If you want to
+impress goblins, bring us silver. Unless you got some jade.'
+~
+   'More than I expected of you,' the raidscribe says under his breath. Despite
+his age, he moves so quickly that you can't even see where he's hidden the bars
+of silver.
+~
+3 d 75 175 0
+A
+1 15903
+P
+17 15900 0 1 a
+R
+7 15900 50
+W
+2 172 0 5 -
+Z
+1 15903
+S
+#15911
+Shipwreck: Skins for the Raidscribe~
+   'You look like someone with a lot of spare skin,' the ancient raidscribe
+murmurs as he looks up at you. 'The more you bring us, the more we like you.'
+~
+   The raidscribe turns the pile of skins over and examines it only briefly.
+He gives you a small nod and says something you can't quite hear, but he seems
+pleased.
+~
+5 d 75 175 0
+A
+1 15903
+P
+17 15900 0 1 a
+R
+7 15900 20
+W
+1 6500 0 10 -
+Z
+1 15903
+S
+#15912
+Shipwreck: Nails for the Raidscribe~
+   'We lost our anvil-gnasher in the crash,' the old raidscribe mumbles through
+dry and cracked lips. 'If you want to trade, first show some goodwill. Isn't
+that what you humans are known for? Bring us some nails.'
+~
+   'I see you do as you're told,' the raidscribe says. 'We will put these nails
+to good use.'
+~
+5 d 75 175 0
+A
+1 15903
+P
+17 15900 0 1 a
+R
+7 15900 10
+W
+1 6790 0 10 -
+Z
+1 15903
+S
+#15915
+Shipwreck: How Much to Clear Out?~
+   The goblins, it seems, are here to raid and that certainly means they're
+after money and valuables. Perhaps they could be paid off instead, since they
+seem to have taken a liking to you. If you offer them 400 coins, maybe they'll
+go bother someone else.
+~
+   You strike a deal with the goblin. For just 400 coins, the whole crew is
+going to pack up and leave. Just give them a minute or two to clear out.
+~
+3 bd 75 175 -1
+A
+1 15901
+A
+1 15902
+A
+1 15903
+P
+16 15900 0 6 -
+T 15915
+W
+21 0 0 400 -
+Z
+1 15901
+Z
+1 15902
+Z
+1 15903
+S
+#15916
+Shipwreck: Ancient Goblin Trinkets~
+   While you rifle through your bag, the goblin notices some old wood and bone
+trinkets you're carrying and shows unusual interest. Perhaps if you hand them
+over...
+~
+You hand some goblin trinkets over...
+~
+4 bd 75 175 0
+A
+1 15901
+A
+1 15902
+A
+1 15903
+P
+2 11976 0 1 a
+P
+17 15900 0 1 a
+R
+7 15900 1500
+W
+2 11976 0 1 -
+Z
+1 15901
+Z
+1 15902
+Z
+1 15903
+S
+#15917
+Shipwreck: Lost Jade Tear~
+   You absentmindedly play with the old square jade tear you found in the
+Gobbrabakh of Orka, which catches the eye of the goblin. Perhaps these goblin
+raiders would have some interest in it?
+~
+You hand the jade tear of Gobbrabakh of Orka over to the goblin...
+~
+5 bd 75 175 0
+A
+1 15901
+A
+1 15902
+A
+1 15903
+P
+2 11965 0 1 a
+P
+17 15900 0 1 a
+R
+7 15900 1500
+W
+2 11965 0 1 -
+Z
+1 15901
+Z
+1 15902
+Z
+1 15903
+S
+$

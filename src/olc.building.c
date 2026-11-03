@@ -369,6 +369,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	shop_data *shop, *next_shop;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	descriptor_data *desc;
 	char name[256];
 	int count;
@@ -469,6 +470,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_VISIT_BUILDING, vnum);
 		
 		if (found) {
@@ -487,7 +489,9 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		// REQ_x:
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_NOT_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_NOT_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum);
 		
@@ -512,12 +516,23 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum);
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted building", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_BUILDING, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to building [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
 		}
 	}
 	
@@ -582,6 +597,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (GET_OLC_PROGRESS(desc)) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_OWN_BUILDING, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_VISIT_BUILDING, vnum);
 		
 			if (found) {
@@ -593,7 +609,9 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_OWN_BUILDING, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_OWN_BUILDING, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_VISIT_BUILDING, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_VISIT_BUILDING, vnum);
 		
@@ -612,11 +630,18 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (GET_OLC_SOCIAL(desc)) {
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_OWN_BUILDING, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_BUILDING, vnum);
 		
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A building required by the social you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_BUILDING, vnum);
+			if (found) {
+				msg_to_desc(desc, "Building [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -866,7 +891,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 			continue;
 		}
 
-		if (*find_keywords && !multi_isname(find_keywords, GET_BLD_NAME(bld)) && !multi_isname(find_keywords, GET_BLD_TITLE(bld)) && !multi_isname(find_keywords, GET_BLD_DESC(bld)) && !search_extra_descs(find_keywords, GET_BLD_EX_DESCS(bld))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_BLD_NAME(bld)) && !multi_isname(find_keywords, GET_BLD_TITLE(bld)) && !multi_isname(find_keywords, GET_BLD_DESC(bld)) && (!GET_BLD_NOTES(bld) || !multi_isname(find_keywords, GET_BLD_NOTES(bld))) && !search_extra_descs(find_keywords, GET_BLD_EX_DESCS(bld))) {
 			continue;
 		}
 		
@@ -907,6 +932,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	bool any;
 	int found;
 	
@@ -981,6 +1007,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_OWN_BUILDING, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_BUILDING, vnum);
 		
 		if (any) {
@@ -998,6 +1025,8 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		// REQ_x:
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_NOT_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_NOT_OWN_BUILDING, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum);
 		
@@ -1017,9 +1046,17 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum)) {
+		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_OWN_BUILDING, vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum)) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_BUILDING, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -1120,6 +1157,9 @@ void save_olc_building(descriptor_data *desc) {
 	if (GET_BLD_DESC(proto)) {
 		free(GET_BLD_DESC(proto));
 	}
+	if (GET_BLD_NOTES(proto)) {
+		free(GET_BLD_NOTES(proto));
+	}
 	free_extra_descs(&GET_BLD_EX_DESCS(proto));
 	while ((spawn = GET_BLD_SPAWNS(proto))) {
 		GET_BLD_SPAWNS(proto) = spawn->next;
@@ -1162,6 +1202,10 @@ void save_olc_building(descriptor_data *desc) {
 			free(GET_BLD_DESC(bdg));
 		}
 		GET_BLD_DESC(bdg) = NULL;
+	}
+	if (GET_BLD_NOTES(bdg) && !*GET_BLD_NOTES(bdg)) {
+		free(GET_BLD_NOTES(bdg));
+		GET_BLD_NOTES(bdg) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1220,6 +1264,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_COMMANDS(new) = GET_BLD_COMMANDS(input) ? str_dup(GET_BLD_COMMANDS(input)) : NULL;
 		GET_BLD_DESC(new) = GET_BLD_DESC(input) ? str_dup(GET_BLD_DESC(input)) : NULL;
 		GET_BLD_RELATIONS(new) = GET_BLD_RELATIONS(input) ? copy_bld_relations(GET_BLD_RELATIONS(input)) : NULL;
+		GET_BLD_NOTES(new) = GET_BLD_NOTES(input) ? str_dup(GET_BLD_NOTES(input)) : NULL;
 		
 		// copy extra descs
 		GET_BLD_EX_DESCS(new) = copy_extra_descs(GET_BLD_EX_DESCS(input));
@@ -1400,6 +1445,8 @@ void olc_show_building(char_data *ch) {
 		}
 		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_BLD_NOTES(bdg)), NULLSAFE(GET_BLD_NOTES(bdg)));
 		
 	send_page_display(ch);
 }
@@ -1645,6 +1692,19 @@ OLC_MODULE(bedit_name) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_BLD_NAME(bdg));
 	CAP(GET_BLD_NAME(bdg));
+}
+
+
+OLC_MODULE(bedit_notes) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_BLD_NAME(bdg));
+		start_string_editor(ch->desc, buf, &GET_BLD_NOTES(bdg), MAX_NOTES, TRUE);
+	}
 }
 
 

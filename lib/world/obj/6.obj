@@ -7,15 +7,19 @@ it catches the light. Legend says that if a sorcerer were to enchant a seed
 like this with a prismatic crystal, it would grow into an entire enchanted
 forest. To enchant the seed, use 'enchant seed'. This requires Enchant Tools.
 ~
-3 0 a 0 0 7
+3 0 a 0 0 10
 0 0 0
 12 0
 C
 1 1
+M
+34
+If you have Enchant Tools, you can enchant this seed to grow something wonderful.~
 R
 4 5164 0
 T 600
 T 605
+T 606
 S
 #601
 seed seeds prismatic~
@@ -27,11 +31,15 @@ the seed has been infused with magic, you need only plant it and use the chant
 of nature to bring it to life. Be sure to claim the tile you plant it on, as
 powerful necrovandals seek out unclaimed enchanted forests.
 ~
-3 j a 0 0 6
+3 j a 0 0 8
 0 0 0
 12 0
+M
+34
+Plant it on a claimed tile to grow something wonderful.~
 T 603
 T 605
+T 606
 S
 #602
 crystal prismatic gems~
@@ -40,11 +48,14 @@ A prismatic crystal sparkles on the ground.~
    This small gem shimmers with every color of the rainbow, casting fanciful
 shadows all around. Magical gems like this one are used in many skilled crafts.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 12 0
 C
 1 1
+M
+34
+This is a rare crafting material.~
 O+ 1 6601
 R
 4 5164 0
@@ -57,13 +68,16 @@ A starwood tree is lying here, leaking mana from its stump.~
 these trees is used in certain advanced crafts, to bring magical properties to
 highly skilled artifacts.
 ~
-3 e a 0 0 12
+3 e a 0 0 13
 0 0 0
 0 0
 C
 1 1
 I 11 617 100.00 1  # LIGHT: magical fire
 I 17 604 100.00 2  # SAW: stellar magewood
+M
+34
+You can saw the tree to get magical lumber.~
 O+ 1 6012
 R
 4 5118 0
@@ -76,7 +90,7 @@ A pile of magewood is lying here.~
 from its ends, forming a cool mist on the ground. Magewood is used in some
 highly skilled crafts.
 ~
-3 el a 0 0 10
+3 el a 0 0 11
 0 0 0
 0 0
 C
@@ -94,6 +108,9 @@ You attach $p in midair, where it seems to float.~
 M
 7
 $n attaches $p in midair, where it seems to float.~
+M
+34
+This is a rare building and crafting material.~
 O+ 1 6001
 R
 4 5118 0
@@ -116,7 +133,7 @@ Some elderberries are scattered on the ground.~
    These elderberries look fresh. They also have a faint pink glow, perhaps
 because of the forest they grew in.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 6 0 0
 7 336
 A
@@ -124,6 +141,9 @@ A
 M
 4
 You eat $p and feel... elder.~
+M
+34
+It doesn't look like anything you could plant.~
 O+ 1 6121
 R
 4 5619 0
@@ -135,12 +155,15 @@ The shimmering hide of a magical beast is lying here.~
    Light breaks apart into rainbows as it passes near this magical skin, making
 it hard to tell what color it really is.
 ~
-3 0 a 0 0 6
+3 0 a 0 0 7
 0 0 0
 7 0
 C
 1 1
 I 18 608 100.00 1 t  # TAN: piece of shimmering leather
+M
+34
+You can tan this to make leather.~
 O+ 1 6510
 R
 4 5120 0
@@ -153,7 +176,7 @@ A large piece of shimmering leather is lying here.~
 softly with iridescent light. While pretty, it's mostly only useful for the
 same things as ordinary leather.
 ~
-3 0 a 0 0 6
+3 0 a 0 0 7
 0 0 0
 7 0
 C
@@ -164,6 +187,9 @@ You stretch $p onto $V.~
 M
 7
 $n stretches $p onto $V.~
+M
+34
+This is a rare crafting material.~
 O+ 1 6530
 R
 4 5120 0
@@ -176,11 +202,14 @@ A majestic chunk of moonstone ore is lying here.~
 On its own, it is too soft to make tools or weapons. But if smelted with other
 rare metals, it creates the incredible alloys called argentine and eventide.
 ~
-3 l a 0 0 8
+3 l a 0 0 9
 0 0 0
 1 0
 C
 1 1
+M
+34
+You can smelt this with rare metals to create rare alloys.~
 O+ 1 6701
 R
 4 5115 0
@@ -193,11 +222,14 @@ An argentine ingot is stacked here.~
 Argentine ingots are used to create incredibly powerful weapons and armors.
 This metal is notoriously difficult to work with, and requires great skill.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 2 0
 C
 1 1
+M
+34
+This is a rare crafting material.~
 O+ 1 6740
 R
 4 5115 0
@@ -212,11 +244,14 @@ used to forge powerful magical weapons, and the metal is sometimes spun into
 thread to stitch robes for the greatest sorcerers. Eventide is unusually
 difficult to forge, and requires incredible skill.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 2 0
 C
 1 1
+M
+34
+This is a rare crafting material.~
 O+ 1 6740
 R
 4 5115 0
@@ -230,9 +265,12 @@ brushes against your hand, tiny red sparks fly off of it and fall to the ground
 as embers. Sparkfiber is used to sew powerful mage armor, by the most skilled
 craftsmen.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 11 0
+M
+34
+This is a rare crafting material.~
 O+ 1 6810
 R
 4 5137 0
@@ -245,11 +283,14 @@ A bolt of manasilk cloth has been left here.~
 your rough hands don't catch on it. This magical cloth is used to make armor
 and clothing for the greatest healers, by highly skilled craftsmen.
 ~
-3 l a 0 0 7
+3 l a 0 0 8
 0 0 0
 11 0
 C
 1 1
+M
+34
+This is a rare crafting material.~
 O+ 1 6810
 R
 4 5137 0
@@ -262,7 +303,7 @@ A pile of briar hide is precariously stacked here.~
 the outside becomes spiny and sharp. This type of leather is used to make great
 armors, by the most skilled craftsmen.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 7 0
 C
@@ -273,6 +314,9 @@ You stretch $p onto $V.~
 M
 7
 $n stretches $p onto $V.~
+M
+34
+This is a rare crafting material.~
 O+ 1 6531
 R
 4 5120 0
@@ -285,7 +329,7 @@ A pile of absinthian leather seethes on the ground.~
 mere presence gives onlookers a bitter taste. This fine leather is used to make
 vitriolic weapons and armor, by skilled craftsmen.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 7 0
 C
@@ -296,6 +340,9 @@ You stretch $p onto $V.~
 M
 7
 $n stretches $p onto $V.~
+M
+34
+This is a rare crafting material.~
 O+ 1 6531
 R
 4 5120 0
@@ -307,11 +354,14 @@ An elegant handle is lying on the ground.~
    This wooden handle has taken on a deep magenta color, and there is a faint
 mist of mana flowing from its exotic leather grip.
 ~
-1 0 ano 0 0 5
+1 0 ano 0 0 6
 0 3 5
 0 0
 C
 1 1
+M
+34
+This is a rare crafting material.~
 O+ 1 6851
 R
 4 5121 0
@@ -339,13 +389,16 @@ A weirdwood tree has fallen here, leaking mana from its stump.~
 from these trees is used in certain advanced crafts, to bring magical
 properties to highly skilled artifacts.
 ~
-3 e a 0 0 13
+3 e a 0 0 14
 0 0 0
 0 0
 C
 1 1
 I 11 617 100.00 1  # LIGHT: magical fire
 I 17 619 100.00 2  # SAW: empyreal magewood
+M
+34
+You can saw the tree to get magical lumber.~
 O+ 1 6012
 R
 4 5118 0
@@ -358,7 +411,7 @@ A pile of empyreal magewood is stacked here.~
 forest. Mana seeps from its ends forming a cool blue mist on the ground.
 Magewood is used in some highly skilled crafts.
 ~
-3 el a 0 0 11
+3 el a 0 0 12
 0 0 0
 0 0
 C
@@ -376,6 +429,9 @@ You attach $p in midair, where it seems to float.~
 M
 7
 $n attaches $p in midair, where it seems to float.~
+M
+34
+This is a rare building and crafting material.~
 O+ 1 6001
 R
 4 5118 0
@@ -399,11 +455,14 @@ A nascent crystal seed has been discarded here.~
 magical energy. Take the seed to an enchanted forest and 'awaken' it to absorb
 the magic of the forest into it.
 ~
-3 0 a 0 0 2
+3 0 a 0 0 3
 0 0 0
 12 0
 C
 1 1
+M
+34
+Awaken the seed in a magical forest to absorb the magic.~
 R
 4 5164 0
 T 621

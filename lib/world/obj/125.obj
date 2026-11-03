@@ -128,9 +128,9 @@ C
 1 1
 S
 #12510
-whistle magpie clockwork~
-a clockwork magpie whistle~
-A clockwork magpie whistle is lying here.~
+whistle magpie clockwork minipet~
+a clockwork magpie minipet whistle~
+A clockwork magpie minipet whistle is lying here.~
 This little brass whistle can summon a noncombat pet.
 Type 'use magpie' to summon it.
 ~
@@ -139,9 +139,9 @@ Type 'use magpie' to summon it.
 2 0
 S
 #12511
-whistle clockwork elephant~
-a clockwork elephant whistle~
-A clockwork elephant whistle is lying here.~
+whistle clockwork elephant mount~
+a clockwork elephant mount whistle~
+A clockwork elephant mount whistle is lying here.~
 This brass whistle can summon a new mount. Type 'use elephant' to summon it.
 ~
 3 p a 0 0 7
@@ -150,9 +150,9 @@ This brass whistle can summon a new mount. Type 'use elephant' to summon it.
 T 9910
 S
 #12512
-whistle eagle clockwork~
-a clockwork eagle whistle~
-A clockwork eagle whistle is lying here.~
+whistle eagle clockwork flying mount~
+a clockwork eagle flying mount whistle~
+A clockwork eagle flying mount whistle is lying here.~
    This brass whistle can summon a new flying mount. Type 'use eagle' to summon
 it.
 ~

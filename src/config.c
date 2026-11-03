@@ -51,6 +51,9 @@ void ensure_storage_timers(any_vnum only_vnum);
 void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
+// external vars used in configs
+extern const char *empire_admin_flags[];
+
 // locals
 #define deprecated_config(set, name, type)	{ init_config((set), (name), (type), "deprecated: do not set"); init_config_flags((name), CONF_FLAG_DEPRECATED); }
 
@@ -123,6 +126,7 @@ struct file_lookup_struct file_lookup[] = {
 	{ "olc", LVL_ASST, "../log/olc" },
 	{ "diplomacy", LVL_ASST, "../log/diplomacy" },
 	{ "scripterr", LVL_ASST, "../log/scripterr" },
+	{ "empires", LVL_ASST, "../log/empires" },
 
 	// last
 	{ "\n", 0, "\n" }
@@ -214,6 +218,9 @@ const double hit_per_dex = 5.0;
 
 // rounds up when scaling mobs/gear if this is > 1; ignored if 0 or 1
 const int round_level_scaling_to_nearest = 5;
+
+// amount of reputation gained/lost from killing faction mobs
+const int default_rep_per_kill = 1;
 
 // Books must contain one of these terms (prevents abuse like naming the book "a gold bar")
 const char *book_name_list[] = {
@@ -989,6 +996,13 @@ CONFIG_HANDLER(config_edit_type) {
 }
 
 
+// Customer handler for immortal empire restrictions that processes a bool and then runs updates
+CONFIG_HANDLER(config_edit_immortal_empire_restrictions) {
+	config_edit_bool(ch, config, argument);
+	resort_empires(TRUE);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: CUSTOM EDITORS ///////////////////////////////////////////
 
@@ -1731,8 +1745,8 @@ void init_config(int set, char *key, int type, char *description) {
 * Attaches custom handlers to config entries.
 *
 * @param char *key The config key to update (must already be set up).
-* @param CONFIG_HANDLER(*show_func) The function to show the config to a player.
-* @param CONFIG_HANDLER(*edit_func) The function for the player to edit the config.
+* @param CONFIG_HANDLER(*show_func) The function to show the config to a player. May be NULL to keep the default.
+* @param CONFIG_HANDLER(*edit_func) The function for the player to edit the config. May be NULL to keep the default.
 * @param void *custom_data Misc data used by show_func/edit_func.
 */
 void init_config_custom(char *key, CONFIG_HANDLER(*show_func), CONFIG_HANDLER(*edit_func), void *custom_data) {
@@ -1751,8 +1765,12 @@ void init_config_custom(char *key, CONFIG_HANDLER(*show_func), CONFIG_HANDLER(*e
 	}
 	
 	// add data
-	cnf->show_func = show_func;
-	cnf->edit_func = edit_func;
+	if (show_func) {
+		cnf->show_func = show_func;
+	}
+	if (edit_func) {
+		cnf->edit_func = edit_func;
+	}
 	cnf->custom_data = custom_data;
 }
 
@@ -1844,7 +1862,7 @@ void init_config_system(void) {
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
 	init_config(CONFIG_ACTIONS, "chip_timer", CONFTYPE_INT, "ticks to chip flint");
-	init_config(CONFIG_ACTIONS, "chop_timer", CONFTYPE_INT, "weapon damage to chop 1 tree");
+	init_config(CONFIG_ACTIONS, "chop_timer", CONFTYPE_INT, "how long it takes to chop a tree at the slowest speed, in seconds");
 	init_config(CONFIG_ACTIONS, "dig_base_timer", CONFTYPE_INT, "ticks, sped up by Finder and/or shovel");
 	init_config(CONFIG_ACTIONS, "fishing_timer", CONFTYPE_INT, "time per fish, halved by high Survival");
 	init_config(CONFIG_ACTIONS, "forage_base_timer", CONFTYPE_INT, "ticks, cut in half by Finder");
@@ -1889,14 +1907,18 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "decay_in_storage", CONFTYPE_BOOL, "stored items still count down their decay timers");
 		init_config_custom("decay_in_storage", config_show_bool, config_edit_decay_in_storage, NULL);
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
-	init_config(CONFIG_EMPIRE, "immortal_empire_restrictions", CONFTYPE_BOOL, "prevents trade, diplomacy, etc between immortal and mortal empires");
+	init_config(CONFIG_PLAYERS, "immortal_empire_default_flags", CONFTYPE_BITVECTOR, "flags automatically set on new immortal empires");
+		init_config_custom("immortal_empire_default_flags", config_show_bitvector, config_edit_bitvector, empire_admin_flags);
+	init_config(CONFIG_EMPIRE, "immortal_empire_restrictions", CONFTYPE_BOOL, "prevents diplomacy, etc between immortal and mortal empires");
+		init_config_custom("immortal_empire_restrictions", config_show_bool, config_edit_immortal_empire_restrictions, NULL);
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_stealth", CONFTYPE_BOOL, "prevents stealth actions by and against immortal empires");
+	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_trade", CONFTYPE_BOOL, "prevents immortal empire from engaging in import/export");
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_war", CONFTYPE_BOOL, "prevents war actions by and against immortal empires");
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "base territory per 1 Greatness");
 	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");
 	init_config(CONFIG_EMPIRE, "land_min_cap", CONFTYPE_INT, "lowest possible claim cap, to prevent very low numbers");
 	init_config(CONFIG_EMPIRE, "land_outside_city_modifier", CONFTYPE_DOUBLE, "portion of land that can be in the outskirts area of cities");
-	init_config(CONFIG_EMPIRE, "building_population_timer", CONFTYPE_INT, "game hours per citizen move-in");
+	init_config(CONFIG_EMPIRE, "building_population_timer", CONFTYPE_INT, "time interval for citizens populating buildings, in minutes");
 	init_config(CONFIG_EMPIRE, "frontier_timeout", CONFTYPE_INT, "after this many days, all frontier territory is lost; 0 to disable this");
 	init_config(CONFIG_EMPIRE, "time_to_empire_delete", CONFTYPE_INT, "weeks until an empire is deleted");
 	init_config(CONFIG_EMPIRE, "time_to_empire_emptiness", CONFTYPE_INT, "weeks until NPCs don't spawn");
@@ -2006,6 +2028,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "temperature_from_fire", CONFTYPE_INT, "warmth value from certain lights");
 	init_config(CONFIG_PLAYERS, "temperature_from_water", CONFTYPE_INT, "cooling value from water tiles");
 	init_config(CONFIG_PLAYERS, "temperature_penalties", CONFTYPE_BOOL, "whether or not players must manage warmth and cooling");
+	init_config(CONFIG_PLAYERS, "tomb_off_island_distance", CONFTYPE_INT, "distance from the tomb where player will respawn there even if off-island");
 	
 	// skills
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");
@@ -2164,9 +2187,9 @@ ACMD(do_config) {
 		msg_to_char(ch, "Valid types:\r\n");
 		count = 0;
 		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %-22.22s%s", config_groups[iter], (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(++count % 3)) ? "\r\n" : "");
+			msg_to_char(ch, " %-22.22s%s", config_groups[iter], (PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 3)) ? "\r\n" : "");
 		}
-		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && count % 3) {
+		if (!PRF_FLAGGED(ch, PRF_NO_COLUMNS) && count % 3) {
 			msg_to_char(ch, "\r\n");
 		}
 		return;
@@ -2266,6 +2289,7 @@ ACMD(do_config) {
 		else {
 			// no argument: show
 			msg_to_char(ch, "&y%s&0: &c%s&0\r\n", cnf->key, cnf->description);
+			msg_to_char(ch, "Type: %s\r\n", config_groups[cnf->set]);
 			
 			if (cnf->show_func != NULL) {
 				(cnf->show_func)(ch, cnf, val_arg);

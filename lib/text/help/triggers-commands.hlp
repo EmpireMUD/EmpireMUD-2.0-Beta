@@ -450,7 +450,7 @@ See also: EXPRESSIONS, NESTED-IFS
 %LOAD% MLOAD OLOAD VLOAD WLOAD
 
 %load% obj <vnum> [name <position>] [scale level]
-%load% obj <vnum> <in-obj> [scale level]
+%load% obj <vnum> <in-obj | in-vehicle> [scale level]
 %load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]
@@ -911,10 +911,10 @@ TATTACH
 Disambiguation: This is the immortal trigger attachment command. For the
                 scripting command, see &yATTACH&0.
 
-Usage:  attach mob <trigger vnum> <mob name> [location]
-        attach obj <trigger vnum> <obj name> [location]
-        attach room <trigger vnum> <room vnum> [location]
-        attach vehicle <trigger vnum> <vehicle name> [location]
+Usage:  tattach mob <trigger vnum> <mob name> [location]
+        tattach obj <trigger vnum> <obj name> [location]
+        tattach room <trigger vnum> <room vnum> [location]
+        tattach vehicle <trigger vnum> <vehicle name> [location]
 
 The tattach command allows you to attach a trigger to a single live copy of
 a mob (or object, etc) -- rather than attach it to the prototype. This is good
@@ -968,6 +968,8 @@ Examples:
 
 This command is grantable under the 'triggers' grant.
 
+Note: You cannot attach triggers to empires.
+
 See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 #d
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
@@ -994,8 +996,6 @@ room template vnum instead of live room number (if used in an instanced zone).
 Examples:
   %teleport% all i17401
   %teleport% %actor% %actor.home%
-
-Note: You cannot attach triggers to empires.
 #d
 %TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
 

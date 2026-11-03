@@ -41,6 +41,8 @@ Variables:
      may also be missing if they died).
   &c%self%&0 - The object being consumed.
   &c%command%&0 - Which consume command was used (e.g. drink).
+  &c%quantity&0 - Amount to be consumed (1 for arrows/poisons, usually more for
+     drink or eat).
 #d
 "FINISH TRIGGER" "OTRIG FINISH" TRIGEDIT-OBJ-FINISH
 
@@ -187,12 +189,17 @@ Objects can trigger on the following events:
 &cKill&0 - Triggers when the object's owner, or their ally, kills someone here.
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command trigs).
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d
 "OTRIG VARS" "OTRIG VARIABLES" OBJ-VARS TRIGEDIT-OBJ-VAR TRIGEDIT-VARIABLES-OBJECTS
 
-All object scripts provide the &c%self%&0 variable.
+Object Variables
+
+All object scripts provide the &c%self%&0 variable. Other ways of getting an
+object variable include %room.contents% and %actor.inventory%. Access the
+fields listed below like this: %obj.shortdesc%
 
 The correct way to get an object's short description in a send/echo is:
 &c@%obj%&0 - short desc, something
@@ -205,8 +212,9 @@ When using field  - The variable returns:
   &ysharp&0 - is a sharp weapon?     &ydamage&0 - physical, magical, etc
   &yblunt&0 - is a blunt weapon?     &ydisarmable&0 - can be disarmed?
   &ymagic&0 - is a magic weapon?
-&cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it). You
-   can copy another object's whole binding list with %newobj.bind(%obj%)%.
+&cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it). Or
+   with a mob, binds to the players who tagged the mob. You can copy another
+   object's whole binding list with %newobj.bind(%obj%)%.
 &cbound_to&0 - Person or people the object is bound to, if any.
 &ccan_wear(flag)&0 - True if the object has the given wear flag (HELP OEDIT WEAR).
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
@@ -231,6 +239,7 @@ When using field  - The variable returns:
    lists current flags instead.
 &cis_inroom&0 - Returns true if object is in room.
 &cis_name(str)&0 - Returns true if str contains names for the object.
+&cis_stolen&0 - True if the item has a 'stolen' timer counting down.
 &ckeywords&0 - The list of keywords for the object.
 &clevel&0 - The current scaled level of the object (0 if not yet scaled).
 &clongdesc&0 - The object's long description.

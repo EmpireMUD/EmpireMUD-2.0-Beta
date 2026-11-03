@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -337,7 +338,7 @@ void olc_fullsearch_augment(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_AUG_NAME(aug))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_AUG_NAME(aug)) && (!GET_AUG_NOTES(aug) || !multi_isname(find_keywords, GET_AUG_NOTES(aug)))) {
 			continue;
 		}
 		
@@ -365,6 +366,7 @@ void olc_fullsearch_augment(char_data *ch, char *argument) {
 */
 void olc_search_augment(char_data *ch, any_vnum vnum) {
 	augment_data *aug = augment_proto(vnum);
+	trig_data *trig, *next_trig;
 	int found;
 	
 	if (!aug) {
@@ -375,7 +377,13 @@ void olc_search_augment(char_data *ch, any_vnum vnum) {
 	found = 0;
 	build_page_display(ch, "Occurrences of augment %d (%s):", vnum, GET_AUG_NAME(aug));
 	
-	// augments are not actually used anywhere else
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_AUGMENT, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		}
+	}
 	
 	if (found > 0) {
 		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
@@ -502,6 +510,9 @@ void free_augment(augment_data *aug) {
 	if (GET_AUG_NAME(aug) && (!proto || GET_AUG_NAME(aug) != GET_AUG_NAME(proto))) {
 		free(GET_AUG_NAME(aug));
 	}
+	if (GET_AUG_NOTES(aug) && (!proto || GET_AUG_NOTES(aug) != GET_AUG_NOTES(proto))) {
+		free(GET_AUG_NOTES(aug));
+	}
 	
 	if (GET_AUG_APPLIES(aug) && (!proto || GET_AUG_APPLIES(aug) != GET_AUG_APPLIES(proto))) {
 		free_apply_list(GET_AUG_APPLIES(aug));
@@ -572,6 +583,11 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				GET_AUG_NOTES(aug) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -612,7 +628,7 @@ void write_augments_index(FILE *fl) {
 * @param augment_data *aug The thing to save.
 */
 void write_augment_to_file(FILE *fl, augment_data *aug) {
-	char temp[256], temp2[256];
+	char temp[MAX_STRING_LENGTH], temp2[256];
 	
 	if (!fl || !aug) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_augment_to_file called without %s", !fl ? "file" : "augment");
@@ -634,6 +650,13 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	
 	// 'R': resources
 	write_resources_to_file(fl, 'R', GET_AUG_RESOURCES(aug));
+	
+	// '_'
+	if (GET_AUG_NOTES(aug) && *GET_AUG_NOTES(aug)) {
+		strcpy(temp, GET_AUG_NOTES(aug));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -681,7 +704,10 @@ augment_data *create_augment_table_entry(any_vnum vnum) {
 */
 void olc_delete_augment(char_data *ch, any_vnum vnum) {
 	augment_data *aug;
+	descriptor_data *desc;
+	trig_data *trig, *next_trig;
 	char name[256];
+	bool found;
 	
 	if (!(aug = augment_proto(vnum))) {
 		msg_to_char(ch, "There is no such augment %d.\r\n", vnum);
@@ -696,6 +722,26 @@ void olc_delete_augment(char_data *ch, any_vnum vnum) {
 	// save index and augment file now
 	save_index(DB_BOOT_AUG);
 	save_library_file_for_vnum(DB_BOOT_AUG, vnum);
+	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_AUGMENT, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to augment [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
+	// live olc editors
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_AUGMENT, vnum);
+			if (found) {
+				msg_to_desc(desc, "Augment [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
+			}
+		}
+	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted augment %d %s", GET_NAME(ch), vnum, name);
 	msg_to_char(ch, "Augment %d (%s) deleted.\r\n", vnum, name);
@@ -723,6 +769,9 @@ void save_olc_augment(descriptor_data *desc) {
 	if (GET_AUG_NAME(proto)) {
 		free(GET_AUG_NAME(proto));
 	}
+	if (GET_AUG_NOTES(proto)) {
+		free(GET_AUG_NOTES(proto));
+	}
 	free_apply_list(GET_AUG_APPLIES(proto));
 	free_resource_list(GET_AUG_RESOURCES(proto));
 	
@@ -732,6 +781,10 @@ void save_olc_augment(descriptor_data *desc) {
 			free(GET_AUG_NAME(aug));
 		}
 		GET_AUG_NAME(aug) = str_dup(default_aug_name);
+	}
+	if (GET_AUG_NOTES(aug) && !*GET_AUG_NOTES(aug)) {
+		free(GET_AUG_NOTES(aug));
+		GET_AUG_NOTES(aug) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -768,6 +821,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 
 		// copy things that are pointers
 		GET_AUG_NAME(new) = GET_AUG_NAME(input) ? str_dup(GET_AUG_NAME(input)) : NULL;
+		GET_AUG_NOTES(new) = GET_AUG_NOTES(input) ? str_dup(GET_AUG_NOTES(input)) : NULL;
 		
 		// copy lists
 		GET_AUG_APPLIES(new) = copy_apply_list(GET_AUG_APPLIES(input));
@@ -836,6 +890,10 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	build_page_display_str(ch, "Resource cost:");
 	show_resource_display(ch, GET_AUG_RESOURCES(aug), FALSE);
 	
+	if (GET_AUG_NOTES(aug) && *GET_AUG_NOTES(aug)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_AUG_NOTES(aug));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -893,6 +951,8 @@ void olc_show_augment(char_data *ch) {
 	if (GET_AUG_RESOURCES(aug)) {
 		show_resource_display(ch, GET_AUG_RESOURCES(aug), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_AUG_NOTES(aug)), NULLSAFE(GET_AUG_NOTES(aug)));
 	
 	send_page_display(ch);
 }
@@ -979,6 +1039,19 @@ OLC_MODULE(augedit_flags) {
 OLC_MODULE(augedit_name) {
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_AUG_NAME(aug));
+}
+
+
+OLC_MODULE(augedit_notes) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_AUG_NAME(aug));
+		start_string_editor(ch->desc, buf, &GET_AUG_NOTES(aug), MAX_NOTES, TRUE);
+	}
 }
 
 

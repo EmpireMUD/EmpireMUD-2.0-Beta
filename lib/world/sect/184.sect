@@ -258,4 +258,29 @@ _
 Beaver-flooded oasis - 21, 80, 81, 82, 83, 84, 86, 88
 ~
 S
+#18458
+Flooded Grassland~
+The Flooded Grassland~
+'~' 17 lov 10 iw p
+D0
+~~~&G,~
+&c~
+D0
+~~&G,&c~~
+&c~
+D0
+~&G,&c~~~
+&c~
+D0
+&G,&c~~~~
+&c~
+E
+4 0 2.00 200
+E
+9 0 75.00 200
+X
+flooding flooded water plains around grassland~
+Rising water from a nearby dam has flooded the entire grassland!
+~
+S
 $

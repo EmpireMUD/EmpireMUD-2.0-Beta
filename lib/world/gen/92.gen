@@ -5,4 +5,35 @@ box jellyfish~
 T0
 The stinging subsides.~
 S
+#9236
+lion summon~
+3 0
+0 0 0 0
+S
+#9255
+deadly snake venom~
+4 0
+0 0 0 0
+T0
+The deadly snake venom seems to have passed.~
+T2
+You don't feel so good...~
+S
+#9297
+tend mammoth~
+2 0
+0 0 0 0
+T0
+You carefully tend the mammoth, cleaning it and removing arrowheads from its skin.~
+T1
+$n carefully tends the mammoth, cleaning it and removing arrowheads from its skin.~
+T2
+You carefully tend the mammoth, cleaning it and removing arrowheads from its skin.~
+T3
+$n carefully tends the mammoth, cleaning it and removing arrowheads from its skin.~
+T4
+You carefully tend the mammoth, cleaning it and removing arrowheads from its skin.~
+T5
+$n carefully tends the mammoth, cleaning it and removing arrowheads from its skin.~
+S
 $

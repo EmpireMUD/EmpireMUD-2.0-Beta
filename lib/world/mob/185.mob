@@ -4,7 +4,7 @@ the Sun King~
 An ancient god-king arises from his deathly slumber!
 ~
 0 0 bdxyzAB 0 3
-1 0 0 18 -1
+1 0 0 18 -1 -1
 D
    The mummified husk of this ancient ruler offers little clue to his
 appearance in life. His jewelled golden raiment, however, attests to the great
@@ -47,7 +47,7 @@ Manasa the serpent lord~
 A serpent lord stands here, wielding a sword with each of her four arms!
 ~
 0 0 bdxzAB 0 4
-2 2 5 1 -1
+2 2 5 1 -1 -1
 D
    This serpent lord has the lower body of a giant serpent, melding into the
 upper body of a four-armed human woman. All four of her arms grip exotic,
@@ -92,7 +92,7 @@ the feathered serpent Quetzalcoatl~
 The feathered serpent Quetzalcoatl hovers here, defending its domain!
 ~
 0 0 bdxy m 5
-0 0 2 22 -1
+0 0 2 22 -1 -1
 D
    This elephant-sized serpent has massive feathered wings with beautiful,
 many-colored plumage that shines softly in the dim light of the hidden valley.
@@ -135,7 +135,7 @@ a giant gorilla~
 A gorilla the size of a carthorse looms menacingly over you!
 ~
 0 0 bdy c 4
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
    A faint emerald light shines in the eyes of this huge ape, suggesting its
 size and aggression may be unnatural...
@@ -149,7 +149,7 @@ a feral jaguar~
 A feral jaguar snarls at you and bares its fangs!
 ~
 0 0 bdjz c 3
-0 0 0 10 -1
+0 0 0 10 -1 -1
 D
    As this large, fearsome feline prepares to defend its territory, you notice
 a faint flicker of green light in its eyes...
@@ -165,7 +165,7 @@ a king cobra~
 A king cobra rears up and flares its hood, hissing loudly!
 ~
 0 0 bdjz c 3
-0 0 5 9 -1
+0 0 5 9 -1 -1
 D
    Are the slitted green eyes of this unusually large and fierce serpent
 glowing, or is it just your imagination...?
@@ -181,7 +181,7 @@ a grass snake~
 A large grass snake is slithering away.
 ~
 0 0 bdho 0 2
-0 0 5 9 -1
+0 0 5 9 -1 -1
 D
    It appears as though Quetzalcoatl has command over normal snakes. It will
 probably leave soon if you don't kill it. Or if you kill Quetzalcoatl.
@@ -194,7 +194,7 @@ a serpent lord mirage~
 A mirage of the serpent lord is fading away.
 ~
 0 0 bdhox 0 4
-2 2 5 1 -1
+2 2 5 1 -1 -1
 D
    These illusory doubles of the serpent lord look and feel real, but their
 strikes don't quite hurt as much... The mirage will probably fade away
@@ -208,7 +208,7 @@ an armored battle-jaguar~
 An armored battle-jaguar is stalking around here.
 ~
 125 175 bdej 0 4
-0 0 11 10 -1
+0 0 11 10 -1 -1
 D
 Someone has given this already fearsome feline a suit of chain armor!
 ~
@@ -225,7 +225,7 @@ a riding jaguar~
 A riding jaguar is saddled up and prowling around.
 ~
 75 100 bdej 0 4
-0 0 11 10 -1
+0 0 11 10 -1 -1
 D
 A glint of intelligence flickers in the fearsome feline's emerald green eyes...
 ~
@@ -239,7 +239,7 @@ a sea serpent~
 A huge sea serpent is swimming around here.
 ~
 125 175 bdejl 0 5
-0 0 6 9 -1
+0 0 6 45 -1 -1
 D
    Someone has very thoughtfully put a bridle on it. It would be pretty hard to
 hold onto it otherwise.
@@ -253,7 +253,7 @@ a feathered serpent~
 A feathered serpent is riding the winds nearby.
 ~
 125 175 bdej m 5
-0 0 2 9 -1
+0 0 2 45 -1 -1
 D
    This feathered serpent, while not as large or majestic as its progenitor,
 Quetzalcoatl, is still easily strong enough to carry someone on its back.
@@ -267,7 +267,7 @@ a tiny jaguar cub~
 A tiny jaguar cub runs around your ankles.
 ~
 1 1 bdoD n 1
-0 0 0 9 -1
+0 0 0 9 -1 -1
 D
 It's the size of a housecat!
 ~
@@ -292,7 +292,7 @@ a knot of snakes~
 A knot of snakes slithers towards you, hissing.
 ~
 0 0 cdhoz c 4
-0 0 5 9 -1
+0 0 5 9 -1 -1
 D
 The snakes are all around you! They're coming out of the walls!
 ~
@@ -304,7 +304,7 @@ Professor #n~
 The renowned archaeologist, Professor #n, is setting up shop here...
 ~
 0 0 bdL cn 3
-0 1 0 15 -1
+0 1 0 15 -1 -1
 D
    Professor of Archaeology, expert on the occult, and how does one say it...
 Obtainer of rare antiquities.

@@ -4,11 +4,14 @@ a glowing green seashell~
 A glowing green seashell is sitting on the ground.~
 The seashell can be used in certain crafts and enchantments.
 ~
-3 l a 0 0 5
+3 l a 0 0 7
 0 0 0
 1 0
 C
 1 1
+M
+34
+This gem is an uncommon crafting material.~
 O+ 1 6600
 R
 4 5164 0
@@ -96,7 +99,7 @@ a pouch of nails~
 A pouch of nails is sitting here.~
 Nails are used for building.
 ~
-3 l a 0 c 6
+3 l a 0 c 7
 0 0 0
 2 0
 C
@@ -113,6 +116,9 @@ You hammer nails into $V.~
 M
 7
 $n hammers nails into $V.~
+M
+34
+This is a common building material.~
 O+ 1 6790
 R
 4 5134 0
@@ -130,12 +136,15 @@ hold it up to the light, you can see its true color is a deep, deep violet.
 This dye, made from a mix of wild berries, imbues a fabric with unusual
 properties.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 8 0
 C
 1 1
 I 26 808 100.00 1  # DECAYS-TO: glass vial
+M
+34
+It's not used for much.~
 R
 4 5137 0
 S
@@ -147,7 +156,7 @@ A vial of deep orange dye is sitting here.~
 pigment of a magenta arrowfish. It has an unusual glow in dim light, like it
 catches and amplifies every ray of light that hits it.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 8 0
 C
@@ -159,6 +168,9 @@ You paint $V orange.~
 M
 7
 $n paints $V orange.~
+M
+34
+It's not used for much.~
 R
 4 5137 0
 S
@@ -168,7 +180,7 @@ a coin mill~
 There is a coin mill here.~
 Coin mills are required to build a mint.
 ~
-3 el a 0 0 2
+3 el a 0 0 3
 0 0 0
 2 0
 M
@@ -177,6 +189,9 @@ You set up $p.~
 M
 1
 $n sets up $p.~
+M
+34
+These are used to build a mint.~
 S
 #1310
 statuette old restored~
@@ -302,12 +317,15 @@ a small skin~
 A small pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 7 0
 C
 1 1
 I 18 1356 100.00 1  # TAN: small piece of leather
+M
+34
+You can tan it to make leather.~
 O+ 1 6501
 R
 4 5120 0
@@ -318,12 +336,15 @@ a large skin~
 A large pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 7 0
 C
 1 1
 I 18 1357 100.00 1  # TAN: large piece of leather
+M
+34
+You can tan it to make leather.~
 O+ 1 6510
 R
 4 5120 0
@@ -334,11 +355,14 @@ a luxurious fox fur~
 A fox fur is crumpled on the ground.~
 Fox fur is used in some types of clothing.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 5
 0 0 0
 7 0
 C
 1 1
+M
+34
+This is an uncommon crafting material.~
 O+ 1 6541
 R
 4 5120 0
@@ -349,11 +373,14 @@ a big cat pelt~
 A big cat pelt is lying here.~
 This pelt, from a dangerous big cat, can be made into fancy clothing.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 7 0
 C
 1 1
+M
+34
+This is an uncommon crafting material.~
 O+ 1 6550
 R
 4 5120 0
@@ -364,11 +391,14 @@ a shark skin~
 A shark skin is drying on the ground.~
 The shark skin is smooth one way, rough the other.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 5
 0 0 0
 7 0
 C
 1 1
+M
+34
+This is an uncommon crafting material.~
 R
 4 5120 0
 S
@@ -378,11 +408,14 @@ some snakeskin~
 Some snakeskin is crumpled on the ground.~
 The snakeskin can be used for certain crafts.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 7 0
 C
 1 1
+M
+34
+This is an uncommon crafting material.~
 R
 4 5120 0
 S
@@ -392,11 +425,14 @@ a small piece of leather~
 A pile of small pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 7 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6521
 R
 4 5134 0
@@ -409,7 +445,7 @@ a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 7 0
 C
@@ -420,6 +456,9 @@ You stretch $p onto $V.~
 M
 7
 $n stretches $p onto $V.~
+M
+34
+This is a basic crafting material.~
 O+ 1 6530
 R
 4 5120 0
@@ -430,11 +469,14 @@ a bag of sheep's wool~
 Some wool is scattered on the ground.~
 You can weave the wool into cloth.
 ~
-3 l a 0 0 7
+3 l a 0 0 8
 0 0 0
 7 0
 C
 1 1
+M
+34
+You can weave it into wool cloth.~
 O+ 1 6441
 R
 4 5137 0
@@ -443,29 +485,6 @@ S
 cloth cotton bolt~
 a bolt of cotton cloth~
 A bolt of cotton cloth is lying on the ground.~
-This simple cloth is used to sew clothing.
-~
-3 l a 0 0 9
-0 0 0
-11 0
-C
-1 1
-M
-6
-You hang some cloth on $V.~
-M
-7
-$n hangs some cloth on $V.~
-O+ 1 6801
-R
-4 5137 0
-R
-4 5134 0
-S
-#1360
-cloth wool bolt~
-a bolt of wool cloth~
-A bolt of wool cloth is sitting here.~
 This simple cloth is used to sew clothing.
 ~
 3 l a 0 0 10
@@ -479,6 +498,35 @@ You hang some cloth on $V.~
 M
 7
 $n hangs some cloth on $V.~
+M
+34
+This is a basic crafting material.~
+O+ 1 6801
+R
+4 5137 0
+R
+4 5134 0
+S
+#1360
+cloth wool bolt~
+a bolt of wool cloth~
+A bolt of wool cloth is sitting here.~
+This simple cloth is used to sew clothing.
+~
+3 l a 0 0 11
+0 0 0
+11 0
+C
+1 1
+M
+6
+You hang some cloth on $V.~
+M
+7
+$n hangs some cloth on $V.~
+M
+34
+This is a basic crafting material.~
 O+ 1 6801
 R
 4 5137 0
@@ -492,11 +540,14 @@ Some soft llama wool is scattered on the ground.~
    Llama wool is softer than sheep wool, and comes in a variety of colors. It
 can be woven into llama fiber cloth.
 ~
-3 l a 0 0 4
+3 l a 0 0 5
 0 0 0
 7 0
 C
 1 1
+M
+34
+You can weave it into llama wool cloth.~
 O+ 1 6441
 R
 4 5137 0
@@ -508,11 +559,14 @@ A bolt of llama wool cloth is lying here.~
    Often smoother and warmer than sheep wool, llama wool cloth can be used to
 sew clothing.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 5
 0 0 0
 11 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6801
 R
 4 5137 0
@@ -526,11 +580,14 @@ A bolt of yak wool cloth has been left here.~
    The warm, soft cloth is made from dark yak's wool. Though not as fine as
 some wool, it is highly prized for its insulation and appearance.
 ~
-3 0 a 0 0 5
+3 0 a 0 0 6
 0 0 0
 11 0
 C
 1 1
+M
+34
+This is a basic crafting material.~
 O+ 1 6801
 R
 4 5137 0

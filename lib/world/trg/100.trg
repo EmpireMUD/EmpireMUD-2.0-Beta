@@ -1,19 +1,19 @@
 #10000
 Mob Kill Adventure Completion~
-0 f 100
+0 f 100 0
 ~
 %adventurecomplete%
 ~
 #10001
 Mob Must Fight~
-0 s 100
+0 s 100 0
 ~
 %send% %actor% You can't leave because of ~%self%.
 return 0
 ~
 #10002
 Wildling combat: Nasty Bite~
-0 k 10
+0 k 10 0
 ~
 * Nasty bite: low damage over time
 %send% %actor% ~%self% snaps ^%self% teeth and takes off a piece of your skin!
@@ -22,7 +22,7 @@ Wildling combat: Nasty Bite~
 ~
 #10003
 Manaweaver combat~
-0 k 10
+0 k 10 0
 ~
 set chance %random.3%
 if (%chance% < 3)
@@ -36,7 +36,7 @@ end
 ~
 #10004
 Archweaver combat: frost~
-0 k 10
+0 k 10 0
 ~
 set chance %random.3%
 if %chance% < 3
@@ -56,7 +56,7 @@ end
 ~
 #10005
 Magiterranean Grove environment~
-2 bw 10
+2 bw 10 0
 ~
 switch %random.4%
   case 1
@@ -75,7 +75,8 @@ done
 ~
 #10006
 Spawn Red Dragon Mount~
-0 f 15
+0 f 15 1
+L b 10007
 ~
 * Load mob 10007: the rare red dragon mount
 %echo% As the dragon dies, you notice a smaller red dragon cowering in the nest.
@@ -83,7 +84,7 @@ Spawn Red Dragon Mount~
 ~
 #10007
 Red Dragon combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.4%
   * Searing burns on tank
@@ -122,7 +123,7 @@ done
 ~
 #10011
 Sewer Environment~
-2 bw 5
+2 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -141,14 +142,15 @@ done
 ~
 #10012
 Ratskins's request~
-0 bw 15
+0 bw 15 0
 ~
 say I could use some more rat skins, if you have any.
 %echo% (Type 'trade' to exchange 15 rat skins.)
 ~
 #10013
 Ratskins's reward~
-0 c 100
+0 c 100 1
+L c 10013
 trade~
 if %self.varexists(gave%actor.id%)%
   %send% %actor% You have already completed this quest in this adventure.
@@ -168,7 +170,7 @@ end
 ~
 #10014
 Rat combat~
-0 k 10
+0 k 10 0
 ~
 * Slow bite
 %send% %actor% ~%self% bites into your flesh, and you don't feel so good.
@@ -177,7 +179,7 @@ dg_affect %actor% SLOW on 60
 ~
 #10015
 Dire rat combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.3%
   * Slow bite
@@ -202,7 +204,9 @@ done
 ~
 #10016
 Urchin combat~
-0 k 10
+0 k 10 2
+L f 10016
+L o 156
 ~
 set chance %random.5%
 if (%chance% < 5)
@@ -228,7 +232,8 @@ end
 ~
 #10017
 Rare thief death~
-0 f 100
+0 f 100 1
+L q 4
 ~
 set ch %self.room.people%
 while %ch%
@@ -244,13 +249,15 @@ done
 ~
 #10018
 Rare thief despawn~
-2 f 100
+2 f 100 1
+L b 10017
 ~
 %purge% instance mob 10017 $n vanishes into the shadows!
 ~
 #10019
 Thief recruiter passive~
-0 bw 5
+0 bw 5 1
+L q 4
 ~
 set target_char %self.room.people%
 while %target_char%
@@ -263,7 +270,7 @@ done
 ~
 #10021
 City Official says~
-0 bw 15
+0 bw 15 0
 ~
 switch %random.4%
   case 1
@@ -282,7 +289,8 @@ done
 ~
 #10022
 City Official rewards~
-0 bw 30
+0 bw 30 1
+L c 10013
 ~
 * Rewards some gold when a player has ratskins in their inventory.
 set target %random.char%
@@ -295,7 +303,7 @@ end
 ~
 #10023
 Spider combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.2%
   * Webby on random enemy
@@ -319,7 +327,7 @@ done
 ~
 #10024
 Baby dragon combat~
-0 k 10
+0 k 10 0
 ~
 set chance %random.3%
 if %chance% < 3
@@ -338,7 +346,7 @@ end
 ~
 #10025
 Rat hunter/rare thief combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.5%
   * Kick
@@ -367,7 +375,8 @@ done
 ~
 #10026
 Cheese Drop Rat Summon~
-1 h 50
+1 h 50 1
+L b 10011
 ~
 wait 2 sec
 %echo% A rat appears and gobbles up the cheese!
@@ -376,7 +385,10 @@ wait 2 sec
 ~
 #10027
 Nest miniboss spawn/despawn~
-2 f 100
+2 f 100 3
+L b 10018
+L b 10019
+L b 10020
 ~
 * Get rid of the old miniboss
 set ch %room.people%
@@ -398,7 +410,7 @@ set person %self.people%
 ~
 #10030
 Gossipers~
-0 bw 10
+0 bw 10 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.4%
@@ -418,7 +430,7 @@ done
 ~
 #10031
 Bustling Page~
-0 bw 10
+0 bw 10 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.4%
@@ -439,7 +451,7 @@ done
 ~
 #10032
 Barista passive~
-0 bw 5
+0 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -464,7 +476,9 @@ done
 ~
 #10033
 Barista purchase~
-0 c 0
+0 c 0 2
+L c 10032
+L c 10033
 buy~
 set vnum -1
 set cost 0
@@ -495,7 +509,7 @@ nop %actor.charge_coins(%cost%)%
 ~
 #10034
 Teacher passive~
-0 bw 5
+0 bw 5 0
 ~
 context %self.room.vnum%
 if (%lesson_running%)
@@ -522,7 +536,9 @@ done
 ~
 #10035
 Teacher study~
-0 c 0
+0 c 0 2
+L c 10037
+L q 2
 study~
 if (%actor.skill(High Sorcery)% >= 50)
   %send% %actor% ~%self% tells you, 'There's nothing more I can teach you.'
@@ -573,7 +589,7 @@ global lesson_running
 ~
 #10036
 Skycleave Cashier list~
-0 c 0
+0 c 0 0
 list~
 %send% %actor% ~%self% sells:
 %send% %actor%  - a skycleaver trinket ('buy trinket', 10 greater skystones)
@@ -588,7 +604,17 @@ list~
 ~
 #10037
 Skycleave Cashier purchase~
-0 c 0
+0 c 0 10
+L c 103
+L c 104
+L c 1206
+L c 1300
+L c 10036
+L c 10038
+L c 10039
+L c 10040
+L c 10041
+L c 10079
 buy~
 set vnum -1
 set cost 0
@@ -656,7 +682,7 @@ nop %actor.add_resources(%currency_vnum%,-%cost%)%
 ~
 #10038
 Goblin Wrangler passive~
-0 bw 5
+0 bw 5 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.4%
@@ -676,7 +702,8 @@ done
 ~
 #10039
 Goblin Wrangler combat~
-0 k 10
+0 k 10 1
+L b 10039
 ~
 switch %random.4%
   case 1
@@ -702,7 +729,8 @@ done
 ~
 #10040
 Goblin combat~
-0 k 10
+0 k 10 1
+L o 156
 ~
 if %random.3% < 3
   %send% %actor% ~%self% stabs you in the leg with a goblin shortsword!
@@ -715,7 +743,7 @@ end
 ~
 #10041
 Pixy race passive~
-2 bw 100
+2 bw 100 0
 ~
 context %instance.id%
 if %pixy_race_running%
@@ -755,7 +783,7 @@ end
 ~
 #10042
 Pixy wager~
-2 c 0
+2 c 0 0
 wager~
 context %instance.id%
 if %pixy_race_running%
@@ -786,7 +814,7 @@ nop %actor.charge_coins(%pixy_wager%)%
 ~
 #10043
 Pixy race~
-2 bw 100
+2 bw 100 0
 ~
 context %instance.id%
 if !%pixy_race_running% || (%race_stage% && %race_stage% > 0)
@@ -882,14 +910,14 @@ unset pixy_race_running
 ~
 #10044
 2F Watcher combat~
-0 k 5
+0 k 5 0
 ~
 %echo% ~%self% draws the Eye Sigil in the air!
 %aoe% 75 magical
 ~
 #10045
 Apprentice passive~
-0 bw 5
+0 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -915,7 +943,14 @@ wait 1 sec
 ~
 #10046
 Sorcerer combat~
-0 k 5
+0 k 5 7
+L o 166
+L o 173
+L o 175
+L o 178
+L w 3009
+L w 3015
+L w 3035
 ~
 if !%self.affect(foresight)%
   foresight
@@ -929,9 +964,11 @@ end
 ~
 #10047
 3F High Master combat~
-0 k 5
+0 k 5 2
+L o 174
+L w 3032
 ~
-if !%actor.affect(enervate)%
+if !%actor.affect(3032)%
   enervate
 else
   %send% %actor% ~%self% marks you with a piece of chalk. It burns!
@@ -942,7 +979,7 @@ end
 ~
 #10048
 Otherworlder guard passive~
-0 bw 5
+0 bw 5 0
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos% + 1
@@ -970,14 +1007,17 @@ remote msg_pos %self.id%
 ~
 #10049
 Otherworlder prisoner passive~
-0 bw 5
+0 bw 5 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 %echo% ~%self% pulls at its chains and lets out a shout.
 ~
 #10050
 Otherworlder prisoner combat~
-0 k 10
+0 k 10 3
+L o 94
+L o 97
+L w 3018
 ~
 if !%actor.affect(disarm)%
   disarm
@@ -987,7 +1027,7 @@ end
 ~
 #10051
 Lich passive~
-0 bw 5
+0 bw 5 0
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos% + 1
@@ -1015,7 +1055,11 @@ remote msg_pos %self.id%
 ~
 #10052
 Lich combat~
-0 k 10
+0 k 10 4
+L b 10049
+L w 3009
+L w 3035
+L w 10052
 ~
 if !%self.affect(3009)%
   foresight
@@ -1055,13 +1099,14 @@ end
 ~
 #10053
 Skeleton combat~
-0 k 10
+0 k 10 1
+L o 97
 ~
 bash
 ~
 #10054
 Shackled Ghost combat~
-0 k 10
+0 k 10 0
 ~
 %send% %actor% ~%self% envelops you. You hear a terrible, soul-piercing scream!
 %echoaround% %actor% ~%self% envelops ~%actor%, who lets out a terrible, soul-piercing scream!
@@ -1070,7 +1115,7 @@ dg_affect %actor% IMMOBILIZED on 20
 ~
 #10055
 Celiya passive~
-0 bw 5
+0 bw 5 0
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos% + 1
@@ -1098,7 +1143,7 @@ remote msg_pos %self.id%
 ~
 #10056
 Celiya combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.3%
   case 1
@@ -1122,7 +1167,9 @@ done
 ~
 #10057
 Celiya buy~
-0 c 0
+0 c 0 2
+L c 10037
+L c 10066
 buy~
 command: buy
 set vnum 10066
@@ -1148,7 +1195,7 @@ nop %actor.add_resources(10037,-%cost%)%
 ~
 #10058
 Barrosh passive~
-0 bw 5
+0 bw 5 0
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos% + 1
@@ -1176,7 +1223,7 @@ remote msg_pos %self.id%
 ~
 #10059
 Barrosh combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.4%
   case 1
@@ -1221,7 +1268,9 @@ done
 ~
 #10060
 Barrosh buy~
-0 c 0
+0 c 0 2
+L c 10037
+L c 10065
 buy~
 set vnum 10065
 set cost 5
@@ -1246,7 +1295,7 @@ nop %actor.add_resources(10037,-%cost%)%
 ~
 #10061
 Knezz passive~
-0 bw 5
+0 bw 5 0
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos% + 1
@@ -1274,7 +1323,7 @@ remote msg_pos %self.id%
 ~
 #10062
 Knezz combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.4%
   case 1
@@ -1320,7 +1369,9 @@ done
 ~
 #10063
 Knezz buy~
-0 c 0
+0 c 0 2
+L c 10037
+L c 10067
 buy~
 set vnum 10067
 set cost 5
@@ -1345,7 +1396,7 @@ nop %actor.add_resources(10037,-%cost%)%
 ~
 #10064
 Escaped experiment passive~
-0 bw 5
+0 bw 5 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.3%
@@ -1362,7 +1413,7 @@ done
 ~
 #10065
 Escaped experiment combat~
-0 k 10
+0 k 10 0
 ~
 * Deliberately sends no messages -- mob grows stronger over time
 switch %random.3%
@@ -1379,7 +1430,9 @@ done
 ~
 #10066
 Skystone combine~
-1 c 2
+1 c 2 2
+L c 10036
+L c 10037
 combine~
 if !%self.is_name(%arg%)%
   return 0
@@ -1396,7 +1449,8 @@ nop %actor.add_resources(10036,-5)%
 ~
 #10067
 Greater skystone split~
-1 c 2
+1 c 2 1
+L c 10036
 split~
 if !%self.is_name(%arg%)%
   return 0
@@ -1413,7 +1467,7 @@ end
 ~
 #10068
 Tower Skycleave announcement~
-2 ab 1
+2 ab 1 0
 ~
 if %random.3% == 3
   %regionecho% %room% 100 The Tower Skycleave has appeared in the region %room.coords%.
@@ -1421,7 +1475,10 @@ end
 ~
 #10079
 Old Skycleaver Trinket: Replace with new one~
-1 c 2
+1 c 2 3
+L c 11909
+L j 10030
+L w 10079
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0

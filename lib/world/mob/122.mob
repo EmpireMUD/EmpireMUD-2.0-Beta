@@ -1,0 +1,542 @@
+#12200
+serragon ribbons tremendous~
+the ribbon serragon~
+A tremendous ribbon serragon glimmers as it coils through the trees!
+~
+25 125 bdghxyADJKL cEGL 5
+0 0 5 12200 -1 -1
+D
+   The sinuous form winds through the trees, flattening the undergrowth beneath
+its coils. Its body is strangely split -- two long ribbons twisting and
+braiding into one another, bright bands of green and red gleaming like silk in
+the dappled forest light. The ribbons never separate, always coiling close,
+twisting around one another in a dizzying dance.
+   The ribbons are as long as the tallest trees, and thick as the length of a
+horse, but no wider than the horse's shoulders. Sparks crackle in the air as
+the jagged, saw-toothed scales of the two sides of the ribbon grind together,
+and woodchips are left in the creature's wake as the scales rasp the bark from
+trees.
+   The creature's head moves so fast in the tangle of ribbons that you could
+easily mistake it for having two. The ribbon serragon slithers nearer, closing
+in on you from both sides, salivating from its gaping maw -- or maws.
+   Type 'adventure' for more information.
+~
+F 12200
+I 4 12218 100.00 1  # LOOT: tremendous corpse of the vermilion serragon
+I 4 12219 100.00 1  # LOOT: twisted corpse of the veridian serragon
+T 9600
+T 9601
+T 9604
+T 12200
+T 12206
+T 12207
+T 12212
+T 12205
+T 12202
+T 12213
+T 12208
+T 12209
+S
+#12201
+serragon ribbon vermilion~
+the vermilion serragon~
+A ribbon serragon gleams with vermilion bands as it twists and coils.
+~
+25 125 abdghxyJKL cEGL 5
+0 0 5 12201 -1 -1
+D
+   The serragon's body flattens into a wide ribbon of scarlet edged in black,
+like silk fraying to knives. Its serrated scales screech as they scrape against
+each other while the creature writhes. The frill crowning its head spreads in
+jagged points, sharp as broken glass, and it flicks forward with sudden,
+whip-like motions. Its narrow eyes gleam like rubies as it gapes its jaws,
+revealing curved teeth that hook like thorns.
+   Type 'adventure' for more information.
+~
+F 12200
+I 0 3012 20.00 2 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 4 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 8 b  # BUTCHER: fillet of raw meat
+I 0 12213 20.00 1 u  # BUTCHER: body of a hapless adventurer
+I 0 12212 20.00 1 u  # BUTCHER: half-digested corpse of a large bear
+I 1 1351 20.00 2 k  # SKIN: large skin
+I 1 1351 40.00 4 k  # SKIN: large skin
+I 1 1351 40.00 8 k  # SKIN: large skin
+I 4 12218 100.00 1 c  # LOOT: tremendous corpse of the vermilion serragon
+M
+0
+You cover your ears as the serragon's scales scrape against each other.~
+M
+14
+The serragon cleans its wounds.~
+M
+0
+The serragon clacks its jaws at you.~
+M
+14
+You cover your eyes as bright red light glints off the serragon's writing scales.~
+M
+14
+The serragon lashes its coils, leaving fresh scars in the earth.~
+M
+14
+A flare of fiery scales glimmers red-orange as the serragon twists past.~
+M
+14
+Ruby eyes glare from the shadows, clear and unblinking.~
+T 9600
+T 9601
+T 9604
+T 12212
+T 12205
+T 12202
+T 12214
+T 12210
+S
+#12202
+serragon ribbon veridian~
+the veridian serragon~
+A ribbon serragon glints in shades of veridian in the soft light.
+~
+25 125 abdghxJKL cEGL 5
+0 0 5 12202 -1 -1
+D
+   The serragon shimmers in waves of green streaked with pale gold, its immense
+but relatively flat body moving like a great banner twisting in the wind. The
+margins of its scales jut outward like the teth of a saw, leaving ragged scars
+on the land and tearing roots from the soil. A wide, leaflike crest runs the
+length of its head and neck, rippling as it moves. Its cold silver eyes flicker
+in the light, and when it opens its maw, a forest of fine, needled teeth greet
+you with an eager stream of saliva.
+   Type 'adventure' for more information.
+~
+F 12200
+I 0 3012 20.00 2 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 4 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 8 b  # BUTCHER: fillet of raw meat
+I 0 12212 20.00 1 u  # BUTCHER: half-digested corpse of a large bear
+I 0 12213 20.00 1 u  # BUTCHER: body of a hapless adventurer
+I 1 1351 20.00 2 k  # SKIN: large skin
+I 1 1351 40.00 4 k  # SKIN: large skin
+I 1 1351 40.00 8 k  # SKIN: large skin
+I 4 12219 100.00 1 c  # LOOT: twisted corpse of the veridian serragon
+M
+0
+The serragon coils restlessly, rasping its scales like sawblades.~
+M
+14
+A pale shimmer of verdigris gleams as the serragon slides past.~
+M
+0
+The air shudders faintly with each grinding twist of the serrgon's jagged body.~
+M
+14
+Silver eyes flash in the shadows.~
+M
+14
+The serragon's frilled crest ripples like a banner caught in a storm.~
+M
+0
+Dust rises with each coil as the ground quivers under the serragon's weight.~
+T 9600
+T 9601
+T 9604
+T 12212
+T 12205
+T 12202
+T 12214
+T 12211
+S
+#12204
+earthworm worm giant~
+a giant earthworm~
+A giant earthworm ripples slowly along the ground.
+~
+100 100 dehj 0 4
+0 0 9 25 -1 -1
+D
+   It is a massive, pale earthworm, thick as a tree trunk and several yards
+long. Its segmented body glistens with the faint sheen of moisture, ridged with
+rings that flex and contract in steady waves. Though blind, it moves
+confidently, sensing vibrations in the ground. Its flattened back offers a
+stable surface where riders can sit astride.
+~
+S
+#12205
+caterpillar giant~
+a giant caterpillar~
+A giant caterpillar inches along, adorned with leafy frills.
+~
+100 100 dehj 0 4
+0 0 9 9 -1 -1
+D
+   The enormous caterpillar has a body of soft, mossy green, banded with darker
+ridges that undulate as it inches forward. Along its back sprout leafy frills
+that resemble sprigs of foliage, allowing it to blend into the forest canopy --
+if it can climb a tree. Its many stubby legs grip firmly to the ground, each
+movement slow but steady. The leaflike pads across its body form a natural
+perch for a rider.
+~
+S
+#12206
+sproutling mossy tiny tuft~
+a mossy sproutling~
+A tiny tuft of moss wiggles along the ground.
+~
+1 1 bdo dn 3
+0 0 34 9 -1 -1
+D
+   It looks like a living patch of forest floor come to life. Its body is
+wormlike and covered in soft green fuzz, with leafy shoots poking out along its
+back. When it wiggles, the shoots sway as though stirred by a breeze. It chirps
+in a soft, rustling way as it moves.
+~
+S
+#12212
+bear large~
+a large bear~
+A large bear is pawing at the ground.
+~
+30 60 dgjkoy c 4
+0 0 0 10 -1 -1
+D
+This bear looks like it was eaten by a serragon.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+T 9118
+S
+#12213
+adventurer hapless fellow~
+some hapless fellow~
+A hapless adventurer is here.
+~
+100 150 dqvI 0 3
+1 0 0 1 -1 -1
+D
+This adventurer suffered a fate.
+~
+S
+#12221
+lizard spine small green spiny~
+a spine lizard~
+A small green spine lizard darts about.
+~
+20 50 djo 0 1
+0 0 0 9 -1 -1
+D
+   The spine lizard is no longer than your forearm, with bright green mottled
+skin and darker bands running down its length. A line of sharp, bony spines
+runs down its back, like the frills of a serragon. It's quick and restless,
+skittering between roots and rocks, vanishing into cover at the slightest
+sound.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+M
+0
+$n flicks its tongue.~
+M
+0
+$n flicks its tongue.~
+M
+0
+$n flicks its tongue.~
+M
+0
+$n flicks its tongue out.~
+M
+0
+$n darts past you.~
+M
+0
+$n skitters around.~
+S
+#12250
+elephant matriarch massive~
+the massive elephant~
+A massive elephant matriarch lumbers along beside you.
+~
+125 150 adjyAL cL 5
+2 0 0 9043 -1 -1
+D
+   The gray-brown matriarch is enormous -- easily among the largest elephants
+you've ever seen. Her soft, old eyes scan the horizon with a calculating motion
+you can't quite fathom. She sways her trunk, signalling to the other elephants,
+but you don't grasp her meaning.
+~
+F 9284
+I 0 3012 100.00 6  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 3  # SKIN: large skin
+M
+15
+A massive elephant matriarch is standing in the water.~
+M
+0
+$n tears up a clump of brush by the roots.~
+M
+0
+$n wraps $s trunk around a sapling and yanks it free.~
+M
+0
+The sound of snapping wood echoes as $n tramples through the undergrowth.~
+M
+0
+$n stamps $s heavy feet, flattening the greenery.~
+M
+0
+$n scuffs and churns up dust with $s feet.~
+M
+0
+$n uses $s trunk to strip leaves from a stray branch.~
+M
+0
+$n pulls apart a tangled vine and flings it away.~
+M
+0
+$n stomps down the plants with $s feet.~
+M
+0
+$n lifts $s head and trumpets.~
+T 12250
+T 12253
+T 12254
+T 12252
+T 12256
+T 12257
+S
+#12251
+elephant lumbering~
+a lumbering elephant~
+An elephant is lumbering around, pulling up plants.
+~
+100 150 adjyL cL 5
+2 0 0 9043 -1 -1
+D
+   The gray-brown elephant seems uninterested in you as it yanks up any plant
+in sight. The small ones, it shoves into its hungry mouth. Anything larger is
+tossed aside unceremoniously as the elephant reshapes the landscape.
+~
+F 9284
+I 0 3012 100.00 6  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 3  # SKIN: large skin
+M
+15
+An elephant is wading through the water.~
+M
+0
+$n tears up a clump of brush by the roots.~
+M
+0
+$n wraps $s trunk around a sapling and yanks it free.~
+M
+0
+The sound of snapping wood echoes as $n tramples through the undergrowth.~
+M
+0
+$n stamps $s heavy feet, flattening the greenery.~
+M
+0
+$n scuffs and churns up dust with $s feet.~
+M
+0
+$n uses $s trunk to strip leaves from a stray branch.~
+M
+0
+$n pulls apart a tangled vine and flings it away.~
+M
+0
+$n stomps down the plants with $s feet.~
+M
+0
+$n lifts $s head and trumpets.~
+T 12250
+T 12253
+T 12254
+T 12252
+S
+#12252
+elephant gentle~
+a gentle elephant~
+An elephant is standing nearby.
+~
+100 150 adjoy c 5
+0 0 0 9043 -1 -1
+D
+   The elephant strolls slowly through the stomping grounds, tasting the grass
+here and there, but rarely staying in one place for very long as it surveys its
+new territory. As you watch the elephant move, it gradually approaches you and
+prods you with the tip of its trunk.
+   It looks like it would like some grain or vegetables. Since it was
+interested in you, perhaps you could tame it.
+~
+F 9284
+I 0 3012 100.00 6  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 3  # SKIN: large skin
+I 24 12253 100.00 1  # TAME: majestic elephant
+M
+6
+An elephant stands near the herd.~
+M
+6
+An elephant grazes quietly among the tall grass.~
+M
+6
+An elephant towers over the grass.~
+M
+6
+An elephant watches you as it eats.~
+M
+6
+An elephant holds its trunk high in the air.~
+M
+6
+There is an elephant standing over you.~
+M
+6
+There is an elephant grazing near the herd.~
+M
+15
+An elephant is swimming in the water.~
+M
+0
+$n tears up a clump of brush by the roots.~
+M
+0
+$n wraps $s trunk around a sapling and yanks it free.~
+M
+0
+The sound of snapping wood echoes as $n tramples through the undergrowth.~
+M
+0
+$n stamps $s heavy feet, flattening the greenery.~
+M
+0
+$n scuffs and churns up dust with $s feet.~
+M
+0
+$n uses $s trunk to strip leaves from a stray branch.~
+M
+0
+$n pulls apart a tangled vine and flings it away.~
+M
+0
+$n stomps down the plants with $s feet.~
+M
+0
+$n lifts $s head and trumpets.~
+T 9027
+T 9028
+S
+#12253
+elephant majestic~
+a majestic elephant~
+A majestic elephant stands over you.
+~
+100 150 adejoy c 5
+0 0 0 9043 -1 -1
+D
+   The gray-brown elephant looks rather majestic in this light. It's enormous,
+with deep black eyes that sparkle and gleam. The blanket strapped to its back
+marks it as a riding elephant -- a task it undertakes with honor.
+~
+F 9284
+I 0 3012 100.00 6  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 3  # SKIN: large skin
+I 3 302 100.00 1 X  # BARDE: armored warelephant
+S
+#12254
+elephant playful little~
+a playful little elephant~
+A playful little elephant is standing here.
+~
+65 95 adjoy 0 4
+0 0 0 9043 -1 -1
+D
+   The baby elephant has no compunctions about roaming free through the
+stomping grounds, comforted as it is by the trumpeting calls of its mother and
+grandmother. Grass stains and loose soil all over its back help to camouflage
+it in the tall grass.
+~
+F 9284
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+M
+6
+A little elephant is playing in a puddle.~
+M
+6
+A little elephant is trumpeting around.~
+M
+6
+A little elephant plays in the dirt.~
+M
+6
+A little elephant rocks its trunk from side to side.~
+M
+6
+A playful little elephant is running around.~
+M
+15
+A little elephant is playing in the water.~
+M
+0
+$n splashes mud onto $s own back with a happy snort.~
+M
+0
+$n runs in a clumsy circle.~
+M
+0
+$n toots out a cute little trumpet with $s trunk.~
+M
+0
+$n grabs a vine with $s trunk and gives it a few playful tugs.~
+M
+0
+$n rolls on its side, waving its legs in the air.~
+M
+0
+$n charges at nothing in particular.~
+M
+0
+$n tries to uproot a bush.~
+M
+0
+$n slaps the ground with its trunk.~
+M
+0
+$n trumpets proudly.~
+T 9027
+T 12255
+S
+#12255
+elephant playful little~
+a playful little elephant~
+A playful little elephant is rolling around on the ground.
+~
+1 1 bdoD n 2
+0 0 11 9043 -1 -1
+D
+The fluffy little chick has a pointed beak and a mottled back.
+~
+M
+15
+A playful little elephant is frolicking in the water.~
+M
+0
+$n runs in a clumsy circle.~
+M
+0
+$n toots out a cute little trumpet with $s trunk.~
+M
+0
+$n rolls on its side, waving its legs in the air.~
+M
+0
+$n charges at nothing in particular.~
+M
+0
+$n slaps the ground with its trunk.~
+M
+0
+$n trumpets proudly.~
+S
+$

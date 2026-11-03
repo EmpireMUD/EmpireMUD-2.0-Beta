@@ -1,6 +1,7 @@
 #1100
 Shimmering anvil: Lasts 1 hour~
-5 ab 10
+5 ab 10 1
+L f 9681
 ~
 * requires 9681 to set load_time
 if %timestamp% - %self.var(load_time)% >= 3600
@@ -10,7 +11,7 @@ end
 ~
 #1128
 Lost Book: Replace on load~
-1 n 100
+1 n 100 0
 ~
 wait 1
 if %self.carried_by%

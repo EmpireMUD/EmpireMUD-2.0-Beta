@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -527,7 +528,7 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not start with capital letter");
 			problem = TRUE;
 		}
-		if (ispunct(*(ATTACK_DEATH_LOG(amd) + strlen(ATTACK_DEATH_LOG(amd)) - 1))) {
+		if (ends_in_punct(ATTACK_DEATH_LOG(amd))) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not end with punctuation");
 			problem = TRUE;
 		}
@@ -684,10 +685,10 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_LIST("damagetype", only_damage, damage_types)
-		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
-		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
+		FULLSEARCH_FLAGS("flags", only_flags, attack_message_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, attack_message_flags)
 		FULLSEARCH_DOUBLE("speed", speed, 0.1, 10.0)
-		FULLSEARCH_FLAGS("unflagged", not_flagged, action_bits)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, attack_message_flags)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		FULLSEARCH_LIST("weapontype", only_weapon, weapon_types)
@@ -794,6 +795,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	char_data *mob, *next_mob;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	
 	if (!amd) {
 		msg_to_char(ch, "There is no attack message %d.\r\n", vnum);
@@ -855,6 +857,14 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_ATTACK, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -1370,6 +1380,7 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 	char_data *mob, *next_mob;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	
 	if (!(amd = real_attack_message(vnum))) {
 		msg_to_char(ch, "There is no such attack message %d.\r\n", vnum);
@@ -1452,6 +1463,16 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_ATTACK, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to attack [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_ABILITY(desc)) {
@@ -1503,6 +1524,12 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 			
 			if (found) {
 				msg_to_char(desc->character, "An attack type used by the weapon you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_ATTACK, vnum);
+			if (found) {
+				msg_to_desc(desc, "Attack [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 	}
@@ -2288,6 +2315,7 @@ OLC_MODULE(attackedit_message) {
 					msg_to_char(ch, "You remove message %d.\r\n", atoi(arg2));
 					LL_DELETE(ATTACK_MSG_LIST(amd), ams);
 					free_attack_message_set(ams);
+					--ATTACK_NUM_MSGS(amd);
 					return;	// done
 				}
 			}
@@ -2321,6 +2349,12 @@ OLC_MODULE(attackedit_name) {
 	else {
 		olc_process_string(ch, argument, "name", &ATTACK_NAME(amd));
 	}
+}
+
+
+OLC_MODULE(attackedit_notes) {
+	msg_to_char(ch, "Attack messages do not support the 'notes' field.\r\n");
+	// NOTE: this is due to how they are saved in the 'messages' file
 }
 
 

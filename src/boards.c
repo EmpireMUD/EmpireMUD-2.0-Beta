@@ -272,8 +272,8 @@ int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *boar
 	tmstr = (char *) asctime(localtime(&ct));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
-	sprintf(buf2, "(%s%s&0)", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
-	sprintf(buf, "%6.10s %-14s :: %s", tmstr, buf2, arg);
+	sprintf(buf2, "%s%s&0", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
+	sprintf(buf, "%6.6s %4.4s  %-12s :: %s", (tmstr + 4), (tmstr + 20), buf2, arg);
 	NEW_MSG_INDEX(board_type).heading = str_dup(buf);
 	NEW_MSG_INDEX(board_type).level = GET_ACCESS_LEVEL(ch);
 	NEW_MSG_INDEX(board_type).reply_num = -1;
@@ -290,7 +290,7 @@ int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *boar
 
 int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) {
 	int i;
-	char tmp[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char tmp[MAX_STRING_LENGTH];
 
 	if (!ch->desc)
 		return (0);
@@ -301,19 +301,21 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 		return (0);
 
 	if (GET_ACCESS_LEVEL(ch) < READ_LVL(board_type)) {
-		send_to_char("You try but fail to understand the holy words.\r\n", ch);
+		build_page_display_str(ch, "You try but fail to understand the holy words.");
+		send_page_display(ch);
 		return (1);
 	}
 	// this results in a double message with "$n looks at $p."
 	//act("$n studies the board.", TRUE, ch, 0, 0, TO_ROOM);
 
-	strcpy(buf,
-		"This is a bulletin board. Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"
-		"You will need to look at the board to save your message.\r\n");
-	if (!num_of_msgs[board_type])
-		strcat(buf, "The board is empty.\r\n");
+	build_page_display_str(ch, "This is a bulletin board. Usage: READ/REMOVE <messg #>, WRITE <header>.");
+	build_page_display_str(ch, "You will need to look at the board to save your message.");
+	
+	if (!num_of_msgs[board_type]) {
+		build_page_display_str(ch, "The board is empty.");
+	}
 	else {
-		sprintf(buf + strlen(buf), "There are %d messages on the board.\r\n", num_of_msgs[board_type]);
+		build_page_display(ch, "There are %d messages on the board.", num_of_msgs[board_type]);
 #if NEWEST_AT_TOP
 		for (i = num_of_msgs[board_type] - 1; i >= 0; i--) {
 #else
@@ -321,35 +323,33 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 #endif
 			if (MSG_HEADING(board_type, i)) {
 				if (MSG_REPLY(board_type, i) == -1)
-					Board_display_response(board_type, i, buf, board, 0);
+					Board_display_response(board_type, i, ch, board, 0);
 			}
 			else {
 				log("SYSERR: The board is fubar'd.");
-				send_to_char("Sorry, the board isn't working.\r\n", ch);
+				build_page_display_str(ch, "Sorry, the board isn't working.");
 				return (1);
 			}
 		}
 	}
-	page_string(ch->desc, buf, 1);
+	send_page_display(ch);
 
 	return (1);
 }
 
 
-void Board_display_response(int board_type, int slot_num, char *output, obj_data *board, bool reply) {
+void Board_display_response(int board_type, int pos, char_data *ch, obj_data *board, bool reply) {
 	int k;
-	char buf[MAX_STRING_LENGTH];
 
 #if NEWEST_AT_TOP
-	sprintf(buf, "%-2d : %s\r\n", num_of_msgs[board_type] - slot_num, MSG_HEADING(board_type, slot_num));
+	build_page_display(ch, "%2d: %s", num_of_msgs[board_type] - pos, MSG_HEADING(board_type, pos));
 #else
-	sprintf(buf, "%-2d : %s\r\n", slot_num + 1, MSG_HEADING(board_type, slot_num));
+	build_page_display(ch, "%2d: %s", pos + 1, MSG_HEADING(board_type, pos));
 #endif
-	strcat(output, buf);
-
-	for (k = slot_num; k < num_of_msgs[board_type]; k++)
-		if (MSG_REPLY(board_type, k) == slot_num)
-			Board_display_response(board_type, k, output, board, 1);
+	
+	for (k = pos; k < num_of_msgs[board_type]; k++)
+		if (MSG_REPLY(board_type, k) == pos)
+			Board_display_response(board_type, k, ch, board, 1);
 }
 
 
@@ -411,22 +411,28 @@ void perform_remove_message(int board_type, int slot_num, int ind) {
 	int k;
 	bool found = FALSE;
 	descriptor_data *d;
-
-	for (k = 0; k < num_of_msgs[board_type]; k++, found = FALSE) {
-		if (MSG_REPLY(board_type, k) > ind)
+	
+	// check further messages to see if they're replies of this one
+	for (k = ind + 1; k < num_of_msgs[board_type]; k++, found = FALSE) {
+		if (MSG_REPLY(board_type, k) > ind) {
 			MSG_REPLY(board_type, k) -= 1;
-		else if (MSG_REPLY(board_type, k) == slot_num) {
-			for (d = descriptor_list; d; d = d->next)
-				if (STATE(d) == CON_PLAYING && d->str == &(msg_storage[MSG_SLOTNUM(board_type, k)]))
+		}
+		else if (MSG_REPLY(board_type, k) == ind) {
+			for (d = descriptor_list; d; d = d->next) {
+				if (STATE(d) == CON_PLAYING && d->str == &(msg_storage[MSG_SLOTNUM(board_type, k)])) {
 					found = TRUE;
-			if (!found)
+				}
+			}
+			if (!found) {
+				// only remove if nobody is editing it, otherwise leave it as an orphan
 				perform_remove_message(board_type, MSG_SLOTNUM(board_type, k), k);
+			}
 		}
 	}
 
 	if (msg_storage[slot_num])
 		free(msg_storage[slot_num]);
-	msg_storage[slot_num] = 0;
+	msg_storage[slot_num] = NULL;
 	msg_storage_taken[slot_num] = 0;
 	if (MSG_HEADING(board_type, ind))
 		free(MSG_HEADING(board_type, ind));
@@ -673,8 +679,8 @@ int Board_respond_message(int board_type, char_data *ch, char *arg, obj_data *bo
 	tmstr = (char *) asctime(localtime(&ct));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
-	sprintf(buf2, "(%s%s&0)", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
-	sprintf(buf, "%6.10s %-14s :: -%s", tmstr, buf2, arg);
+	sprintf(buf2, "%s%s&0", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
+	sprintf(buf, "%6.6s %4.4s  %-12s :: -%s", (tmstr + 4), (tmstr + 20), buf2, arg);
 	NEW_MSG_INDEX(board_type).heading = str_dup(buf);
 	NEW_MSG_INDEX(board_type).level = GET_ACCESS_LEVEL(ch);
 	NEW_MSG_INDEX(board_type).reply_num = MSG_SLOTNUM(board_type, ind);

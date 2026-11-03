@@ -210,7 +210,7 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 		msg_to_char(ch, "You can't enter that!\r\n");
 	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		msg_to_char(ch, "You are overburdened and cannot move (%d/%d items).\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
 	}
 	else if (!can_enter_room(ch, to_room)) {
 		msg_to_char(ch, "You can't seem to go there. Perhaps it's full.\r\n");
@@ -530,11 +530,18 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, bitvector_t f
 }
 
 
-int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
+/**
+* @param char_data *ch The person looking for the door.
+* @param const char *type Door keyword.
+* @param char *dir Optional: Player-specified direction. (may be empty string)
+* @param const char *cmdname The command the player used (open/close).
+* @param int *number Optional: Support for the number.name syntax.
+*/
+int find_door(char_data *ch, const char *type, char *dir, const char *cmdname, int *number) {
 	struct room_direction_data *ex;
-	int door;
+	int door, num;
 
-	if (*dir) {			/* a direction was specified */
+	if (dir && *dir) {			/* a direction was specified */
 		if ((door = parse_direction(ch, dir)) == NO_DIR) {	/* Partial Match */
 			send_to_char("That's not a direction.\r\n", ch);
 			return (-1);
@@ -565,9 +572,9 @@ int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
 			return (NO_DIR);
 		}
 		if (COMPLEX_DATA(IN_ROOM(ch))) {
-			for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
+			for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits, num = 0; ex; ex = ex->next) {
 				if (ex->keyword) {
-					if (isname((char *) type, ex->keyword)) {
+					if (isname((char *) type, ex->keyword) && (!number || ++num == *number)) {
 						return (ex->dir);
 					}
 				}
@@ -875,13 +882,13 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	char_to_room(ch, to_room);
 	qt_visit_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "transport");	// cannot pre-greet for transport
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "transport", was_in);	// cannot pre-greet for transport
 	look_at_room(ch);
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
-	enter_triggers(ch, NO_DIR, "transport", FALSE);
-	greet_triggers(ch, NO_DIR, "transport", FALSE);
+	enter_triggers(ch, NO_DIR, "transport", FALSE, was_in);
+	greet_triggers(ch, NO_DIR, "transport", FALSE, was_in);
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 
@@ -1093,7 +1100,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 				}
 			}
 			// auto-swim ?
-			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) || !can_mount_in_room(ch, to_room))) {
+			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !can_mount_in_room(ch, to_room))) {
 				msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
 				return FALSE;
 			}
@@ -1128,7 +1135,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 	
 	// too much inventory
 	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		msg_to_char(ch, "You are overburdened and cannot move (%d/%d items).\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
 		return FALSE;
 	}
 	// permission check
@@ -1158,7 +1165,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
-			msg_to_char(ch, "You can't ride on such rough terrain.\r\n");
+			msg_to_char(ch, "You can't ride on such rough terrain%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (dismount first)"));
 			return FALSE;
 		}
 	}
@@ -1168,7 +1175,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
-			msg_to_char(ch, "Your mount won't ride into the ocean.\r\n");
+			msg_to_char(ch, "Your mount won't ride into the ocean%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (dismount first)"));
 			return FALSE;
 		}
 	}
@@ -1177,16 +1184,16 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
-			msg_to_char(ch, "Your mount won't ride into the water.\r\n");
+			msg_to_char(ch, "Your mount won't ride into the water%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (dismount first)"));
 			return FALSE;
 		}
 	}
-	if (IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !EFFECTIVELY_FLYING(ch) && !WATER_SECT(IN_ROOM(ch))) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
-			msg_to_char(ch, "Your mount won't go onto the land.\r\n");
+			msg_to_char(ch, "Your mount won't go onto the land%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (dismount first)"));
 			return FALSE;
 		}
 	}
@@ -1195,7 +1202,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
-			msg_to_char(ch, "You can't ride there.\r\n");
+			msg_to_char(ch, "You can't ride there%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (dismount first)"));
 			return FALSE;
 		}
 	}
@@ -1206,7 +1213,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
-			msg_to_char(ch, "You can't ride indoors.\r\n");
+			msg_to_char(ch, "You can't ride indoors%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (dismount first)"));
 			return FALSE;
 		}
 	}
@@ -1374,7 +1381,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room,
 	}
 	
 	// barrier?
-	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
+	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && (!VEH_FLAGGED(veh, VEH_FLYING) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY))) {
 		if (ch) {
 			act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
@@ -1433,7 +1440,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	}
 	
 	// pre-greet can cancel the whole thing
-	if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "portal")) {
+	if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "portal", was_in)) {
 		return;
 	}
 	
@@ -1455,23 +1462,25 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// move them first, then move them back if they aren't allowed to go.
 	// see if an entry trigger disallows the move
-	if (!enter_triggers(ch, NO_DIR, "portal", TRUE)) {
+	if (!enter_triggers(ch, NO_DIR, "portal", TRUE, was_in)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		return;
 	}
 	
+	// mark visit before looking so quest visits trigger in time to see the quest finish message (e.g. Enter the Soulstream)
+	qt_visit_room(ch, to_room);
+	
 	look_at_room(ch);
 	
-	if (!greet_triggers(ch, NO_DIR, "portal", TRUE)) {
+	if (!greet_triggers(ch, NO_DIR, "portal", TRUE, was_in)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
 		return;
 	}
 	
-	// update visit and last-dir
-	qt_visit_room(ch, to_room);
+	// room updates
 	GET_LAST_DIR(ch) = NO_DIR;
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	add_tracks(ch, was_in, NO_DIR, IN_ROOM(ch));
@@ -1586,22 +1595,23 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
 	
 	// lastly, check pre-greet trigs
-	if (!pre_greet_mtrigger(ch, to_room, dir, move_flags_to_method(flags))) {
+	if (!pre_greet_mtrigger(ch, to_room, dir, move_flags_to_method(flags), was_in)) {
 		return FALSE;
 	}
 	
 	// ACTUAL MOVEMENT
 	char_from_room(ch);
 	char_to_room(ch, to_room);
-	qt_visit_room(ch, to_room);
 
 	/* move them first, then move them back if they aren't allowed to go. */
 	/* see if an entry trigger disallows the move */
-	if (!enter_triggers(ch, dir, move_flags_to_method(flags), TRUE)) {
+	if (!enter_triggers(ch, dir, move_flags_to_method(flags), TRUE, was_in)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		return FALSE;
 	}
+	
+	qt_visit_room(ch, to_room);
 	
 	// MESSAGING: if we made it this far, send the messages
 	send_leave_message(ch, was_in, to_room, dir, flags);
@@ -1618,7 +1628,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 	
 	// greet trigger section: this can send the player back
-	if (!greet_triggers(ch, dir, move_flags_to_method(flags), TRUE)) {
+	if (!greet_triggers(ch, dir, move_flags_to_method(flags), TRUE, was_in)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -2094,7 +2104,7 @@ ACMD(do_circle) {
 	}
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		msg_to_char(ch, "You are overburdened and cannot move (%d/%d items).\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
 		return;
 	}
 	
@@ -2207,7 +2217,7 @@ ACMD(do_circle) {
 	}
 	
 	// lastly, check pre-greet trigs
-	if (!pre_greet_mtrigger(ch, found_room, dir, "move")) {
+	if (!pre_greet_mtrigger(ch, found_room, dir, "move", was_in)) {
 		return;
 	}
 	
@@ -2235,12 +2245,13 @@ ACMD(do_circle) {
 	char_from_room(ch);
 	char_to_room(ch, found_room);
 	
-	if (!enter_triggers(ch, dir, "move", TRUE)) {
+	if (!enter_triggers(ch, dir, "move", TRUE, was_in)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		return;
 	}
 	
+	qt_visit_room(ch, IN_ROOM(ch));
 	mark_move_time(ch);
 	if (ch->desc) {
 		look_at_room(ch);
@@ -2249,7 +2260,7 @@ ACMD(do_circle) {
 	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
-	if (!greet_triggers(ch, dir, "move", TRUE)) {
+	if (!greet_triggers(ch, dir, "move", TRUE, was_in)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		if (ch->desc) {
@@ -2259,7 +2270,6 @@ ACMD(do_circle) {
 	}
 	
 	GET_LAST_DIR(ch) = dir;
-	qt_visit_room(ch, IN_ROOM(ch));
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 	
@@ -2308,7 +2318,7 @@ ACMD(do_climb) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
-		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
+		msg_to_char(ch, "You only need to use 'climb' for rough terrain.\r\n");
 	}
 	else {
 		perform_move(ch, dir, NULL, MOVE_CLIMB);
@@ -2373,6 +2383,9 @@ ACMD(do_exit) {
 	else if (GET_POS(ch) < POS_STANDING) {
 		// if we got here but aren't standing, alert
 		send_low_pos_msg(ch);
+	}
+	else if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
+		msg_to_char(ch, "You cannot exit onto a barrier.\r\n");
 	}
 	else {
 		perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
@@ -2451,7 +2464,7 @@ ACMD(do_follow) {
 
 
 ACMD(do_gen_door) {
-	int door = NO_DIR;
+	int number, door = NO_DIR;
 	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
 	vehicle_data *tmp_veh = NULL;
 	obj_data *obj = NULL;
@@ -2469,26 +2482,49 @@ ACMD(do_gen_door) {
 	#define DOOR_IS_CLOSED(ch, obj, ex)	(!(DOOR_IS_OPEN(ch, obj, ex)))
 
 	skip_spaces(&argument);
+	number = get_number(&argument);
 	if (!*argument) {
 		sprintf(buf, "%s what?\r\n", cmd_door[subcmd]);
 		send_to_char(CAP(buf), ch);
 		return;
 	}
+	
 	two_arguments(argument, type, dir);
-	if (!generic_find(type, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh))
-		door = find_door(ch, type, dir, cmd_door[subcmd]);
+	
+	if (!generic_find(type, &number, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh)) {
+		door = find_door(ch, type, dir, cmd_door[subcmd], &number);
+	}
 	
 	ex = find_exit(IN_ROOM(ch), door);
 
 	if ((obj) || (ex)) {
-		if (!(DOOR_IS_OPENABLE(ch, obj, ex)))
-			act("You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
-		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN))
-			send_to_char("But it's already closed!\r\n", ch);
-		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED))
-			send_to_char("But it's currently open!\r\n", ch);
-		else
+		if (!(DOOR_IS_OPENABLE(ch, obj, ex))) {
+			if (obj) {
+				act("You can't $F $p!", FALSE, ch, obj, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
+			}
+			else {
+				act("You can't $F that!", FALSE, ch, NULL, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
+			}
+		}
+		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN)) {
+			if (obj) {
+				act("But $p is already closed!", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			else {
+				send_to_char("But it's already closed!\r\n", ch);
+			}
+		}
+		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED)) {
+			if (obj) {
+				act("But $p is currently open!", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			else {
+				send_to_char("But it's currently open!\r\n", ch);
+			}
+		}
+		else {
 			do_doorcmd(ch, obj, door, subcmd);
+		}
 	}
 	return;
 }
@@ -2818,7 +2854,7 @@ ACMD(do_rest) {
 			send_to_char("You have to wake up first.\r\n", ch);
 			break;
 		case POS_FIGHTING:
-			send_to_char("Rest while fighting?  Are you MAD?\r\n", ch);
+			send_to_char("Rest while fighting? Are you MAD?\r\n", ch);
 			break;
 		default:
 			send_to_char("You stop floating around, and stop to rest your tired bones.\r\n", ch);
@@ -3022,7 +3058,7 @@ ACMD(do_sleep) {
 			send_to_char("You are already sound asleep.\r\n", ch);
 			break;
 		case POS_FIGHTING:
-			send_to_char("Sleep while fighting?  Are you MAD?\r\n", ch);
+			send_to_char("Sleep while fighting? Are you MAD?\r\n", ch);
 			break;
 		default:
 			send_to_char("You stop floating around, and lie down to sleep.\r\n", ch);

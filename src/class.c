@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -51,7 +52,7 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 /**
 * Checks that the player has the correct set of abilities from their class,
 * role, synergy, etc; and removes any they shouldn't have. This also applies
-* bonus abilities. This function ignores immortals.
+* bonus abilities. This function will NOT remove abilities from immortals.
 *
 * @param char_data *ch The player to check.
 * @param class_data *cls Optional: Any player class, or NULL to detect from the player.
@@ -77,7 +78,7 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 
 	// simple sanity
-	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -209,7 +210,7 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 	// STEP 5: assign/remove abilities
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
-		if (has_ability(ch, aat->vnum) && !aat->can_have) {
+		if (has_ability(ch, aat->vnum) && !aat->can_have && !IS_IMMORTAL(ch)) {
 			remove_ability(ch, aat->ptr, FALSE);
 			check_skill_sell(ch, aat->ptr);
 			qt_change_ability(ch, aat->vnum);
@@ -224,6 +225,84 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 		HASH_DEL(hash, aat);
 		free(aat);
 	}
+}
+
+
+/**
+* Automatically picks a role based on the character's current abilities and
+* assigns it to the character, if they don't currently have a role. Characters
+* with no role-linked abilities are assigned to the SOLO role.
+*
+* @param char_data *ch The player character to assign to a role (if currently unassigned).
+* @param bool notify If TRUE, player gets a message.
+*/
+void auto_assign_role(char_data *ch, bool notify) {
+	ability_data *abil;
+	int count[NUM_ROLES], found, iter;
+	struct player_ability_data *plab, *next_plab;
+	
+	// safety
+	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_NONE || GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
+		return;
+	}
+	
+	// init
+	found = ROLE_NONE;
+	for (iter = 0; iter < NUM_ROLES; ++iter) {
+		count[iter] = 0;
+	}
+	
+	// check purchased abilties
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!(abil = plab->ptr)) {
+			continue;	// error?
+		}
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;	// wrong skill set
+		}
+		
+		// ROLE_x, ABILF_x: count roles (not mutually exclusive)
+		if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE)) {
+			++count[ROLE_TANK];
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE)) {
+			++count[ROLE_HEALER];
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE)) {
+			++count[ROLE_CASTER];
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE)) {
+			++count[ROLE_MELEE];
+		}
+	}
+	
+	// which rose above the rest?
+	if (count[ROLE_TANK] > 0 && count[ROLE_TANK] >= count[ROLE_HEALER] && count[ROLE_TANK] >= count[ROLE_CASTER] && count[ROLE_TANK] >= count[ROLE_MELEE]) {
+		found = ROLE_TANK;
+	}
+	else if (count[ROLE_HEALER] > 0 && count[ROLE_HEALER] >= count[ROLE_TANK] && count[ROLE_HEALER] >= count[ROLE_CASTER] && count[ROLE_HEALER] >= count[ROLE_MELEE]) {
+		found = ROLE_HEALER;
+	}
+	else if (count[ROLE_CASTER] > 0 && count[ROLE_CASTER] >= count[ROLE_HEALER] && count[ROLE_CASTER] >= count[ROLE_TANK] && count[ROLE_CASTER] >= count[ROLE_MELEE]) {
+		found = ROLE_CASTER;
+	}
+	else if (count[ROLE_MELEE] > 0 && count[ROLE_MELEE] >= count[ROLE_HEALER] && count[ROLE_MELEE] >= count[ROLE_CASTER] && count[ROLE_MELEE] >= count[ROLE_TANK]) {
+		found = ROLE_MELEE;
+	}
+	else {
+		found = ROLE_SOLO;
+	}
+	
+	// change role
+	GET_CLASS_ROLE(ch) = found;
+	
+	// add new abilities
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
+	
+	if (notify) {
+		msg_to_char(ch, "Your group role is now: %s%s\t0. (HELP ROLE)\r\n", class_role_color[(int) GET_CLASS_ROLE(ch)], class_role[(int) GET_CLASS_ROLE(ch)]);
+	}
+	queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 }
 
 
@@ -680,6 +759,7 @@ char *list_one_class(class_data *cls, bool detail) {
 */
 void olc_search_class(char_data *ch, any_vnum vnum) {
 	class_data *cls = find_class_by_vnum(vnum);
+	trig_data *trig, *next_trig;
 	int found;
 	
 	if (!cls) {
@@ -690,7 +770,13 @@ void olc_search_class(char_data *ch, any_vnum vnum) {
 	found = 0;
 	build_page_display(ch, "Occurrences of class %d (%s):", vnum, CLASS_NAME(cls));
 	
-	// classes are not actually used anywhere else
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_CLASS, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		}
+	}
 	
 	if (found > 0) {
 		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
@@ -928,6 +1014,9 @@ void free_class(class_data *cls) {
 	if (CLASS_ABBREV(cls) && (!proto || CLASS_ABBREV(cls) != CLASS_ABBREV(proto))) {
 		free(CLASS_ABBREV(cls));
 	}
+	if (CLASS_NOTES(cls) && (!proto || CLASS_NOTES(cls) != CLASS_NOTES(proto))) {
+		free(CLASS_NOTES(cls));
+	}
 	
 	if (CLASS_ABILITIES(cls) && (!proto || CLASS_ABILITIES(cls) != CLASS_ABILITIES(proto))) {
 		free_class_abilities(CLASS_ABILITIES(cls));
@@ -1020,6 +1109,11 @@ void parse_class(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				CLASS_NOTES(cls) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -1060,6 +1154,7 @@ void write_class_index(FILE *fl) {
 * @param class_data *cls The thing to save.
 */
 void write_class_to_file(FILE *fl, class_data *cls) {
+	char temp[MAX_STRING_LENGTH];
 	struct class_skill_req *skill;
 	struct class_ability *abil;
 	int iter;
@@ -1092,6 +1187,13 @@ void write_class_to_file(FILE *fl, class_data *cls) {
 	// 'R': skill requirements
 	LL_FOREACH(CLASS_SKILL_REQUIREMENTS(cls), skill) {
 		fprintf(fl, "R %d %d\n", skill->vnum, skill->level);
+	}
+	
+	// '_'
+	if (CLASS_NOTES(cls) && *CLASS_NOTES(cls)) {
+		strcpy(temp, CLASS_NOTES(cls));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1141,7 +1243,10 @@ class_data *create_class_table_entry(any_vnum vnum) {
 void olc_delete_class(char_data *ch, any_vnum vnum) {
 	char_data *chiter;
 	class_data *cls;
+	descriptor_data *desc;
+	trig_data *trig, *next_trig;
 	char name[256];
+	bool found;
 	
 	if (!(cls = find_class_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such class %d.\r\n", vnum);
@@ -1167,6 +1272,26 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 	// save index and class file now
 	save_index(DB_BOOT_CLASS);
 	save_library_file_for_vnum(DB_BOOT_CLASS, vnum);
+	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_CLASS, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to class [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
+	// live olc editors
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_CLASS, vnum);
+			if (found) {
+				msg_to_desc(desc, "Class [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
+			}
+		}
+	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted class %d %s", GET_NAME(ch), vnum, name);
 	msg_to_char(ch, "Class %d (%s) deleted.\r\n", vnum, name);
@@ -1198,6 +1323,9 @@ void save_olc_class(descriptor_data *desc) {
 	if (CLASS_ABBREV(proto)) {
 		free(CLASS_ABBREV(proto));
 	}
+	if (CLASS_NOTES(proto)) {
+		free(CLASS_NOTES(proto));
+	}
 	free_class_abilities(CLASS_ABILITIES(proto));
 	free_class_skill_reqs(CLASS_SKILL_REQUIREMENTS(proto));
 	
@@ -1213,6 +1341,10 @@ void save_olc_class(descriptor_data *desc) {
 			free(CLASS_ABBREV(cls));
 		}
 		CLASS_ABBREV(cls) = str_dup(default_class_abbrev);
+	}
+	if (CLASS_NOTES(cls) && !*CLASS_NOTES(cls)) {
+		free(CLASS_NOTES(cls));
+		CLASS_NOTES(cls) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1257,6 +1389,7 @@ class_data *setup_olc_class(class_data *input) {
 		// copy things that are pointers
 		CLASS_NAME(new) = CLASS_NAME(input) ? str_dup(CLASS_NAME(input)) : NULL;
 		CLASS_ABBREV(new) = CLASS_ABBREV(input) ? str_dup(CLASS_ABBREV(input)) : NULL;
+		CLASS_NOTES(new) = CLASS_NOTES(input) ? str_dup(CLASS_NOTES(input)) : NULL;
 		
 		// copy lists
 		CLASS_ABILITIES(new) = copy_class_abilities(CLASS_ABILITIES(input));
@@ -1303,6 +1436,10 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	
 	build_page_display_str(ch, "Roles and abilities:");
 	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
+	
+	if (CLASS_NOTES(cls) && *CLASS_NOTES(cls)) {
+		build_page_display(ch, "Notes:\r\n%s", CLASS_NOTES(cls));
+	}
 
 	send_page_display(ch);
 }
@@ -1424,6 +1561,8 @@ void olc_show_class(char_data *ch) {
 	build_page_display(ch, "Class roles and abilities: <%srole\t0>", OLC_LABEL_PTR(CLASS_ABILITIES(cls)));
 	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(CLASS_NOTES(cls)), NULLSAFE(CLASS_NOTES(cls)));
+	
 	send_page_display(ch);
 }
 
@@ -1503,6 +1642,19 @@ OLC_MODULE(classedit_maxmoves) {
 OLC_MODULE(classedit_name) {
 	class_data *cls = GET_OLC_CLASS(ch->desc);
 	olc_process_string(ch, argument, "name", &CLASS_NAME(cls));
+}
+
+
+OLC_MODULE(classedit_notes) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", CLASS_NAME(cls));
+		start_string_editor(ch->desc, buf, &CLASS_NOTES(cls), MAX_NOTES, TRUE);
+	}
 }
 
 

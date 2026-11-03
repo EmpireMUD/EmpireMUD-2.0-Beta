@@ -1,6 +1,12 @@
 #12102
 Master Baker's Trials~
-0 e 0
+0 e 0 6
+L c 3357
+L c 3358
+L c 3359
+L c 3360
+L c 3361
+L t 12102
 finishes cooking~
 if !%actor.on_quest(12102)% || !%object%
   halt
@@ -50,7 +56,8 @@ end
 ~
 #12103
 Divinely Tasty: Require milk then teach molds~
-2 v 0
+2 v 0 1
+L a 12142
 ~
 * script to check for milk
 set milk_vnum 5
@@ -89,7 +96,17 @@ return 1
 ~
 #12141
 Learn Imperial Chef recipes from book~
-1 c 2
+1 c 2 10
+L a 12100
+L a 12101
+L a 12103
+L a 12105
+L a 12106
+L a 12108
+L a 12140
+L o 270
+L o 271
+L o 293
 learn~
 * Usage: learn <self>
 * check targeting
@@ -145,7 +162,9 @@ done
 ~
 #12142
 DEPRECATED set of wooden molds~
-1 c 6
+1 c 6 2
+L c 12129
+L c 12131
 mold~
 * this script is deprecated and replaced by 12144
 *
@@ -265,7 +284,9 @@ end
 ~
 #12143
 DEPRECATED set of halloween-themed wooden molds~
-1 c 6
+1 c 6 2
+L c 12129
+L c 12131
 mold~
 * this script is deprecated and replaced by 12144
 *
@@ -370,7 +391,9 @@ end
 ~
 #12144
 Chocolate Molds reusable script~
-1 c 6
+1 c 6 2
+L c 12129
+L c 12131
 mold~
 * Handles molding various chocolates.
 * This item should may have unlimited sets of 5 custom messages in script1. For

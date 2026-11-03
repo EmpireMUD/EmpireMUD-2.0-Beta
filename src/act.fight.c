@@ -198,16 +198,34 @@ ACMD(do_consider) {
 			any = TRUE;
 		}
 
-		// hit/dodge
+		// hit
 		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
+		*buf = '\0';
+		if (IS_NPC(vict)) {
+			safe_snprintf(buf, sizeof(buf), "Hit cap against $M: %d.", get_hit_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+		}
 		if (hitch < 50) {
-			act("You would have trouble hitting $M.", FALSE, ch, NULL, vict, TO_CHAR);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble hitting $M.", (*buf ? "  " : ""));
 			any = TRUE;
 		}
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		
+		// dodge
 		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
+		*buf = '\0';
+		if (IS_NPC(vict)) {
+			safe_snprintf(buf, sizeof(buf), "Dodge cap against $M: %d.", get_dodge_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+		}
 		if (hitch > 50) {
-			act("You would have trouble dodging $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble dodging $S attacks.", (*buf ? "  " : ""));
 			any = TRUE;
+		}
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		
+		// block
+		if (IS_NPC(vict) && has_player_tech(ch, PTECH_BLOCK)) {
+			safe_snprintf(buf, sizeof(buf), "Block cap against $M: %d.", get_block_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 		}
 
 		// flags (with overflow protection on affected_bits_consider[])
@@ -316,10 +334,10 @@ ACMD(do_flee) {
 			was_fighting = FIGHTING(ch);
 			if (perform_move(ch, attempt, NULL, NOBITS)) {
 				send_to_char("You flee head over heels.\r\n", ch);
-				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
+				if (was_fighting && can_gain_exp_from(ch, was_fighting, NULL)) {
 					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
-				GET_WAIT_STATE(ch) = 2 RL_SEC;
+				GET_WAIT_STATE(ch) = (upgrade ? 2 RL_SEC : 1 RL_SEC);
 				run_ability_hooks_by_player_tech(ch, PTECH_FLEE_UPGRADE, NULL, NULL, NULL, NULL);
 			}
 			else {
@@ -386,8 +404,19 @@ ACMD(do_hit) {
 				hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
 				
 				// ensure hitting
-				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
-					FIGHTING(ch) = vict;
+				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && !EXTRACTED(ch) && !IS_DEAD(ch) && GET_POS(vict) > POS_STUNNED) {
+					// ch->vict
+					if (FIGHTING(ch) && FIGHTING(ch) != vict) {
+						FIGHTING(ch) = vict;
+					}
+					else if (!FIGHTING(ch)) {
+						set_fighting(ch, vict, FMODE_MELEE);
+					}
+					
+					// vict->ch
+					if (!FIGHTING(vict)) {
+						set_fighting(vict, ch, FMODE_MELEE);
+					}
 				}
 			}
 			else {	// already fighting -- just change targets
@@ -406,6 +435,10 @@ ACMD(do_hit) {
 						FIGHT_MODE(ch) = FMODE_MISSILE;
 					}
 					FIGHT_WAIT(ch) = 0;
+				}
+				
+				if (!FIGHTING(vict) && !IS_DEAD(vict) && GET_POS(vict) > POS_STUNNED) {
+					set_fighting(vict, ch, FMODE_MELEE);
 				}
 			}
 			
@@ -471,6 +504,7 @@ ACMD(do_meters) {
 
 
 ACMD(do_respawn) {
+	room_data *was_in = IN_ROOM(ch);
 	struct affected_type *af;
 	
 	if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
@@ -487,10 +521,10 @@ ACMD(do_respawn) {
 		act("$n shuffles off $s mortal coil and dies.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		player_death(ch);
-		char_to_room(ch, find_load_room(ch));
+		char_to_room(ch, find_load_room(ch, NULL));
 		GET_LAST_DIR(ch) = NO_DIR;
 		qt_visit_room(ch, IN_ROOM(ch));
-		pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "respawn");	// cannot pre-greet for respawn
+		pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "respawn", was_in);	// cannot pre-greet for respawn
 		
 		syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has respawned at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		act("$n rises from the dead!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -498,8 +532,8 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
-		enter_triggers(ch, NO_DIR, "respawn", FALSE);
-		greet_triggers(ch, NO_DIR, "respawn", FALSE);
+		enter_triggers(ch, NO_DIR, "respawn", FALSE, was_in);
+		greet_triggers(ch, NO_DIR, "respawn", FALSE, was_in);
 		
 		// temporary safety effect after a respawn
 		af = create_flag_aff(ATYPE_BRIEF_RESPITE, 30, AFF_IMMUNE_TEMPERATURE, ch);

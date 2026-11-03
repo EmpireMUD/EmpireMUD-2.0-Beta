@@ -1,7 +1,29 @@
+#10300
+Flame Dragon~
+Paul Clarke~
+   A flame dragon has made its nest in a mountain cave and is terrorizing the
+countryside! Can you hunt it down and kill it? Just follow the swath of
+scorched earth. The dragon is tough -- you might want to bring a partner.
+~
+10300 10329 100-150
+5 0 n 0
+L
+5 0
+43200 -1 -1 -1
+-1 0 0
+L
+6 0
+75 -1 -1 -1
+-1 0 0
+L
+1 0
+10300 -1 -1 -1
+14 c bdegkln
+S
 #10370
 An Uninvited Guest~
 Paul Clarke~
-   It seems someone has been sleeping in the back of a local artisan's shop! 
+   It seems someone has been sleeping in the back of a local artisan's shop!
 Perhaps you should investigate.
 ~
 10370 10399 100-200

@@ -737,9 +737,9 @@ C
 T 16114
 S
 #16132
-whistle multi-headed~
-a multi-headed whistle~
-A multi-headed whistle sits on the ground here.~
+whistle multi-headed headed minipet~
+a multi-headed minipet whistle~
+A multi-headed minipet whistle sits on the ground here.~
 Use this whistle once to receive one of the hydra minipets.
 ~
 3 p a 0 0 8
@@ -794,9 +794,9 @@ R
 4 5611 a
 S
 #16135
-whistle hydraling~
-a hydraling whistle~
-A hydraling whistle sits on the ground here.~
+whistle hydraling aquatic mount~
+a hydraling aquatic mount whistle~
+A hydraling aquatic mount whistle sits on the ground here.~
 Use this whistle once to receive an aquatic oceanic hydraling mount.
 ~
 3 p a 0 0 17

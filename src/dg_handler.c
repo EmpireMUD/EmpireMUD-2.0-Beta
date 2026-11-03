@@ -114,6 +114,23 @@ void free_freeable_triggers(void) {
 }
 
 
+/**
+* Helper to free a linked list of trigger links.
+*
+* @param struct trig_link **list Pointer to the list to free.
+*/
+void free_trigger_links(struct trig_link **list) {
+	struct trig_link *iter, *next;
+	
+	if (list) {
+		LL_FOREACH_SAFE(*list, iter, next) {
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+}
+
+
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
 	struct trig_var_data *var, *next_var;
@@ -166,6 +183,9 @@ void actually_free_trigger(trig_data *trig) {
 			}
 			free(cmd);
 		}
+	}
+	if (GET_TRIG_LINKS(trig) && (!proto || GET_TRIG_LINKS(trig) != GET_TRIG_LINKS(proto))) {
+		free_trigger_links(&GET_TRIG_LINKS(trig));
 	}
 	
 	free_varlist(trig->var_list);
@@ -464,10 +484,91 @@ struct trig_proto_list *copy_trig_protos(struct trig_proto_list *from) {
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct trig_proto_list, 1);
 		*el = *iter;
+		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
 	return list;
+}
+
+
+/**
+* Duplicates a list of trigger links.
+*
+* @param struct trig_link *from Head of the list to copy from.
+* @return struct trig_link* The duplicate list.
+*/
+struct trig_link *copy_trigger_links(struct trig_link *from) {
+	struct trig_link *list = NULL, *copy, *iter;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(copy, struct trig_link, 1);
+		*copy = *iter;
+		copy->next = NULL;
+		LL_APPEND(list, copy);
+	}
+	
+	return list;
+}
+
+
+/**
+* Deletes any matching links on the trigger.
+*
+* @param trig_data *trig The trigger to check.
+* @param bitvector_t type Any OLC_ type to remove.
+* @param any_vnum vnum What vnum of that type to delete.
+* @return bool TRUE if any were deleted, FALSE if not.
+*/
+bool delete_trigger_links(trig_data *trig, bitvector_t type, any_vnum vnum) {
+	struct trig_link *link, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(GET_TRIG_LINKS(trig), link, next) {
+		if (link->type == type && link->vnum == vnum) {
+			LL_DELETE(GET_TRIG_LINKS(trig), link);
+			free(link);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+// Simple type sorter for trigger links
+int sort_trigger_links(struct trig_link *a, struct trig_link *b) {
+	// type is unsigned, shouldn't use basic math
+	if (a->type > b->type) {
+		return 1;
+	}
+	else if (b->type > a->type) {
+		return -1;
+	}
+	else {
+		return a->vnum - b->vnum;
+	}
+}
+
+
+/**
+* Checks if a trigger links to a given type.
+*
+* @param trig_data *trig The trigger to check.
+* @param bitvector_t type Any OLC_ type.
+* @param any_vnum vnum What vnum of that type to check for.
+* @return bool TRUE if it's present as a link on the trigger, FALSE if not.
+*/
+bool trigger_has_link(trig_data *trig, bitvector_t type, any_vnum vnum) {
+	struct trig_link *link;
+	
+	LL_FOREACH(GET_TRIG_LINKS(trig), link) {
+		if (link->type == type && link->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
 }
 
 

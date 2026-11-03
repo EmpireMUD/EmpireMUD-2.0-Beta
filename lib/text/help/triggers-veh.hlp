@@ -92,17 +92,24 @@ Vehicles can trigger on the following events:
 &cKill&0 - Triggers when the vehicle kills someone.
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command trigs).
 
 For each type, there is a help file named &yVTRIG <type>&0.
 #d
 "VTRIG VARS" "VTRIG VARIABLES" VEH-VARS TRIGEDIT-VEH-VAR TRIGEDIT-VARIABLES-VEHICLES
 
-All vehicle scripts provide the &c%self%&0 variable.
+Vehicle Variables
+
+All vehicle scripts provide the &c%self%&0 variable. Other ways of getting a
+vehicle variable include %room.vehicles%. Access the fields of a vehicle var,
+listed below, like this: %veh.shortdesc%
 
 The correct way to get a vehicle's short description in a send/echo is:
 @%veh% - short desc, something
 
 When using field  - The variable returns:
+&cadd_built_with(vnum,amount,level)&0 - Adds to the list of items used to build
+   the vehicle (for later dismantle).
 &canimals_harnessed&0 - Number of animals harnessed to the vehicle.
 &canimals_required&0 - Number of animals needed for the vehicle to move.
 &cburn&0 - Ignites the vehicle, if possible.
@@ -113,6 +120,7 @@ When using field  - The variable returns:
 &cdedicated_to&0 - If the vehicle is dedicated to someone, gets the name.
 &cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
    vehicle, or change it with %veh.depletion(type,amount)%; 0 is not-depleted.
+&cdismantling&0 - True if the vehicle is being dismantled.
 &cdriver&0 - The person driving/sailing the vehicle, if any.
 &cdump&0 - Empties everything out of the vehicle, including people.
 &cdump_objects&0 - Empties just the contents, if the vehicle is a container.

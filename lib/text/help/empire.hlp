@@ -34,7 +34,7 @@ tiles.
 
 Privileged immortals can abandon rooms and vehicles they do not own.
 
-See also: CEDE, CLAIM, MANAGE, PRIVILEGE, PUBLICIZE
+See also: CEDE, CLAIM, MANAGE, PRIVILEGE
 #
 ALLIANCE "DIPLOMACY ALLIANCE" ALLY ALLIES ALLIED
 
@@ -64,15 +64,6 @@ Rewards the following buildings:
   [oo]  tomb
 
 See also: PROGRESS
-#
-BANNER
-
-The empire banner can be changed with the eedit command.
-
-It's a good idea to choose a distinct color so that people can see your empire
-on the political map.
-
-See also: COLOR, EMPIRE, POLITICAL, EEDIT
 #
 CEDE
 
@@ -191,7 +182,7 @@ background highlight (on the visual map), or you can use the 'mark' command
 to measure distances from the center if you're using a screenreader.
 
 See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION,
-CITY POINT
+CITY POINT, MOUNTAIN OUTPOST
 #
 CLAIM
 
@@ -208,7 +199,7 @@ with that empire.
 Privileged immortals can claim land/vehicles for other empires by giving the
 empire name as the last arg.
 
-See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY, CITY CLAIM
+See also: PRIVILEGE, ABANDON, CEDE, MANAGE, TERRITORY, CITY CLAIM
 #
 DEDICATE
 
@@ -230,7 +221,7 @@ See also: PROGRESS, UPGRADE
 #
 "DEEP MINES"
 
-Deep Mines (Stockpile Iron goal)
+Deep Mines (Ironclad Future goal)
 
 Mines your empire digs or prospects will have 50% more ore. You must be the
 first empire to build a mine or prospect on a given mountain tile (at least,
@@ -272,7 +263,7 @@ Usage:  demote <person> [rank]
 Demotes a person within the empire. You can specify the name of the rank
 you'd like to demote them to, or just do it one rank at a time.
 
-See also: PRIVILEGE, PROMOTE, EXPEL
+See also: PRIVILEGE, PROMOTE, EXPEL, ROSTER
 #
 DEPOSIT
 
@@ -378,21 +369,23 @@ name to its privileges. Only players who are at the maximum rank can change
 the empire's properties.
 
 Available options:
- adjective - the form of the empire name used in some sentences
- banner - set the color codes used for your empire's name and territory
+ adjective - the adjective form of the empire's name (HELP EMPIRE ADJECTIVE)
+ banner - set the color shown for your empire (HELP EMPIRE BANNER)
  changeleader - lets you set a new leader
  description - shown on your empire detail
  motd - change the "message of the day"
- name - set the full name of the empire
+ name - change the full name of the empire (HELP EMPIRE NAME)
  privilege - set the rank required to do certain things
  rank - change the name of a rank
  ranks - change the number of ranks
  frontiertraits - set your empire's default behavior outside of cities
+ toggles - settings
 
 Ranking immortals may use the syntax:  eedit [empire] <option> <argument>
  adminflags - immortals may set admin flags on empires
+ rescan - immortals can have the game rescan territory and other stats
 
-See also: PRIVILEGE, EMPIRE TRAITS
+See also: PRIVILEGE, ROSTER, EMPIRE TRAITS
 #
 "EEDIT ADMINFLAGS" "EEDIT ADMIN FLAGS" "EMPIRE ADMIN FLAGS"
 
@@ -411,12 +404,114 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &gNO-DECAY&0 - Buildings do not suffer annual decay.
  &gALL-TECHS&0 - Empire can use all empire techs (e.g. Seafaring).
  &gFREE-WAR&0 - Wars by/against the empire have no cost.
+ &gALLOW-NEWBIE-ISLE&0 - Newbie island claims don't auto-clear.
+ &gROSTER-SHARING&0 - Allies can see the roster (this is an eedit toggle).
+ &cHIDDEN-PROGRESS&0 - Progress goals are not announced to the world.
 
 Both the NO-WAR and NO-STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.
 
 See also: GRANT, RECLAIM
 #d
+"EEDIT ADJECTIVE" "EMPIRE ADJECTIVE"
+
+Usage:  eedit adjective <word>
+
+The empire's adjective form is one used on currency, territory, and in certain
+sentences. It should be similar to your empire's name, but simpler and shorter.
+
+The adjective should NOT be a general descriptor or trait. It should have a
+clear connection to the empire's name.
+
+By default, the adjective form is the same as the empire's name.
+
+Examples of good adjective choices for empire names:
+   Blue Rhino Empire - Bluanian
+   The Corridor Sentinels - Sentinel
+   Fiefdom of Amainiris - Amainirian
+   Heroes for Hire - Heroic
+   Kingdom of Moon - Moon
+   Reserve - Reserved
+   Wildcat Collective - Wildcat
+
+Example sentences where the adjective is shown:
+   Working adjective citizens...
+   Only adjective coins are stored here.
+   <Adjective> Sam, a citizen of Empire Name, is standing here.
+
+See also: EMPIRE NAME
+#
+"EEDIT BANNER" "EMPIRE BANNER" BANNER
+
+Usage:  eedit banner <color code>
+
+The empire banner appears on the ascii map and on the website's graphical map
+when 'political' view is enabled. See HELP COLOR for a list of color codes,
+which begin with && (ampersand). The underline code, &&u, may be used in
+combination with a color, but not by itself.
+
+Players using screenreader view instead see the empire adjective on remote
+tiles, and the empire name on their current tile.
+
+The banner color also appears anywhere the empire name is displays, on the
+titles of rooms owned by the empire, and on the empire details page.
+
+It's a good idea to choose a distinct color so that people can see your empire
+on the political map.
+
+See also: COLOR, EMPIRE DETAILS, SCREENREADER, TOGGLE POLITICAL
+#
+"EEDIT NAME" "EMPIRE NAME"
+
+Usage:  eedit name <new name>
+
+Choose a good name for your empire -- this is how the world will know you.
+
+There are no hard and fast guidelines for the empire name, but in general you
+should keep it short and avoid words like "kingdom" or "empire".
+
+Be sure to capitalize any words in the empire name that should start with a
+capital letter; the game will not do this for you because you can choose lower-
+case letters for words such as "of".
+
+Changing the empire name will also change its adjective; use "eedit adjective"
+to set a good adjective to go with your new name.
+
+See also: EMPIRE ADJECTIVE, EMPIRE BANNER
+#
+"EEDIT RESCAN" "UTILITY RESCAN" "UTIL RESCAN" "RESCAN EMPIRES"
+
+Usage:  eedit <empire> rescan
+        eedit rescan <empire>
+        eedit rescan all
+
+Immortals with the "EMPIRES" grant can trigger a 'rescan' of one or all empires
+with this command. This refreshes or updates:
+ - empire techs, fame, and greatness
+ - progress goals
+ - dropped items
+ - territory claim counts
+ - checks empty cities for ruins
+
+This was formerly 'utility rescan'.
+
+See also: GRANT
+#d
+"EEDIT TOGGLES" "EMPIRE TOGGLES"
+
+Usage:  eedit toggles
+        eedit toggle <option> [on | off]
+
+You can configure certain empire settings using "eedit toggles", if you're the
+leader or the highest rank in the empire.
+
+Available toggles:
+  Roster Sharing - Members of allied empires can view your roster.
+  Hidden Progress - Your progress goals won't announce to the world (requires
+    the Hidden Progress goal).
+
+See also: HIDDEN PROGRESS, ROSTER SHARING
+#
 EFIND
 
 Usage:  efind <name>
@@ -502,6 +597,7 @@ EMPIREINVENTORY EINVENTORY EINV
 
 Usage:  empireinventory [item | all]
         einventory [item | all]
+        einventory -c <component type>
        
 The EInventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
@@ -510,7 +606,7 @@ use the ship command to move resources between multiple islands.
 You can specify an item name to see only matching items. If you specify a name,
 it'll show them whether or not the item is stored on your current island. If
 you don't specify a name, you can see all items regardless of where they are
-stored using "EInv all".
+stored using "EInv all". You can also search by component type.
 
 You can use "warehouse inventory" to see items in warehouse (unique) storage.
 
@@ -518,7 +614,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: AUTOSTORE, EFIND, SHIPPING, WORKFORCE, EIDENTIFY
+See also: AUTOSTORE, COMPONENT TYPES, EFIND, SHIPPING, WORKFORCE, EIDENTIFY
 #
 "EMPIRE SCORE" ESCORE
 
@@ -538,17 +634,20 @@ See also: MUDSTATS
 #
 ENROLL
 
-Usage:  enroll <person>
+Usage:  enroll [person]
 
-When a person has pledged his loyalty to your empire, you can enroll him into
-it. This will start him at the lowest empire level.
+When a person has pledged their loyalty to your empire, you can enroll them
+into the empire with this command. This will start them at the lowest rank.
+
+Typing this command with no argument will list any online players who have
+pledged to your empire.
 
 If you enroll the leader of another empire, that empire's entire roster,
 inventory, and territory will also become part of your empire. However, if
 the newly-merged empire doesn't have enough city points available, some of
 the merged cities may lose their city status.
 
-See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE
+See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE, ROSTER
 #
 ESAY ETALK EHISTORY EMPIREHISTORY
 
@@ -574,10 +673,12 @@ Examples:
  > etalk Hi guys!
  > etalk #high_lord Hi, High Lords!
  > etalk #lord *bows before the other lords.
+
+See also: RECOLOR
 #
 ESTABLISH ESTABLISHED ESTABLISHING "NOT ESTABLISHED" "CITY DELAY"
 
-A city is not fully "established" until 2 game days (60 minutes) after you
+A city is not fully "established" until 60 real minutes have passed after you
 found it. In-city-only buildings and functions won't work during this period,
 and it will show as (establishing) on your city list.
 
@@ -624,6 +725,8 @@ with. Coins will be converted from your currency to theirs (for importing), or
 from their currency to yours (for exporting). The better your relationship with
 that empire, the more even the exchange of money will be.
 
+Imports are processed automatically; items are imported to your main island.
+
 The analyze command will show you which of your trading partners has the item
 available.
 
@@ -638,7 +741,12 @@ another item is matching the name, try having the correct item in your own
 inventory. This command will try to match an item in your inventory before
 searching the item database.
 
-See also: COINS, EXCHANGE RATE
+Examples:
+  > import add 50 500 large tree
+  > import add 500 1 strange crystal seed
+  > export add 750 5 strange crystal seed
+
+See also: COINS, EXCHANGE RATE, MAIN ISLAND
 #
 "EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
 
@@ -748,6 +856,27 @@ Rewards the following building:
 
 See also: PROGRESS
 #
+"HIDDEN PROGRESS" "HIDE PROGRESS"
+
+Hidden Progress (purchasable progress goal)
+
+After purchasing this progress goal, you can turn this feature on or off with
+"eedit toggle Hidden Progress". If you enable this, your future progress goal
+achievements will not announce to the world that you have completed them.
+
+See also: EEDIT TOGGLES, PROGRESS
+#
+"HIGH MOUNTAIN GRAZIERS" "MOUNTAIN GRAZIERS" GRAZIERS
+
+High Mountain Graziers (Community goal)
+
+Rewards the following buildings:
+  &y/&g""&y\&0  mountain pasture
+  &y/&t''&y\&0  mountain pens
+  &y/&w{}&y\&0  mountain corral
+
+See also: LIVESTOCK LIVELIHOOD, MOUNTAIN ENGINEERING
+#
 HOME "HOME STORAGE"
 
 Usage:  home [set/unset/list/clear]
@@ -761,6 +890,11 @@ you set it as your home, other members of the empire can't enter (except the
 highest-ranking leaders). You can unset your home from anywhere, or clear the
 owner for the building you're in. Only the empire leaders can clear homes they
 don't own.
+
+When you first set a house as your home, there is a 1-hour delay before you
+can retrieve items from home inventory. After that, your home inventory will
+be there even if your previous home was on a different island. This delay
+applies every time you change homes, even if you haven't moved far.
 
 Any member may type "home list" to see all homes in the empire.
 
@@ -818,9 +952,8 @@ Buying this goal lets you build:
   |CC|  chickencoops
   &t|&G..&t|&0  pasture
   |ST|  pigsty
-  (SS)  stable
 
-See also: PROGRESS
+See also: &y/&w{}&y\  Mountain Corral, PROGRESS
 #
 LUXURIES "LUXURIES GOAL"
 
@@ -847,7 +980,20 @@ Rewards the following buildings:
 
 See also: LUXURIES GOAL, PROGRESS
 #
-MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE
+"MAIN ISLAND" "PRIMARY ISLAND"
+
+An empire's "main island" is the one where it has the largest city. Or, if two
+or more islands have the same city size, the main island is whichever has the
+oldest city.
+
+Situations involving the main island:
+- Imports from another empire go to your main island.
+- Vessel at sea with items stored inside autostore to the main island.
+- Stolen items that are left at sea autostore back to your main island.
+
+See also: AUTOSTORE
+#
+MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE PRIVATE PRIVATIZE
 
 Usage:  manage [option] [on/off]
         manage <vehicle> [option] [on/off]
@@ -855,6 +1001,7 @@ Usage:  manage [option] [on/off]
 This command allows you to manage land use. You can configure the following
 options:
  &cpublic&0 - Non-members can use the room/building.
+ &cprivate&0 - Allies cannot use the room/building.
  &cno-abandon&0 - The tile cannot be abandoned by accident (or by Workforce).
  &cno-dismantle&0 - The building cannot be dismantled.
  &cno-work&0 - Workforce will not work the tile (also applies to vehicles here).
@@ -912,11 +1059,12 @@ Rewards the following buildings:
   &y[**]&0  mountainhall
   &y(==)&0  mountainlodge
   &y.&0/\&y.&0  mountainoutpost
+  &y/\-\&0  mountainterrace
   &y(&c~~&y)&0  mountainwell
   &y/&0OO&y\&0  Tunnel  (tunnel command)
   &y(FF)&0  volcanicforge
 
-See also: PROGRESS, TUNNEL
+See also: HIGH MOUNTAIN GRAZIERS, PROGRESS, TUNNEL
 #
 NONAGGRESSION "NON-AGGRESSION" "DIPLOMACY NONAGGRESSION"
 
@@ -965,6 +1113,8 @@ Usage:  pledge <empire | cancel>
 Allows you to pledge your loyalty to an empire. If they find you worthy, you
 may be allowed to join. You can cancel your pledge if you change your mind,
 but you must wait an hour to pledge again.
+
+A member of the empire must accept your pledge using the 'enroll' command.
 
 If the leader of one empire pledges to another empire and is enrolled, the
 entire original empire becomes a part of the second empire, including all
@@ -1023,11 +1173,14 @@ Privileges:
   dismantle: can dismantle buildings and vehicles owned by the empire (also
     controls burning your empire's buildings and vehicles)
 
-See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
+See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG,
+ROSTER
 #
 PUBLICIZE
 
 Usage:  publicize
+
+Note: This command has been replaced by 'manage public'.
 
 Allows you to make an area public so others can use it. This also undoes the 
 same command. Others cannot withdraw from public vaults or dismantle public 
@@ -1036,7 +1189,7 @@ buildings.
 If a room is made public, other players may take items from the ground without
 being marked "hostile".
 
-See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
+See also: CLAIM, CEDE, ABANDON, MANAGE, UNPUBLICIZE, HOSTILE
 #
 "RARE METALS"
 
@@ -1096,7 +1249,7 @@ See also: PROGRESS
 #
 ROSTER
 
-Usage:  roster [all]
+Usage:  roster [empire] [all]
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while. The color of the player's main skills (if not
@@ -1104,9 +1257,18 @@ white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee
 
 If you don't use the "all" option, you won't see members who have timed out.
 
-High-level immortals can also target other empires with this command.
+You can view the roster of allied empires if they have toggled Roster Sharing
+on with eedit. Privileged immortals can also target other empires with this
+command.
 
-See also: WHO
+See also: ROSTER SHARING, WHO
+#
+"ROSTER SHARING" "SHARED ROSTER"
+
+You can enable or disable roster sharing with "eedit toggle Roster Sharing".
+When enabled, any empire that is allied with yours can view your roster.
+
+See also: EEDIT TOGGLES, ROSTER
 #
 "SALT OF THE EARTH"
 
@@ -1129,15 +1291,18 @@ Rewards the following buildings:
 
 See also: PROGRESS
 #
-SILVER GOLD COPPER
+SILVER GOLD COPPER "PRECIOUS METALS" "PRECIOUS METAL INGOTS"
 
-Copper, silver, and gold are found in mines, although more rarely than iron
-ore. They are used as currency in many empires for trade and exchange. Some
-empires, however, prefer to use material goods instead.
+Copper, silver, and gold are precious metals that can be found in mines. Smelt
+them into ingots for use in crafting; smelt them again to refine them into bars
+that you can store in your vault to increase your wealth.
 
-You must also smelt copper into nocturnium ore to make nocturnium ingots.
+You can split bars back into ingots using the 'separate' command.
 
-See also: RARE METALS, SMELT, SEPARATE
+You can also mint these precious metals into coins. Copper is also used when
+smelting nocturnium ingots.
+
+See also: COINS, MINT, RARE METALS, SMELT, SEPARATE
 #
 "STILT BUILDINGS" "STILT BUILDINGS GOAL"
 
@@ -1223,6 +1388,8 @@ Supported options:
    -no-dismantle   Only no-dismantle tiles.
    -no-work   Only no-work tiles.
    -public   Only public tiles.
+   -private  Only private tiles.
+   -all  No grouping (show all tiles, even if the list is long).
 
 You can also add search keywords. Starting a keyword with a dash (-) will
 search for tiles that DON'T have that word. If you need to exclude a word
@@ -1371,7 +1538,7 @@ If you have a truce with a distrustful empire, their guards will attack you.
 However if you have a truce with an empire that isn't distrustful, the guards
 will ignore you.
 
-The exchnage rate with a truce is 50% (the same as no relations).
+The exchange rate with a truce is 50% (the same as no relations).
 
 See also: DIPLOMACY, PEACE
 #
@@ -1397,6 +1564,25 @@ Rewards the following buildings:
   &y.&0[]&y.&0  pueblohaven
 
 See also: PROGRESS
+#
+"VILLAGE FOODS" "VILLAGE BREAD" "VILLAGE GRUEL" "VILLAGE RICE" "VILLAGE VEGETABLES" "PICKLED VILLAGE VEGETABLES" "VILLAGE OAT CAKES" "VILLAGE FRUIT PRESERVES" "VILLAGE EGGS" "PICKLED VILLAGE EGGS"
+
+The workforce will produce various village foods at a bakery, kitchen, or
+similar location. Having many different foods in the empire's inventory will
+help keep its workforce well-fed. Players can also retrieve these foods from
+the larder and take them along as long-lasting food.
+
+Examples of village foods:
+ loaf of village bread  (2x flour)
+ village gruel  (2x grain)
+ village rice  (2x rice)
+ pickled village vegetables  (2x large vegetables, 1x salt)
+ village oat cakes  (2x oatmeal)
+ village fruit preserves  (2x large raw fruit)
+ pickled village eggs  (2x raw eggs, 1x salt)
+ village smoked meat  (2x meat)
+
+See also: EINVENTORY, WORKFORCE CRAFTING
 #
 "WALLED TOWN" "WALLED TOWN GOAL"
 
@@ -1562,7 +1748,9 @@ Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
 
 Additional workforce chores are available from progress buys:
-  &gprospecting (Prospector Training):&0 NPCs will slowly prospect mountain tiles.
+  &gprospecting (Prospector Training):&0 The empire will slowly prospect mountain
+     tiles. This takes several days and uses food for all mountain tiles it
+     prospects, but will not spawn worker NPCs.
 
 See also: ABANDON, WORKFORCE, FEEDING WORKFORCE
 #
@@ -1579,7 +1767,7 @@ Common things produced by this:
  Glass blower: glass ingots
  Tavern: barrels of ale
 
-See also: WORKFORCE CHORES, WORKFORCE LIMIT
+See also: VILLAGE FOODS, WORKFORCE CHORES, WORKFORCE LIMIT
 #
 "WORKFORCE FOOD" "FEEDING WORKFORCE" "WORKFORCE EATING" "STARVING WORKFORCE" "WORKFORCE IS STARVING"
 
@@ -1607,7 +1795,8 @@ reduce the chances of running out of food. Not all crops can be eaten raw. Give
 your workers a bakery and enable workforce crafting; they will cook raw foods
 into additional things to eat.
 
-See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTS, WORKFORCE WHY
+See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTING, WORKFORCE WHY,
+   VILLAGE FOODS
 #
 "WORKFORCE KEEP" "WORKFORCE KEEP DEFAULT" "DEFAULT KEEP" "DEFAULT WORKFORCE KEEP"
 
@@ -1701,6 +1890,11 @@ With the 'prospecting' chore, your workforce will camp out on claimed mountain
 tiles and slowly prospect to look for metals. This can take a long time to
 finish but when it is done, any member of the empire can type 'prospect' on the
 tile to instantly find out what metal it has.
+
+Because this is a long, time-consuming chore, and because it often involves a
+large number of tiles per empire, this chore does not spawn a worker NPC (but
+it still costs food per hour per tile). All mountain tiles owned by an empire
+are prospected at the same time, so long as there's food available.
 
 You can turn on 'toggle informative' to see tiles that have been prospected by
 your empire.

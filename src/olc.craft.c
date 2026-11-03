@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -44,11 +45,11 @@ const char *default_craft_name = "unnamed recipe";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_craft(craft_data *craft, char_data *ch) {
-	char temp[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], last_word[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	bld_data *bld = NULL;
 
-	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED) && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
+	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED | CRAFT_DISMANTLE_ONLY) && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object, ability, or recipe");
 		problem = TRUE;
 	}
@@ -56,7 +57,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-	if (!GET_CRAFT_RESOURCES(craft) && (!CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ) || GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING)) {
+	if (!GET_CRAFT_RESOURCES(craft) && (!CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ) || GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) && !CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no resources");
 		problem = TRUE;
 	}
@@ -76,6 +77,12 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	chop_last_arg(GET_CRAFT_NAME(craft), temp, last_word);
+	if (*last_word && parse_direction(ch, last_word) != NO_DIR) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft name ends with a direction (HELP CRAFT NAME MATCHING)");
+		problem = TRUE;
+	}
+	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_ERROR) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft type not set");
 		problem = TRUE;
@@ -87,7 +94,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
 		}
-		if (GET_CRAFT_BUILD_TYPE(craft) != NOTHING && GET_CRAFT_BUILD_TYPE(craft) != GET_CRAFT_VNUM(craft)) {
+		if (GET_CRAFT_BUILD_TYPE(craft) != NOTHING && GET_CRAFT_BUILD_TYPE(craft) != GET_CRAFT_VNUM(craft) && !CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates building with different vnum");
 			problem = TRUE;
 		}
@@ -99,7 +106,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Possible unnecessary in-city-only flag (not set on building or building functions)");
 			problem = TRUE;
 		}
-		if (bld && !GET_CRAFT_BUILD_FACING(craft) && !IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && !CRAFT_FLAGGED(craft, CRAFT_UPGRADE)) {
+		if (bld && !GET_CRAFT_BUILD_FACING(craft) && !IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && !CRAFT_FLAGGED(craft, CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Missing build-facing");
 			problem = TRUE;
 		}
@@ -167,6 +174,14 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP and VEHICLE or BUILD");
 		problem = TRUE;
 	}
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE && (CRAFT_FLAGGED(craft, CRAFT_SOUP) || CRAFT_FLAGGED(craft, CRAFT_BUILDING) || CRAFT_FLAGGED(craft, CRAFT_VEHICLE))) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "WORKFORCE craft has SOUP, BUILDING, or VEHICLE type");
+		problem = TRUE;
+	}
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_MILL && (CRAFT_FLAGGED(craft, CRAFT_SOUP) || CRAFT_FLAGGED(craft, CRAFT_BUILDING) || CRAFT_FLAGGED(craft, CRAFT_VEHICLE))) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "MILL craft has SOUP, BUILDING, or VEHICLE type");
+		problem = TRUE;
+	}
 	if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && CRAFT_FLAGGED(craft, CRAFT_BUILDING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has both VEHICLE and BUILDING flags");
 		problem = TRUE;
@@ -229,9 +244,27 @@ craft_data *create_craft_table_entry(craft_vnum vnum) {
 */
 char *list_one_craft(craft_data *craft, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char abil[256], flags[MAX_STRING_LENGTH], obj[256];
 	
 	if (detail) {
-		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		// requirements
+		if (GET_CRAFT_ABILITY(craft) != NOTHING) {
+			safe_snprintf(abil, sizeof(abil), " {%s}", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+		}
+		else {
+			*abil = '\0';
+		}
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
+			safe_snprintf(abil, sizeof(abil), " [%s]", skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
+		}
+		else {
+			*obj = '\0';
+		}
+		
+		// flags
+		sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, flags, TRUE);
+		
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)%s%s %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)], abil, obj, flags);
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -254,7 +287,9 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	descriptor_data *desc;
 	craft_data *craft;
 	char_data *iter;
+	trig_data *trig, *next_trig;
 	char name[256];
+	bool found;
 	
 	if (!(craft = craft_proto(vnum))) {
 		msg_to_char(ch, "There is no such craft %d.\r\n", vnum);
@@ -309,6 +344,16 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 		}
 	}
 	
+	// update triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		found = trigger_has_link(trig, OLC_CRAFT, vnum);
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d %s lost link to craft [%d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), vnum, name);
+			// Doesn't delete
+			// save_library_file_for_vnum(DB_BOOT_TRG, GET_TRIG_VNUM(trig));
+		}
+	}
+	
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_OBJECT(desc)) {
@@ -321,6 +366,12 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 			if (delete_progress_perk_from_list(&PRG_PERKS(GET_OLC_PROGRESS(desc)), PRG_PERK_CRAFT, vnum)) {
 				save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(GET_OLC_PROGRESS(desc)));
 				msg_to_char(desc->character, "A craft used by the progress goal you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_TRIGGER(desc)) {
+			found = trigger_has_link(GET_OLC_TRIGGER(desc), OLC_CRAFT, vnum);
+			if (found) {
+				msg_to_desc(desc, "Craft [%d] %s was deleted but remains in the link list for the trigger you're editing.", vnum, name);
 			}
 		}
 	}
@@ -381,7 +432,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("requiresfunction", only_functions, function_flags)
 		FULLSEARCH_BOOL("requiresobject", requires_obj)
 		FULLSEARCH_INT("time", only_time, 0, INT_MAX)
-		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
+		FULLSEARCH_INT("timeover", time_over, 0, INT_MAX)
 		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
@@ -455,7 +506,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 			continue;
 		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, GET_CRAFT_NAME(craft))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_CRAFT_NAME(craft)) && (!GET_CRAFT_NOTES(craft) || !multi_isname(find_keywords, GET_CRAFT_NOTES(craft)))) {
 			continue;
 		}
 		
@@ -485,6 +536,7 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	craft_data *craft = craft_proto(vnum);
 	progress_data *prg, *next_prg;
 	obj_data *obj, *next_obj;
+	trig_data *trig, *next_trig;
 	int found;
 	
 	if (!craft) {
@@ -508,6 +560,14 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 		if (find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
 			++found;
 			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+		}
+	}
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_CRAFT, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		}
 	}
 	
@@ -567,6 +627,9 @@ void save_olc_craft(descriptor_data *desc) {
 	if (GET_CRAFT_NAME(proto)) {
 		free(GET_CRAFT_NAME(proto));
 	}
+	if (GET_CRAFT_NOTES(proto)) {
+		free(GET_CRAFT_NOTES(proto));
+	}
 	free_resource_list(GET_CRAFT_RESOURCES(proto));
 	
 	// sanity
@@ -575,6 +638,10 @@ void save_olc_craft(descriptor_data *desc) {
 			free(GET_CRAFT_NAME(craft));
 		}
 		GET_CRAFT_NAME(craft) = str_dup(default_craft_name);
+	}
+	if (GET_CRAFT_NOTES(craft) && !*GET_CRAFT_NOTES(craft)) {
+		free(GET_CRAFT_NOTES(craft));
+		GET_CRAFT_NOTES(craft) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -611,6 +678,7 @@ craft_data *setup_olc_craft(craft_data *input) {
 
 		// copy things that are pointers
 		GET_CRAFT_NAME(new) = GET_CRAFT_NAME(input) ? str_dup(GET_CRAFT_NAME(input)) : NULL;
+		GET_CRAFT_NOTES(new) = GET_CRAFT_NOTES(input) ? str_dup(GET_CRAFT_NOTES(input)) : NULL;
 		GET_CRAFT_RESOURCES(new) = copy_resource_list(GET_CRAFT_RESOURCES(input));
 	}
 	else {
@@ -734,6 +802,8 @@ void olc_show_craft(char_data *ch) {
 	// resources
 	build_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
 	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_CRAFT_NOTES(craft)), NULLSAFE(GET_CRAFT_NOTES(craft)));
 		
 	send_page_display(ch);
 }
@@ -917,6 +987,19 @@ OLC_MODULE(cedit_liquid) {
 OLC_MODULE(cedit_name) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_CRAFT_NAME(craft));
+}
+
+
+OLC_MODULE(cedit_notes) {
+	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_CRAFT_NAME(craft));
+		start_string_editor(ch->desc, buf, &GET_CRAFT_NOTES(craft), MAX_NOTES, TRUE);
+	}
 }
 
 

@@ -8,7 +8,7 @@ C
 dedicate~
 E
 statue adventurer~
-   The monument is a larger-than-life stone sculpture of a great adventurer. 
+   The monument is a larger-than-life stone sculpture of a great adventurer.
 Unfortunately, there's no information on their deeds.
 ~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
@@ -62,7 +62,7 @@ S
 Elfin Workshop~
 An Elfin Workshop~
 &0[  ]~
-1 0 aHR 0
+1 0 azHR 0
 0 0 0 -1
 C
 (functions as a tailor and tannery)~
@@ -87,7 +87,7 @@ S
 Tiny Kitchen~
 A Tiny, Cluttered Kitchen~
 ~
-0 0 aHR 0
+0 0 azHR 0
 0 0 0 -1
 C
 cook~

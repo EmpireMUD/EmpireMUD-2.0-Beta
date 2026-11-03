@@ -4,7 +4,7 @@ Battle training~
 ~
 Fighter~
 Fighter~
-1 b
+1 b -1
 K
 0 5
 S
@@ -14,7 +14,7 @@ More Empire skill~
 ~
 Ruler~
 Ruler~
-1 ab
+1 ab -1
 S
 #1002
 Exploring~
@@ -22,9 +22,9 @@ Better Survival~
 ~
 Explorer~
 Explorer~
-1 b
+1 b -1
 G
-22 2147  # a simple skinning knife
+22 2152  # a simple skinning knife
 K
 5 5
 S
@@ -34,11 +34,11 @@ Trade skill~
 ~
 Crafter~
 Crafter~
-1 b
+1 b -1
 G
--1 2145  # feather sewing needles
+-1 2145  # a feather sewing kit
 G
-22 2148  # a hobby knife
+22 2153  # a hobby knife
 K
 6 5
 S

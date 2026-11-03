@@ -588,6 +588,7 @@ WCMD(do_wslay) {
 	char_data *vict;
 	
 	argument = one_argument(argument, name);
+	skip_spaces(&argument);
 
 	if (!*name) {
 		wld_log(room, "wslay: no target");
@@ -630,7 +631,7 @@ WCMD(do_wslay) {
 WCMD(do_wteleport) {
 	char_data *ch, *next_ch;
 	vehicle_data *veh;
-	room_data *target;
+	room_data *target, *was_in;
 	obj_data *obj, *cont;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
@@ -661,10 +662,11 @@ WCMD(do_wteleport) {
 			if (!valid_dg_target(ch, DG_ALLOW_GODS)) 
 				continue;
 			GET_LAST_DIR(ch) = NO_DIR;
+			was_in = IN_ROOM(ch);
 			char_from_room(ch);
 			char_to_room(ch, target);
-			enter_triggers(ch, NO_DIR, "script", FALSE);
-			greet_triggers(ch, NO_DIR, "script", FALSE);
+			enter_triggers(ch, NO_DIR, "script", FALSE, was_in);
+			greet_triggers(ch, NO_DIR, "script", FALSE, was_in);
 			qt_visit_room(ch, IN_ROOM(ch));
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
@@ -691,11 +693,12 @@ WCMD(do_wteleport) {
 					
 					// teleport players and their followers
 					if (!IS_NPC(ch) || (GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch)))) {
+						was_in = IN_ROOM(ch);
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_triggers(ch, NO_DIR, "script", FALSE);
-						greet_triggers(ch, NO_DIR, "script", FALSE);
+						enter_triggers(ch, NO_DIR, "script", FALSE, was_in);
+						greet_triggers(ch, NO_DIR, "script", FALSE, was_in);
 						qt_visit_room(ch, IN_ROOM(ch));
 						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);	// once we're sure we're staying
@@ -712,10 +715,11 @@ WCMD(do_wteleport) {
 			}
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(ch) = NO_DIR;
+				was_in = IN_ROOM(ch);
 				char_from_room(ch);
 				char_to_room(ch, target);
-				enter_triggers(ch, NO_DIR, "script", FALSE);
-				greet_triggers(ch, NO_DIR, "script", FALSE);
+				enter_triggers(ch, NO_DIR, "script", FALSE, was_in);
+				greet_triggers(ch, NO_DIR, "script", FALSE, was_in);
 				qt_visit_room(ch, IN_ROOM(ch));
 				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);	// once we're sure we're staying
@@ -1127,7 +1131,7 @@ WCMD(do_wload) {
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	room_data *in_room;
-	vehicle_data *veh;
+	vehicle_data *veh, *cnt_veh;
 	struct empire_storage_data *store;
 	char *target;
 
@@ -1211,7 +1215,7 @@ WCMD(do_wload) {
 			}
 			
 			// ok: charge it
-			charge_stored_resource(emp, GET_ISLAND_ID(room), number, 1, TRUE);
+			charge_stored_resource(emp, GET_ISLAND_ID(room), number, 1, STORAGE_TIMERS_OLDEST);
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			// and load it
@@ -1292,6 +1296,12 @@ WCMD(do_wload) {
 		cnt = get_obj_in_room(room, arg1);
 		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
+			load_otrigger(object);
+			return;
+		}
+		cnt_veh = get_vehicle_room(room, arg1, NULL);
+		if (cnt_veh && VEH_FLAGGED(cnt_veh, VEH_CONTAINER)) {
+			obj_to_vehicle(object, cnt_veh);
 			load_otrigger(object);
 			return;
 		}

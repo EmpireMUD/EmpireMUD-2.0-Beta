@@ -170,17 +170,17 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	
 	// are we just removing the whole thing?
 	if (all_off) {
-		affect_from_char(ch, atype, !silent);
+		affect_from_char_by_caster(ch, atype, caster, !silent);
 		return;
 	}
 	
 	// removing one type?
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, atype, i, !silent);
+			affect_from_char_by_apply_and_caster(ch, atype, i, caster, !silent);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, atype, BIT(i), !silent);
+			affect_from_char_by_bitvector_and_caster(ch, atype, BIT(i), caster, !silent);
 		}
 		return;
 	}
@@ -707,7 +707,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		return;
 	}
 	
-	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, get_climate(target)))) {
+	if (!(sect = find_first_matching_sector(SECTF_CROP | SECTF_BASIC_CROP, NOBITS, GET_CROP_CLIMATE(cp)))) {
 		// no crop sects?
 		return;
 	}
@@ -812,8 +812,8 @@ void send_char_pos(char_data *ch, int dam) {
 			msg_to_char(ch, "You're stunned, but will probably regain consciousness again.\r\n");
 			break;
 		case POS_DEAD:
-			//act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
-			send_to_char("You are dead!  Sorry...\r\n", ch);
+			//act("$n is dead! R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
+			send_to_char("You are dead! Sorry...\r\n", ch);
 			break;
 		default: {                        /* >= POSITION SLEEPING */
 			if (dam > (GET_MAX_HEALTH(ch) / 4)) {

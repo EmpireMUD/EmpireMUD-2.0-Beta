@@ -137,7 +137,8 @@ S
 Winter Wonderland: Letter to Father Christmas~
    This young child wrote a letter to Father Christmas, but isn't allowed to
 send it. As the good samaritan that you are, you offer to take and post the
-letter for them. Take the letter to any building you can send mail from and
+letter for them. Take the letter to any building you can send mail from and set
+it on its way for them.
 Instructions:
 - Take the letter to a Pigeon Post
 - Type: post letter
@@ -468,9 +469,10 @@ S
 Winter Wonderland: Replica Reindeer Wrangling~
    While standing in your stable, you get the great idea that the animals of
 the empire should get into the holiday spirit as well. So, you take some
-reindeer outfits and begin your search for five horses or camels to dress up
-around your city.
-Type: dress <horse | camel>
+reindeer outfits and begin your search for five domestic horses, camels, zebu,
+or water buffalo to dress up around your city (depending on what region it's
+in).
+Type: dress <horse | camel | zebu | buffalo>
 ~
    There! Now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
@@ -492,7 +494,7 @@ W
 36 10700 0 1 a
 W+
 11 0 0 5 a
-Dress up horses or camels~
+Dress up beasts of burden~
 Z
 4 16618
 S
@@ -805,6 +807,44 @@ Summon and fight the demon~
 Z
 4 16603
 S
+#16687
+Winter Wonderland: Santa's Little Helper~
+   The one thing Santa loves more than spreading holiday cheer is getting
+others to join him in the mission. Now he's enlisting you to deliver gifts, but
+not to just your own empire -- no, you have to deliver to at least three others
+outside of your own, too! Deliver gifts to four houses within your own empire,
+and two houses in each of three empires outside your own for a total of 10
+total presents delivered to empty the sack.
+   You can deliver from inside any house by typing 'deliver' or from outside by
+typing 'deliver <direction>'.
+~
+   And finally the sack is empty and your belly full of delicious treats left
+for Father Christmas! The empty sack seems to fold in on itself, disappearing
+back to the North Pole in a miniature snow flurry. You roll your back and
+shoulders, relieving the ache that built up, but are satisfied with a job well
+done. You are sure Father Christmas is grateful for your assistance in
+spreading holiday cheer, too.
+~
+9 ej 0 0 -1
+A
+1 10703
+P
+36 10700 0 1 -
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W+
+11 0 0 10 a
+Deliver the presents~
+Z
+2 16687
+Z
+4 16687
+S
 #16690
 Winter Wonderland: Feed the Polar Vortex~
    A Frostwarden -- one of the Guardians of Winter -- appears and warns you
@@ -825,7 +865,7 @@ other side. Since it's the holidays, a lot of pets need good homes, so the
 reward for your hard work is an adoption certificate to get a free puppy or
 kitten.
 ~
-11 j 0 0 -1
+12 jl 0 0 -1
 A
 2 16659
 A

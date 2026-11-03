@@ -1,6 +1,8 @@
 #1502
 Silent Ascension: Detect pickpocket~
-1 c 2
+1 c 2 2
+L o 142
+L t 1502
 pickpocket~
 * basic checks first
 return 0
@@ -39,7 +41,35 @@ end
 ~
 #1503
 Legacy in Crimson: Peep and Minionize minion~
-1 c 2
+1 c 2 28
+L b 202
+L b 203
+L b 206
+L b 207
+L b 208
+L b 209
+L b 224
+L b 226
+L b 227
+L b 229
+L b 256
+L b 257
+L b 258
+L b 265
+L b 267
+L b 268
+L b 269
+L b 272
+L b 274
+L b 276
+L b 277
+L b 279
+L b 283
+L b 284
+L b 285
+L b 550
+L t 1503
+L w 1503
 peep minionize~
 * citizen mobs we can minionize: must have #n as first keyword
 set cit_list 202 203 206 207 208 209 224 226 227 229 256 257 258 265 267 268 269 272 274 276 277 279 283 284 285
@@ -124,7 +154,7 @@ elseif minionize /= %cmd%
       %quest% %actor% trigger 1503
       * remove citizen?
       set targ_id %target.id%
-      dg_affect %target% !SEE on 5
+      dg_affect %target% NO-SEE-IN-ROOM on 5
       %own% %target% none
       * still here?
       if %target% && %target.id% == %targ_id%
@@ -142,7 +172,13 @@ end
 ~
 #1506
 Archetype unlock quests: Give quest items~
-2 u 0
+2 u 0 6
+L c 1001
+L c 1011
+L c 1012
+L t 1502
+L t 1503
+L t 1506
 ~
 switch %questvnum%
   case 1506

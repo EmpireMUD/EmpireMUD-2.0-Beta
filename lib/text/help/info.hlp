@@ -12,7 +12,7 @@ These are the common map icons:
  &y....&0  Desert              &y.&g^^&y.&0  Desert Grove        &y.&c~~&y.&0  Oasis
  &c~~~~&0  River               &b~~~~&0  Ocean               &a~~~~&0  Estuary/Shallows
  &c~&t..&c~&0  Riverbank           &c~&g^&t.&c~&0  Riverbank           &c~~&g^&c~&0  Swamp/Marsh
- &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra       &0
+ &G^^%^&0  Jungle              &G ,,&T|&?^  Savanna             &W,,,,&0  Arctic Tundra
 
  --+-  Road                [--]  Building            \__/  Trench
  vvvv  Fence               vxxv  Gate                VVVV  Wall
@@ -62,23 +62,33 @@ can shut off these messages with 'toggle action-spam'. You'll still see the
 messages for starting and stopping the action, plus any resources you get.
 
 The following things will speed up various chores:
-- Work ethic bonus trait: dig, gather, chop, build, dismantle, harvest, plant,
-   manufacture, mine, mint, repair, chip, excavate, pick, scrape, fillin, saw,
-   quarry, tan, cook, smelt, burning stumps, bake
-- Faster walking: run
-- Finder: dig, forage, gather, hunt, pan, pick
-- Haste: dig, forage, gather, chop, build, dismantle, harvest, plant,
-   manufacture, mine, repair, play (music), excavate, pick, scrape, fillin,
-   saw, quarry
-- Shovel: dig
-- Superior tool: chop, craft, forge, mine, process, saw, sew
-- Higher level tool: chop, fish, mine
-- Progression goals: excavate, prospect
-- Mastery abilities: forge, sew, crafts in general
-- Woodworking ability: saw, scrape
-- Certain buildings: sew (tailor), weaving (tailor), craft (clay at potter)
+- &cWork ethic bonus trait:&0 bake, build, burn stumps, chip, cook, chop, dig,
+   dismantle, excavate, fillin, gather, harvest, manufacture, mine, mint, pick,
+   plant, quarry, repair, saw, smelt, scrape, tan
+- &cFaster walking:&0 run
+- &cFinder:&0 dig, forage, gather, hunt, pan, pick
+- &cHaste:&0 build, chop, dig, dismantle, excavate, fillin, forage, gather,
+   harvest, manufacture, mine, pick, plant, play music, quarry, repair, saw,
+   scrape, tan
+- &cShovel:&0 dig, plant
+- &cSuperior tool:&0 chop, craft, forge, mine, process, saw, sew
+- &cHigher level tool:&0 chop, fish, mine
+- &cProgression goals:&0 excavate, prospect
+- &cMastery abilities:&0 forge, sew, crafts in general
+- &cWoodworking ability:&0 saw, scrape
+- &cCertain buildings:&0 craft (clay at potter), sew (tailor), weaving (tailor)
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
+#
+AGE AGING
+
+Age is a measure of how long each character has been around. New characters
+have an age of 17. Type "mudstats configs" to see how long each game year
+lasts. Age has no bearing on any game stats or effects; players are free to
+roleplay their character as any age.
+
+For vampires, age is shown as two numbers such as 25/174. The first number (25)
+is the character's apparent age; the second number (174) is their actual age.
 #
 AGGRO AGGR AGGRESSIVE
 
@@ -123,6 +133,44 @@ will not be eligible for resurrection. You can still be summoned back.
 the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, COMBAT GIMMICK, DIFFICULTY SELECTOR, GROUP, NEARBY
+#
+AI "AI POLICY" "AI STATEMENT" "AI DISCLOSURE" "ARTIFICIAL INTELLIGENCE" GENAI CHATGPT MIDJOURNEY
+
+EmpireMUD AI Policy, Statement, and Disclosure
+
+CODE
+
+All EmpireMUD code is written and debugged by humans without AI tools. No vibe
+coding, no IDE auto-suggests, nothing more complicated than a regex search.
+
+GAME CONTENT
+
+Some content builders have chosen to use AI at various levels of the
+development process from brainstorming assistance to writing player-facing
+text. Most of the game's content, however, predates generative AI tools and was
+built on caffeine and dreams alone.
+
+No game content currently uses live AI services; all apparent NPC behavior is
+managed by human-written C code and DG Scripts instead.
+
+WEBSITE
+
+EmpireMUD's official website includes artwork created by subscription-based
+generative AI tools such as Midjourney and ChatGPT. EmpireMUD is a free game
+developed by an unpaid team and has no budget for genuine human artwork;
+subscriptions for these generative tools were paid for out-of-pocket. EmpireMUD
+accepts donations of appropriately-licensed, human-created artwork for use on
+the website.
+
+The purpose of AI artwork on the website is to beautify the site and to give a
+visual representation of each adventure in line with the original builders'
+vision. You are free to share these images or use them in other contexts so
+long as you include the original alt text so they continue to be accessible to
+blind users. We also appreciate if you attribute EmpireMUD as the source of
+these images.
+
+The website itself was written by hand (and keyboard) without the use of AI
+tools or content management services.
 #
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
 
@@ -201,10 +249,13 @@ enchanted or superior cannot be stored.
 If the land is not claimed, animals and stray humans make off with the items,
 never to be seen again.
 
+Items inside of vehicles will autostore to the island where the vehicle is
+located or, if at sea, will autostore to your main island.
+
 Items which can't be picked up, like signs, are not normally affected by this
 system. However, items left inside of vehicles will be stored or cleaned up.
 
-See also: HOME
+See also: HOME, MAIN ISLAND
 #
 AXE
 
@@ -308,7 +359,7 @@ will die.
 
 See also: ANCIENT BLOOD, HUNGER
 #
-BOARDS READ WRITE RESPOND
+BOARDS READ WRITE RESPOND "MESSAGE BOARDS"
 
 Usage:  look board
         write <headline>
@@ -374,6 +425,9 @@ BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
 The BONUS-HEALING gear stat, also shown on your score page as "Healing +X",
 is an amount added to any healing abilities you use. This is similar to the
 way Intelligence is added to healing.
+
+Healing from this trait does not increase the cost of spells in the way level
+or Intelligence would.
 
 See also: SCORE
 #
@@ -498,7 +552,7 @@ different language for a single say/shout with #language-name. For example:
 
 You can join or create new slash-channels with /join and leave with /leave.
 
-See also: TOGGLE, SAY, SLASH-CHANNELS, LANGUAGE
+See also: TOGGLE, RECOLOR, SAY, SLASH-CHANNELS, LANGUAGE
 #
 CHARISMA CHA
 
@@ -517,8 +571,7 @@ CITIZEN CITIZENS
 
 Citizens will move into homes in your empire once you have unlocked the
 Thriving Community goal. Adding a bedroom to any building will also allow a
-citizen to move in. It takes up to an hour (real time) for a new citizen to
-move in.
+citizen to move in. It takes up to two game days for citizens to move in.
 
 Eventually your empire can learn to put citizens to work. Citizens work chores
 within 20 tiles of their homes.
@@ -593,6 +646,9 @@ different types of resources:
    various empires if you don't have the misc coins to spend. If you cancel a
    craft before it's complete, you'll get back the specific coins you spent.
 
+&cCurrency&0 - Crafts may use adventure currencies such as the permafrost
+   tokens (Magiterranean: Permafrost), which are shown on the 'coins' command.
+
 &cPools&0 - These include mana, move, and blood points (not to be confused with
    the blood liquid, which comes from drink containers). In order to build or
    craft, you must have the entire pool cost available at once. You can't spend
@@ -611,7 +667,7 @@ The 'keep' command can be used to prevent items in your inventory from being
 used for your craft and building commands.
 
 See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP, COMPONENT TYPES
-  FREE ACTIONS
+  FREE ACTIONS, COINS, UNITS OF LIQUID
 #
 COOLDOWNS "COOL DOWNS" CD
 
@@ -623,9 +679,10 @@ abilities can only be used every so often, usually for reasons relating to
 game balance.
 
 If you don't want to see alerts when your cooldowns expire, you can turn them
-off with the "smessages" command.
+off with the "smessages" command. If you want cooldown messages to have a
+different color, they fall under the "status" option for "recolor".
 
-See also: STATUS MESSAGES
+See also: RECOLOR, STATUS MESSAGES
 #
 DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" SCRATCH BATTER WALLOP FEROCIOUSLY RUTHLESSLY MAUL RAVAGE MASSACRE DECIMATE BRUTALLY VICIOUSLY CRUSH WRECK OBLITERATE ANNIHILATE MUTILATE SLAUGHTER DEMOLISH DEVASTATE ERADICATE LIQUIDATE EXTERMINATE VANQUISH CONQUER
 
@@ -719,7 +776,9 @@ When you die in EmpireMUD, you will lie on the ground for a short time, until
 you type 'respawn'. When you respawn, you'll appear at your chosen tomb, at
 any nearby tomb your empire owns, or at a random starting location. You can
 only be reanimated in a tomb if your empire owns one on the same island
-where you died (rivers don't count for this; only oceans separate islands).
+where you died (rivers don't count for this; only oceans separate islands) --
+OR, if you're in the ocean but within 100 tiles of a tomb, you can still
+respawn at that tomb.
 
 When you die, you'll come back hungry and thirsty, and with a quarter of your
 maximum health, moves, and mana. Vampires also come back with a quarter of
@@ -776,6 +835,23 @@ stat is applied directly, but the next +20 only brings you up to +30.
 
 This is currently only used for resistances.
 #
+DISARMED "DISARMED AFFECT"
+
+A person may become DISARMED as a result of an ability (like Disarm) or a
+special move by a mob in combat. Only certain weapon types may be disarmed.
+
+If you are disarmed, you don't have to re-equip your weapon yourself. When the
+disarm affect wears off, it will still be in your <wield> slot.
+
+Disarmed players lose their weapon damage and will make basic unarmed 'hit'
+attacks (unless the disarmed weapon was a caster weapon, in which case they
+receive a basic 'mana blast' attack instead).
+
+Disarmed mobs lose half their damage and their attack type is changed to 'hit'
+or 'mana blast', but not all mobs can be disarmed.
+
+See also: DISARM
+#
 DISPLAY
 
 Usage:  display <text>
@@ -803,7 +879,8 @@ needs in order to hit you.
 
 For fighting NPCs, the highest possible dodge chance is 55%. Against players,
 it's 75%. Players who aren't in tank/solo role have a lower dodge cap by 20%.
-Some abilities may change the dodge cap as well.
+Some abilities may change the dodge cap as well. View your dodge cap against
+an NPC using the 'consider' command.
 
 Players' chance of hitting you is based on their to-hit score, but
 mobs are more predictable and it is possible to reach a "dodge cap", the amount
@@ -818,7 +895,7 @@ Dodge cap:
 - Add 75 to the total
 - Add +5 per Dexterity the mob has more than you
 
-See also: AFFECTS, SCORE, TO-HIT, IMPROVED REFLEXES
+See also: AFFECTS, CONSIDER, SCORE, TO-HIT, IMPROVED REFLEXES
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME STACKS STACKING
 
@@ -883,15 +960,18 @@ Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
  &Y.&G^&yo&G.&0  Oranges             &gnn&Ri&gn&0  Peppers
 
-Tropical crops (partially cleared jungle):
+Tropical crops (fertile soil):
  &Yd&G\/&Yb&0  Bananas             &G^&Oo&G^&Oo&0  Mangoes              &Gd&g\/&Gb&0  Plantains
  &G^&Yo&G^^&0  Lemons              &Gwwow&0  Watermelons
  
-Tropical river crops (partially cleared jungle near river):
+Tropical river crops (fertile soil near river):
  &G||||&0  Sugarcane
 
 Newbie island crops:
  &G@@@@&0  Lettuce             &goooo&0  Calabash gourds
+
+Flower crops:
+ &Yo&A:&Yo&A:&0  Temperate           &OlL&ClL  Arid                 &A^&G|&V`&G|&0  Tropical
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 Make sure you claim all your map tiles that have crops as unclaimed crops may
@@ -914,6 +994,20 @@ When a building says it must be built facing "flat-terrain", this refers to
 most regular land tiles, including plains, forest, desert, crops, and roads.
 
 Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
+#
+FLYING FLIGHT
+
+The FLYING affect means your character can move through the air, albeit at a
+limited height. Flight greatly reduces the amount of effort it takes to move;
+however, it will still cost more to fly over a mountain than flat land.
+
+Flying will allow you to pass over normal barriers such as walls. Some hostile
+creatures, such as sharks in the ocean, will not appear if you're flying.
+
+Flying also allows you to see over blocked terrain that's at the same elevation
+as you are.
+
+See also: FLY, LAND
 #
 GIMMICK "COMBAT GIMMICK" "FIGHT GIMMICK" "INTERACTIVE FIGHT"
 
@@ -965,6 +1059,16 @@ A superior hammer will forge twice as fast.
 
 See also: BASIC CRAFTS, FORGE
 #
+HASTE "HASTE AFFECT"
+
+The HASTE affect speeds up a person so they attack faster in combat and perform
+ordinary chores at a higher speed.
+
+This affect may come from various places, such as abilities like Hasten or from
+potions. Different sources of HASTE do not stack.
+
+See also: HASTEN
+#
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
@@ -974,6 +1078,19 @@ health, and you can enchant your gear to get even more.
 If you're knocked out with 0 health, you will die without assistance.
 
 See also: DEATH, ENDURANCE
+#
+HIDDEN HIDING
+
+A HIDDEN character doesn't appear when other characters type 'look' in the
+room, but can generally still be targeted by commands.
+
+Most things that hide your character will be broken if you type any normal game
+command -- or even just pressing return. You must remain very still to avoid
+becoming visible. Only rare commands like 'pickpocket' will keep you hidden.
+
+Find hidden characters using the 'search' command.
+
+See also: HIDE, SEARCH
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 
@@ -1048,10 +1165,25 @@ through MSDP.
 See also: BLOOD, EAT, MSDP, PROMPT, REGENS, SATED THIRST, SLEEP, 
    STATUS MESSAGES, TIME, UNNATURAL THIRST
 #
+IMMOBILIZE IMMOBILIZED IMMOBILE
+
+The IMMOBILIZED affect, which appears on some spells and effects, prevents an
+affected character from moving or fleeing.
+
+Additionally, during ranged combat, an immobilized person cannot close the
+distance to switch from ranged to melee combat.
+#
+IMMUNE-WHERE IMMUNEWHERE "IMMUNE WHERE" "IMMUNE TO WHERE" !WHERE
+
+The IMMUNE-WHERE flag prevents a person from showing up on the 'where' command.
+
+See also: WHERE
+#
 INFRA INFRAVISION
 
 The INFRA affect, which appears on some spells and items, allows a character
-perfect night vision.
+perfect night vision. This includes the ability to see the map clearly at night
+without being limited by the amount of light.
 #
 INSTANCES INSTANTIATION INSTANCING
 
@@ -1107,33 +1239,32 @@ Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
 You have three different levels.
 
-Skill level: This level is determined by your top 3 skills, and is currently
-   capped at 100. You only reach that level when you have two skills at 100
-   and one skill at 75. You can see your skill level by typing "skills", or
-   in parentheses on your "score". Skill levels are grouped into three ranges:
-   Basic (up to 50), Specialty (up to 75), and Class (up to 100).
+Skill level: Rated 1 to 100. This level is determined by your top 3 skills,
+   with a maximum of 100, which you reach when you have two skills at 100 and
+   one skill at 75. You can see your skill level by typing "skills". Skill
+   levels are grouped into three ranges: Basic (up to 50), Specialty (up to
+   75), and Class (up to 100).
 
 Gear level: Your gear level raises your total level to 50 more than the average
    level of the gear you have equipped (except sheathed weapons, clothes, and
-   items in the ranged slot). You can see it by typing "eq". Some item flags
-   which make the item more powerful, such as superior and drop flags, raise
-   the effective levels of items for this purpose.
+   items in the ranged slot). Gear level is shown at the top of the "equipment"
+   command. Superior or hard/group/boss-drop items contribute more to this.
 
 Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
-Levels for mobs and items are rounded up to the next 5 (e.g. 73 to 75, 109 to
+Highest level: Your highest-ever composite level is used for determining the
+   reward level for special events and for which items you can equip. You can
+   equip items up to 25 levels above you (50 for BoP items) once you hit level
+   100. Bellow 100, items must be in the same level range as you (1-50, 50-75,
+   75-100).
+
+Levels for mobs and items are rounded up to the next 5 (e.g. 71 to 75, 109 to
 110).
 
-Note: Until level 100, you must be in the same level range as an item
-   (1-50, 50-75, 75-100, or 100+) or higher to equip it. After level 100, you
-   can't use gear that's more than 25 levels above you (50 for BoP items). Your
-   highest recent level is used, so you should still be able to remove all your
-   gear and re-equip it.
-
-See also: ROLE, SCALING, SYNERGY ABILITY
-Immortals see also: ACCESS LEVEL
+See also: EVENTS, ROLE, SCALING, SYNERGY ABILITY
+Immortals see also: ACCESS LEVEL, LEVELS COMMAND
 #
 "LEVEL COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"
 
@@ -1153,6 +1284,18 @@ a level difference. The colors are:
 
 See also: COLORS, CONSIDER, IDENTIFY, NEARBY, QUEST
 #
+"LIMITED CROWD CONTROL" "LIMIT CROWD CONTROL" "CROWN CONTROL" CROWN-CONTROL
+
+The term "crowd control" refers to abilities that can reduce the number of
+enemies hitting you. For example, "sap" stuns someone for a while, giving you
+time to deal with other NPCs in the room.
+
+When an ability says "limited crowd control", this means you can only use the
+ability on 1 person at a time. For example, if you sap a second mob in the same
+room, the first one will un-stun.
+
+See also: SAP
+#
 LINK LINKDEAD
 
 A lot of players have problems with their links to the game. This can be very
@@ -1161,6 +1304,13 @@ linkdead, your character will idle out of the game faster. But until that
 happens, you'll be stuck where you were.
 
 Do not try to get out of a fight by breaking link. You will likely still die.
+#
+LORE "PLAYER LORE" "CHARACTER LORE" "MORTAL LORE"
+
+Lore is shown on the 'whois' command. It encompasses the major milestones and
+accomplishments the character has achieved.
+
+See also: WHOIS
 #
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
@@ -1205,6 +1355,13 @@ maximum distance, which is based on the size of the world map.
 You must have Navigation to do this.
 
 See also: SCAN, LOOK, MAP
+#
+MASK-AFFECTS MASKAFFECTS "MASK AFFECTS"
+
+The MASK-AFFECTS affect prevents others from seeing what's affecting you with
+the 'affects' command.
+
+See also: SOULMASK
 #
 MOON MOONS
 
@@ -1330,8 +1487,9 @@ This command displays various statistics about this EmpireMUD.
 
 Options:
  configs: Shows how the game is configured.
- empires: Shows averages for the numbers used to compute empire scores.
- time: Shows time left until events such as the next daily cycle.
+ empires: Averages for the numbers used to compute empire scores.
+ time: Time left until events such as the next daily cycle.
+ world: Stats on empires and players.
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
 
@@ -1342,6 +1500,21 @@ are offline.
 See the POLICY command for detailed rules on multiplaying and alts.
 
 See also: ALTERNATE
+#
+NAWS "NEGOTIATE ABOUT WINDOW SIZE"
+
+Some MUD clients support the NAWS feature, which stands for Negotiate About
+Window Size. This lets the client send its display size to the MUD, and allows
+the MUD to format some things to fit it.
+
+If you enable NAWS in your client, you may need to disconnect and reconnect for
+the MUD to recognize it.
+
+If you have a NAWS-enabled client, you can use 'mapsize auto' to get the best
+map size for your window. This only applies to the ascii map; it won't be very
+useful for screenreader users.
+
+See also: MAPSIZE
 #
 NEARBY
 
@@ -1389,6 +1562,30 @@ When you found your empire's first city, anything stored on a newbie island is
 automatically transferred there as a courtesy.
 
 See also: INFO, GETTING STARTED
+#
+NO-DISARM NODISARM !DISARM "NO DISARM"
+
+The NO-DISARM affect prevents your weapon from being disarmed.
+
+See also: DISARM
+#
+NO-DRINK-BLOOD NODRINKBLOOD !DRINK-BLOOD "NO DRINK BLOOD"
+
+The NO-DRINK-BLOOD affect prevents a character from being bitten or sired by
+vampires.
+#
+NO-SPEND-BLOOD NOSPENDBLOOD !BLOOD !SPEND-BLOOD "NO SPEND BLOOD"
+
+The NO-SPEND-BLOOD affect prevents a character from using any ability that
+requires them to spend blood points.
+
+See also: VAMPIRE
+#
+NO-MORPH NOMORPH !MORPH "NO MORPH"
+
+The NO-MORPH affect prevents you from morphing or un-morphing.
+
+See also: MORPH
 #
 OVEN OVENS
 
@@ -1478,6 +1675,24 @@ inventory and gear.
 You can identify items to see which quest they belong to.
 
 See also: IDENTIFY
+#
+"RANGED COMBAT" RANGED
+
+Ranged combat in EmpireMUD is limited. To use it, you must equip a bow (or
+similar item) in your "ranged" equipment slot. This is done with the "hold"
+command. Begin combat with 'shoot' or with a ranged ability.
+
+Ranged combat is usually brief. Your target will run toward you to engage in
+melee combat; you will automatically switch to melee when they reach you. You
+can prolong ranged combat by immobilizing your target.
+
+If you shoot someone who also has a ranged weapon, or if they're fighting
+someone else, you can stay at range indefinitely. You can manually cancel
+ranged combat by typing 'approach'.
+
+Use the 'use' command to set a default arrow (or other ammo) type.
+
+See also: APPROACH, HOLD, IMMOBILIZED, SHOOT, USE
 #
 REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION" MANA-REGEN MOVE-REGEN
 
@@ -1702,7 +1917,7 @@ Example:
 Immortals may also:  /recase <channel> <new capitalization>
                      /echo <channel> <text>  (this requires the GECHO grant)
 
-See also: CHANNELS
+See also: CHANNELS, RECOLOR
 #
 SPEAR
 
@@ -1726,6 +1941,38 @@ proportionally.
 
 See also: SCORE, WITS, HASTEN, SLOW
 #
+STOLEN "STOLEN ITEMS" "STOLEN OBJECTS" (STOLEN)
+
+Items are marked with a (stolen) tag for 30 minutes after you steal them from
+another empire. These items must remain in your inventory until the timer
+expires and the (stolen) tag disappears. You cannot quit during this period.
+
+If you die or are logged out of the game for being idle too long, any stolen
+items are automatically returned.
+
+There are many things you cannot do to an item while it has the (stolen) tag:
+ - butcher
+ - chip
+ - combine
+ - craft (including build, forge, smelt, etc)
+ - douse
+ - drop (exception: may be dropped on the original owner's land)
+ - eat
+ - give (exception: may be given to the original owner)
+ - identify (in certain rare cases)
+ - light
+ - mint
+ - put
+ - rework
+ - saw
+ - scrape
+ - seed
+ - separate
+ - skin
+ - tan
+
+See also: STEAL
+#
 STRENGTH STR
 
 Strength (physical attribute)
@@ -1748,22 +1995,26 @@ When you chop down a forest, you are usually left with a field of stumps. If
 left alone, they will regrow into a copse, and can be chopped down for
 saplings. Given time, they will regrow into full-size trees again.
 
-You can build without removing stumps, but most other uses will require that
-you burn them. Try 'burn stumps' to remove them.
+You can usually build without removing stumps, but most other uses will require
+that you burn them. Try 'burn stumps' to remove them.
 
 See also: BURN, LIGHTER
 #
-STUN STUNNED "STUN IMMUNITY"
+STUN STUNNED "STUN IMMUNITY" NO-STUN NOSTUN !STUN "NO STUN" HARD-STUNNED HARDSTUNNED "HARD STUNNED"
 
 A character who is stunned, for instance by the Bash ability, cannot type
-commands or attack. Stuns are usually brief, and when they expire, you become
+commands or attack. Stuns are usually brief and when they expire, you become
 temporarily immune to other stuns.
 
 There is also a "stunned" condition for people who are reduced to 0 health.
 Characters will normally recover from this through normal regeneration.
 
-Note: Some scripting NPCs can stun characters even while they have stun
-immunity. This is part of the combat script.
+If you are "hard-stunned", this version ignores stun immunity, and won't cause
+stun immunity when it wears off. This is generally used by scripted game
+content rather than player abilities. Some scripted NPCs can also stun
+characters even while they have stun immunity.
+
+See also: BASH
 #
 SUN SUNRISE SUNSET DAY
 
@@ -1778,7 +2029,7 @@ off sunrise and sunset messages.
 You can check the current time of day with the "time" command, which will also
 tell you whether it's daytime or nighttime.
 
-See also: PROMPT, STATUS MESSAGES, TIME
+See also: RECOLOR, PROMPT, STATUS MESSAGES, TIME
 #
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
@@ -1824,6 +2075,8 @@ based on your opponent's Dodge rating. You can compute the "hit cap" -- the
 point at which you'll hit 100% of the time -- based on the level of the mob
 you're fighting.
 
+View your hit cap against an NPC using the 'consider' command.
+
 Hit cap:
 - Start with the mob's level, minus 50 (not less than 0)
 - Add 10% of the mob's level
@@ -1833,7 +2086,7 @@ Hit cap:
 - Add 100 to the total
 - Add +5 per Dexterity the mob has more than you
 
-See also: AFFECTS, DODGE, SCORE
+See also: AFFECTS, CONSIDER, DODGE, SCORE
 #
 TRANSPORTATION
 
@@ -1892,11 +2145,31 @@ if you equip a tool like an axe that would apply stats if it were in the
 
 See also: USE
 #
-UNSTUCK
+"UNIT OF WATER" "UNITS OF WATER" "UNIT OF LIQUID" "UNITS OF LIQUID" UNIT UNITS LIQUID LIQUIDS WATER
+
+The capacity of a drink container, such as a canteen or gourd bottle, is rated
+in "units" of liquid. You can see how many units of liquid are inside using the
+"identify" command.
+
+Each type of liquid is different. Examples of the value of 1 unit:
+ water: 3 hours of thirst
+ milk: 2 hours of hunger, 2 hours of thirst
+ ale: 1 hour of hunger, 1 hour of thirst, drunk for 2 hours
+
+See also: DRINK, IDENTIFY
+#
+UNSTUCK STUCK
 
 You gain the 'unstuck' effect if you're inside a building and try to leave it,
 but the entrance is water and you have no ability to swim or fly. This short
 effect will get you past the water.
+
+Additional ways to get unstuck from somewhere:
+- Request help from a game administrator
+- Toggle autorecall on and then log out for a full hour
+- Use a spell or trinket to teleport home
+
+See also: TOGGLE AUTORECALL
 #
 VEHICLE VEHICLES VEH
 
@@ -1945,6 +2218,10 @@ around you. This will also show your current maximum range.
 Example:
   > where
   > where dragon
+
+Immortals see a vastly expanded version of this command, but may use the mortal
+version by giving "-mortal" or "-m" as the first argument, such as:
+  > where -m bear
 
 See also: MASTER TRACKER, NO TRACE, UNSEEN PASSING, WHERE RANGE
 #

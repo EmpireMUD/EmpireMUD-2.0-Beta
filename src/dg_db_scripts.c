@@ -62,10 +62,12 @@ struct cmdlist_element *compile_command_list(char *input) {
 
 
 void parse_trigger(FILE *trig_f, int nr) {
-	int t[2], k, attach_type;
+	int t[2], k, attach_type, iter, num_links;
 	char line[256], *cmds, *s, flags[256], errors[MAX_INPUT_LENGTH];
+	size_t length;
 	struct cmdlist_element *cle;
 	trig_data *trig;
+	struct trig_link *link;
 
 	CREATE(trig, trig_data, 1);
 	trig->vnum = nr;
@@ -76,10 +78,28 @@ void parse_trigger(FILE *trig_f, int nr) {
 	trig->name = fread_string(trig_f, errors);
 
 	get_line(trig_f, line);
-	k = sscanf(line, "%d %s %d", &attach_type, flags, t);
+	k = sscanf(line, "%d %s %d %d", &attach_type, flags, &t[0], &num_links);
 	trig->attach_type = (byte)attach_type;
 	trig->trigger_type = asciiflag_conv(flags);
-	trig->narg = (k == 3) ? t[0] : 0;
+	trig->narg = (k >= 3) ? t[0] : 0;
+	
+	// load links? number of links MUST be specified
+	if (k >= 4) {
+		for (iter = 0; iter < num_links; ++iter) {
+			get_line(trig_f, line);
+			if (*line == 'L' && sscanf(line, "L %s %d", flags, &t[0])) {
+				CREATE(link, struct trig_link, 1);
+				link->type = asciiflag_conv(flags);
+				link->vnum = t[0];
+				LL_APPEND(GET_TRIG_LINKS(trig), link);
+			}
+			else {
+				log("SYSERR: Expecting trigger link in trig %d, got: %s", nr, line);
+				exit(1);
+			}
+		}
+		LL_SORT(GET_TRIG_LINKS(trig), sort_trigger_links);
+	}
 
 	trig->arglist = fread_string(trig_f, errors);
 
@@ -88,11 +108,26 @@ void parse_trigger(FILE *trig_f, int nr) {
 	CREATE(trig->cmdlist, struct cmdlist_element, 1);
 	trig->cmdlist->cmd = strdup(strtok(s, "\n\r"));
 	cle = trig->cmdlist;
-
+	
+	// ensure length safety
+	length = strlen(cle->cmd) + 2;	// add 2 for crlf
+	if (length >= MAX_CMD_LENGTH) {
+		log("SCRIPT: Trig %d first line is too long; truncating", nr);
+		free(cmds);
+		return;
+	}
+	
+	// one line at a time
 	while ((s = strtok(NULL, "\n\r"))) {
-		CREATE(cle->next, struct cmdlist_element, 1);
-		cle = cle->next;
-		cle->cmd = strdup(s);
+		length += strlen(s) + 2;	// add 2 for crlf
+		if (length >= MAX_CMD_LENGTH) {
+			log("SCRIPT: Trig %d too long, ignoring line: %s", nr, s);
+		}
+		else {
+			CREATE(cle->next, struct cmdlist_element, 1);
+			cle = cle->next;
+			cle->cmd = strdup(s);
+		}
 	}
 
 	free(cmds);

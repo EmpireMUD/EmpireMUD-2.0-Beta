@@ -24,7 +24,7 @@ S
 #11932
 cough~
 cough~
-0 5 0
+c 5 0
 L
 18 11932 0 1 -
 M0
@@ -43,6 +43,10 @@ M6
 You let out a cough inside your coat.~
 M7
 There's a cough from $n's midsection.~
+M8
+You cough silently.~
+M9
+$n coughs silently.~
 S
 #11983
 bow~
@@ -70,7 +74,7 @@ S
 #11984
 cheer~
 cheer~
-0 5 0
+c 5 0
 L
 18 11984 0 1 -
 M0
@@ -89,6 +93,10 @@ M6
 You let out an unenthused cheer.~
 M7
 $n lets out an unenthused cheer.~
+M8
+You give a silent, stoic cheer.~
+M9
+$n gives a silent, stoic cheer.~
 S
 #11985
 comfort~
@@ -139,7 +147,7 @@ S
 #11987
 greet~
 greet~
-0 5 5
+c 5 5
 L
 18 11987 0 1 -
 M0

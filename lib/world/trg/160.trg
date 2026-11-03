@@ -1,6 +1,7 @@
 #16000
 hidden necro gob~
-2 g 100
+2 g 100 1
+L o 18
 ~
 wait 1
 if (%actor.ability(Search)%)
@@ -13,13 +14,10 @@ detach 16000 %self.id%
 ~
 #16001
 necro summon 1~
-0 l 75
+0 l 75 1
+L b 16001
 ~
-* No script
-if %self.cooldown(16001)%
-  halt
-end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
@@ -35,12 +33,10 @@ detach 16001 %self.id%
 ~
 #16002
 necro summon 2~
-0 l 50
+0 l 50 1
+L b 16002
 ~
-if %self.cooldown(16002)%
-  halt
-end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
@@ -57,12 +53,10 @@ detach 16002 %self.id%
 ~
 #16003
 necro summon 3~
-0 l 25
+0 l 25 1
+L b 16003
 ~
-if %self.cooldown(16003)%
-  halt
-end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
@@ -72,7 +66,11 @@ detach 16003 %self.id%
 ~
 #16004
 nature combat~
-0 k 30
+0 k 30 4
+L o 15
+L o 121
+L o 125
+L w 3012
 ~
 if !%self.affect(3012)%
   eartharmor
@@ -84,7 +82,7 @@ end
 ~
 #16005
 bone dust usage~
-1 c 2
+1 c 2 0
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -104,7 +102,7 @@ end
 ~
 #16006
 undead blocking~
-0 s 100
+0 s 100 0
 ~
 if %actor.is_pc%
   if %actor.can_see(%self%)%
@@ -117,7 +115,10 @@ end
 ~
 #16007
 skeletal combat~
-0 k 30
+0 k 30 3
+L o 17
+L o 96
+L w 3048
 ~
 if !%actor.affect(3048)%
   terrify
@@ -127,7 +128,12 @@ end
 ~
 #16008
 nature buff up~
-0 k 25
+0 k 25 5
+L o 109
+L o 114
+L o 120
+L w 3021
+L w 3023
 ~
 if !%self.affect(3021)%
   counterspell
@@ -139,7 +145,17 @@ end
 ~
 #16009
 transformative tooth~
-1 c 2
+1 c 2 10
+L b 16008
+L b 16009
+L b 16010
+L b 16011
+L b 16012
+L b 16013
+L b 16014
+L b 16015
+L b 16016
+L b 16017
 implant~
 if !%arg%
   %send% %actor% What would you like to implant with the tooth?
@@ -223,13 +239,16 @@ end
 ~
 #16010
 mutant mounts die~
-0 f 100
+0 f 100 0
 ~
 %echo% As ~%self% dies, it crumbles and returned to the earth.
 ~
 #16011
 necrogoblin trigger reattach~
-0 h 100
+0 h 100 3
+L f 16001
+L f 16002
+L f 16003
 ~
 if %self.fighting%
   halt
@@ -246,13 +265,14 @@ end
 ~
 #16012
 necrogoblin adventure removal~
-0 f 100
+0 f 100 0
 ~
 %adventurecomplete%
 ~
 #16020
 no drop me~
-1 h 100
+1 h 100 1
+L c 16021
 ~
 if %command% == drop || %command% == put
   return 0
@@ -265,7 +285,9 @@ end
 ~
 #16021
 entering the adventure~
-1 c 4
+1 c 4 2
+L c 16021
+L t 16039
 enter~
 if %actor.obj_target(%arg%)% == %self%
   if %actor.completed_quest_instance(16039)%
@@ -287,7 +309,8 @@ end
 ~
 #16022
 drops blood disc~
-0 f 100
+0 f 100 1
+L c 16021
 ~
 if !%actor.inventory(16021)%
   %load% obj 16021 %actor% inv
@@ -295,22 +318,71 @@ if !%actor.inventory(16021)%
 else
   %send% %actor% The solidified disc of blood you carry pulses in response to the death, but there is no change.
 end
+set control %instance.mob(16041)%
+if %control.varexists(PlayersHunted)%
+  set id %actor.id%
+  set PlayersHunted %control.PlayersHunted%
+  while %PlayersHunted%
+    if %id% == %PlayersHunted.car%
+      halt
+    end
+    set PlayersHunted %PlayersHunted.cdr%
+  done
+  set PlayersHunted %control.PlayersHunted%
+end
+set PlayersHunted %PlayersHunted% %id%
+remote PlayersHunted %control.id%
 ~
 #16023
-memorise and taunt~
-0 s 50
+city husking~
+0 z 100 0
 ~
+%echoaround% %actor% ~%self% drains the blood from ~%actor% and leaves a husk on the ground.
+%heal% %self% health 10
 if %actor.is_pc%
-  Mremember %actor%
-  %send% %actor% %self.firstname% the vampire tells you, 'You won't get far! Sooner or later, I will kill you!'
-else
-  halt
+  set id %actor.id%
+  %send% %actor% As ~%self% drains the last drop of blood from your body, &%self% drops the dried husk to the ground.
+  if !%self.room.people(16042)%
+    %load% mob 16042
+  end
+  set ControlId %self.room.people(16042)%
+  remote id %ControlId%
+end
+if %actor.is_npc%
+  wait 1
+  if %actor.mob_flagged(no-corpse)%
+    halt
+  end
+  %load% obj 16032 room
+  set husk %self.room.contents(16032)%
+  %echo% the husk variable targets @%husk%. raw %husk%.
+  set corpse %self.room.contents(1000)%
+  if %corpse% && %husk%
+    while %corpse.contents%
+      %echo% moving @%corpse.contents%
+      %teleport% %corpse.contents% %husk%
+    done
+    %echo% finished
+    %purge% %corpse%
+  end
 end
 ~
 #16024
 kill the remembered~
-0 o 100
+0 o 100 0
 ~
+set person %self.room.people%
+while %person%
+  if %person.mob_flagged(cityguard)%
+    %send% %actor% The vampire growls at you and says, "You won't always be protected. Eventually I'll catch you alone."
+    mmove
+    mmove
+    mmove
+    mmove
+    halt
+  end
+  set person %person.next_in_room%
+done
 %send% %actor% The vampire growls at you and says, "I told you I'd catch you eventually. Now, you die!"
 mkill %actor%
 wait 1 sec
@@ -318,36 +390,70 @@ mforget %actor%
 ~
 #16025
 hunting memory~
-0 s 90
+0 s 100 0
 ~
-if %actor.is_pc%
-  Mremember %actor%
-  %send% %actor% A vampire scout tells you, 'You won't get far! Sooner or later, I will kill you!'
-  wait 2 sec
-  mhunt %actor%
+%echo% Debug: it fired.
+if !%actor.is_pc%
+  halt
+end
+%echo% debug: it was a player, not a mob.
+if %actor.level% < 160
+  halt
+end
+%echo% debug: player's level was over 160.
+set control %instance.mob(16041)%
+if %control.varexists(PlayersHunted)%
+  %echo% debug: should be checking the hunted players list now.
+  set PlayerId %control.PlayersHunted%
+  while %PlayerId%
+    %echo% debug: player id is %actor.id% and listed id is %PlayerId.car%.
+    if %PlayerId.car% == %actor.id%
+      halt
+    end
+    set PlayerId %PlayerId.cdr%
+  done
+end
+eval roll %random.10%
+if %self.vnum% == 16022
+  if %roll% < 10
+    %send% %actor% A vampire scout tells you, 'You won't get far! Sooner or later, I will kill you!'
+    Mremember %actor%
+    wait 2 sec
+    set room %self.room%
+    if %room.is_outdoors% && %room.sun% == light
+      halt
+    else
+      mhunt %actor%
+    end
+  end
+else
+  if %roll% < 6
+    %send% %actor% %self.firstname% the vampire tells you, 'You won't get far! Sooner or later, I will kill you!'
+    Mremember %actor%
+  end
 end
 ~
 #16026
 wandering vamps~
-0 n 100
+0 n 100 0
 ~
-%echo% ~%self% appears from the shadows and flashes out through the arch.
-mgoto %instance.location%
-mmove
-mmove
-mmove
-mmove
-mmove
-mmove
-mmove
-mmove
-mmove
-mmove
-detach 16026 %self.id%
+set vnum %self.vnum%
+if %vnum% >= 16020 && %vnum% <= 16022
+  %echo% ~%self% appears from the shadows and flashes out through the arch.
+  mgoto %instance.location%
+  eval move_count %random.5% * 3
+  while %move_count%
+    mmove
+    eval move_count %move_count% - 1
+  done
+elseif %vnum% == 16025
+  eval random_room %random.8% + 16021
+  mgoto i%random_room%
+end
 ~
 #16027
 purge blood vial~
-1 s 100
+1 s 100 0
 ~
 wait 1
 if %self.val1% == 0
@@ -359,7 +465,7 @@ end
 ~
 #16028
 tripping in the cave~
-2 g 70
+2 g 70 0
 ~
 if !%actor.is_flying% && %actor.is_pc%
   %echoaround% %actor% ~%actor% trips on the uneven ground and hits the dirt.
@@ -369,29 +475,33 @@ end
 ~
 #16029
 illusion magic~
-0 k 33
+0 k 33 0
 ~
+set dead_char %random.enemy%
+set verify_target %dead_char.id%
 switch %random.5%
   case 1
-    set dead_char %random.enemy%
     %send% %dead_char% A lightning bolt comes down from the roof and sends your rings flying.
     %echoaround% %dead_char% A lightningbolt strikes ~%dead_char% and blows ^%dead_char% rings off ^%dead_char% hands!
   break
   case 2
     %echo% All of the exits brick over as the vampire smirks.
     say This chamber will be your tomb.
+    wait 3 s
+    %echo% ~%self% seems to lose concentration and the exits all return to normal.
   break
   case 3
-    set dead_char %random.enemy%
     dg_affect %dead_char% stoned on 180
     %send% %dead_char% A flash from the illusionist's hand forces you to shut your eyes and when you open them again, the world doesn't quite look the same.
     %echoaround% %dead_char% A flash of light strikes ~%dead_char% with no visible affect.
   break
   case 4
-    set dead_char %random.enemy%
     %send% %dead_char% A blade spins out of no where and carves a line across your throat.
     %echoaround% %dead_char% A blade comes flying through the air and opens |%dead_char% throat.
     wait 3 sec
+    if %verify_target% != %actor.id%
+      halt
+    end
     %send% %dead_char% Blood sprays all down your front.
     %echoaround% %dead_char% Blood sprays all down ^%dead_char% front.
     wait 2 sec
@@ -407,7 +517,9 @@ done
 ~
 #16030
 illusionist's death~
-0 f 100
+0 f 100 2
+L f 16031
+L y 16020
 ~
 attach 16031 %self.room.id%
 %echo% As ~%self% dies all of ^%self% illusions fade away.
@@ -425,7 +537,15 @@ done
 ~
 #16031
 remove the illusionist's exits~
-2 f 100
+2 f 100 8
+L j 16022
+L j 16023
+L j 16024
+L j 16025
+L j 16026
+L j 16027
+L j 16028
+L j 16029
 ~
 %echo% The exit leading down to the second level fades as though it were never there.
 eval newroom %room.template% + 8
@@ -436,39 +556,138 @@ unset newroom
 detach 16031 %room.id%
 ~
 #16032
-illusionist in random room~
-0 n 100
+alchemist healing~
+0 l 30 8
+L j 16022
+L j 16023
+L j 16024
+L j 16025
+L j 16026
+L j 16027
+L j 16028
+L j 16029
 ~
-eval random_room %random.8% + 16021
-mgoto i%random_room%
+if %self.cooldown(16032)%
+  halt
+end
+nop %self.set_cooldown(16032, 30)%
+%echo% ~%self% grabs a large beaker of blood and chugs it down!
+set chance %random.100%
+%echo% %chance% now
+if %chance% <= 50
+  eval healing %random.11% * 5 + 45
+  set healing health %healing%
+elseif %chance% <= 85
+  eval healing %random.15% * 5 + 75
+  set healing health %healing%
+elseif %chance% <= 98
+  set healing debuffs
+elseif %chance% <= 100
+  set healing health 500
+end
+%heal% %self% %healing%
 ~
 #16033
 vampire blocking~
-0 s 100
+0 s 100 0
 ~
+if %actor.is_npc%
+  halt
+end
 set room_var %self.room%
 eval move_dir %%room_var.%direction%(room)%%
-if %actor.vampire%
-  if !%move_dir% || %move_dir.template% < %room_var.template%
-    %echo% ~%self% says, "By all means ~%actor%, go with my blessing."
-  else
-    %echo% ~%self% says, "I'm sorry ~%actor%, but even being a fellow vampire, I may not let you pass."
+if %self.vnum% == 16031
+  if %actor.vampire%
+    say Enslaved or not, I refuse to let your kind live. You won't be leaving this chamber alive %actor.name%!
     return 0
+  else
+    if !%move_dir% || %move_dir.template% < %room_var.template%
+      say please %actor.name%, take me with you!
+    else
+      set check %actor.name%
+      if %self.varexists(MayPass)%
+        set MayPass %self.MayPass%
+        while %MayPass%
+          if %check% == %MayPass.car%
+            say You've proven yourself %actor.name%, you may pass.
+            return 1
+            halt
+          end
+          set MayPass %MayPass.cdr%
+        done
+      elseif %self.varexists(failed)%
+        set failed %self.failed%
+        while %failed%
+          if %check% == %failed.car%
+            say You failed to beat me in a contest of the bow %actor.name%, you must kill me to pass.
+            return 0
+            halt
+          end
+          set failed %failed.cdr%
+        done
+      else
+        say Perhaps if you beat me in an archery challenge I could let you pass %actor.name%.
+        if %actor.ability(archery)%
+          %send% %actor% (type: 'challenge archery')
+        else
+          %send% %actor% (You need the archery ability to challenge ~%self% to an archery contest.)
+        end
+        return 0
+      end
+    end
   end
 else
-  %echo% ~%self% says, "Good try ~%actor%, but you won't be making it out of this chamber alive."
-  return 0
+  if %actor.vampire%
+    if !%move_dir% || %move_dir.template% < %room_var.template%
+      say By all means %actor.name%, go with my blessing.
+    else
+      say I'm sorry %actor.name%, but even being a fellow vampire, I may not let you pass.
+      return 0
+    end
+  else
+    say Good try %actor.name%, but you won't be making it out of this chamber alive.
+    return 0
+  end
 end
 ~
 #16034
 vampire alchemist combat~
-0 k 0
+0 k 50 0
 ~
-* No script
+if %self.cooldown(16034)%
+  halt
+end
+nop %self.set_cooldown(16034, 20)%
+switch %random.2%
+  case 1
+    %echo% ~%self% begins spraying a mist of blood into the air!
+    wait 2
+    set person %self.room.people%
+    while %person%
+      if %person.vampire()%
+        %send% %person% You begin to feel something is horribly wrong!
+        %dot% #16036 %person% 100 30 poison 2
+      end
+      set person %person.next_in_room%
+    done
+  break
+  case 2
+    %echo% ~%self% smashes a vial on the ground and laughs as a gas cloud begins to spread!
+    wait 2
+    set person %self.room.people%
+    while %person%
+      if !%person.vampire()%
+        %send% %person% You begin to feel something is horribly wrong!
+        %dot% #16036 %person% 100 30 poison 2
+      end
+      set person %person.next_in_room%
+    done
+  break
+done
 ~
 #16035
 tile password set~
-2 f 100
+2 f 100 0
 ~
 if %tile_row% == 5
   %door% %self% north purge
@@ -564,7 +783,8 @@ global step_tile4
 ~
 #16036
 stepping on tiles~
-2 c 0
+2 c 0 1
+L j 16040
 step~
 if !%arg%
   %send% %actor% Which letter tile are you stepping on?
@@ -576,65 +796,124 @@ if !%tile_row%
   set tile_row 1
   global tile_row
 end
-if %tile_row% == 1
-  if %stepped_tile% == c || %stepped_tile% == g || %stepped_tile% == t || %stepped_tile% == v
-    if %step_tile1% == %stepped_tile%
-      %echo% The tile holds and the first row of tiles stops glowing.
-      set tile_row 2
-      global tile_row
+switch %tile_row%
+  case 1
+    if %stepped_tile% == c || %stepped_tile% == g || %stepped_tile% == t || %stepped_tile% == v
+      %echo% The tention mounts as |%actor% foot descends toward the "%stepped_tile%" tile in row %tile_row%...
+      if %step_tile1% == %stepped_tile%
+        %echo% The tile holds and the first row of tiles stops glowing.
+        set tile_row 2
+        global tile_row
+        halt
+      end
+    else
+      %send% %actor% There's no such tile in the first row, try again.
+      return 1
       halt
     end
-  else
-    %send% %actor% There's no such tile in the first row, try again.
-    return 1
-    halt
-  end
-end
-if %tile_row% == 2
-  if %stepped_tile% == a || %stepped_tile% == e || %stepped_tile% == i || %stepped_tile% == l
-    if %step_tile2% == %stepped_tile%
-      %echo% The tile holds and the second row of tiles stops glowing.
-      set tile_row 3
-      global tile_row
+  break
+  case 2
+    if %stepped_tile% == a || %stepped_tile% == e || %stepped_tile% == i || %stepped_tile% == l
+      %echo% The tention mounts as |%actor% foot descends toward the "%stepped_tile%" tile in row %tile_row%...
+      if %step_tile2% == %stepped_tile%
+        %echo% The tile holds and the second row of tiles stops glowing.
+        set tile_row 3
+        global tile_row
+        halt
+      end
+    else
+      %send% %actor% There's no such tile in the second row, try again.
+      return 1
       halt
     end
-  else
-    %send% %actor% There's no such tile in the second row, try again.
-    return 1
-    halt
-  end
-end
-if %tile_row% == 3
-  if %stepped_tile% == a || %stepped_tile% == i || %stepped_tile% == m || %stepped_tile% == n
-    if %step_tile3% == %stepped_tile%
-      %echo% The tile holds and the third row of tiles stops glowing.
-      set tile_row 4
-      global tile_row
+  break
+  case 3
+    if %stepped_tile% == a || %stepped_tile% == i || %stepped_tile% == m || %stepped_tile% == n
+      %echo% The tention mounts as |%actor% foot descends toward the "%stepped_tile%" tile in row %tile_row%...
+      if %step_tile3% == %stepped_tile%
+        %echo% The tile holds and the third row of tiles stops glowing.
+        set tile_row 4
+        global tile_row
+        halt
+      end
+    else
+      %send% %actor% There's no such tile in the third row, try again.
+      return 1
       halt
     end
-  else
-    %send% %actor% There's no such tile in the third row, try again.
-    return 1
-    halt
-  end
-end
-if %tile_row% == 4
-  if %stepped_tile% == d || %stepped_tile% == e || %stepped_tile% == n || %stepped_tile% == p
-    if %step_tile4% == %stepped_tile%
-      %echo% The tile holds and the final row of tiles stops glowing.
-      set tile_row 5
-      global tile_row
-      %door% %self% south room i16040
-      wait 1
-      %echo% As the glow fades the south wall parts.
+  break
+  case 4
+    if %stepped_tile% == d || %stepped_tile% == e || %stepped_tile% == n || %stepped_tile% == p
+      %echo% The tention mounts as |%actor% foot descends toward the "%stepped_tile%" tile in row %tile_row%...
+      if %step_tile4% == %stepped_tile%
+        %echo% The tile holds and the final row of tiles stops glowing.
+        set tile_row 5
+        global tile_row
+        %door% %self% south room i16040
+        wait 1
+        %echo% As the glow fades the south wall parts.
+        halt
+      end
+    else
+      %send% %actor% There's no such tile in the fourth row, try again.
+      return 1
       halt
     end
-  else
-    %send% %actor% There's no such tile in the fourth row, try again.
-    return 1
+  break
+  case 5
+    %send% %actor% The tiles are no longer glowing, you can just walk across them.
     halt
-  end
-end
-%echo% domino forgot a fail message, but you didn't get it right, try again.
+  break
+done
+switch %random.4%
+  case 1
+    %send% %actor% As you step on the tile, a sudden shock rushes through your body!
+    %echoaround% %actor% As ~%self% steps on a tile, &%actor% starts to convulse!
+    eval shocking %random.6% * 20
+    %damage% %actor% %shocking% direct
+  break
+  case 2
+    %echo% The click of the tile depressing into the floor is drownd out by a sudden explosion as a fireball hits everyone!
+    eval fireball %random.5% * 12 + 60
+    %aoe% %fireball% fire
+  break
+  case 3
+    %echo% A gas cloud is released!
+    wait 2
+    set person %self.people%
+    while %person%
+      if !%person.vampire()%
+        if %person.is_npc%
+          set poison 500
+        else
+          set poison 90
+        end
+        %send% %person% You start choking on the gas!
+        %dot% #16036 %person% %poison% 30 poison 5
+      end
+      set person %person.next_in_room%
+    done
+  break
+  case 4
+    set blades 3
+    while %blades%
+      if %blades% == 1
+        set dir north
+      elseif %blades% == 2
+        set dir ceiling
+      else
+        set dir west
+      end
+      set target %random.char%
+      %echo% A blade comes flying from the %dir% and hits ~%target%!
+      set crit %random.20%
+      %damage% %target% 100 physical
+      if %crit% == 20
+        %dot% %target% 15 75 physical 2
+      end
+      eval blades %blades% - 1
+    done
+  break
+done
 ~
 $

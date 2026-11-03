@@ -1,0 +1,78 @@
+#12200
+Ribbon Serragon~
+Paul Clarke~
+   You've stumbled across a massive pit yawning in the forest floor -- too
+smooth and too deep to be any ordinary sinkhole. You've heard that livestock
+from nearby farms have gone missing, dragged off in the night with only long
+furrows in the soil to mark the struggle. Now, even townsfolk have disappeared,
+their tracks leading toward the same stretch of woods. The locals whisper
+uneasily, their eyes darting whenever the subject is raised.
+   Some claim the pit is the lair of a monstrous serpent, others say it's the
+work of a dragon that burrows instead of flying. The boldest insist it is the
+dwelling of the ribbon serragon, a whirling mass of streamers large enough to
+eat a bull. Around the tavern tables, rumors stretch further: that the
+creatures grind whole trees to splinters with their scales, that their blood
+glows like sunlight in a pond. Most dismiss such tales as fancy... but no one
+can deny the growing list of names gone missing, or the sound of earth
+shifting at night as if something vast is moving just beneath the roots.
+~
+12200 12229 25-125
+10 0 gknp 0
+L
+6 0
+100 -1 -1 -1
+-1 0 0
+L
+4 a
+12200 12201 12201 -1
+-1 d 0
+L
+5 0
+21600 -1 -1 -1
+-1 0 0
+S
+#12250
+Elephant Stomping Grounds~
+Paul Clarke~
+   A herd of elephants has taken up residence and they're determined to turn
+this area into their new stomping grounds. Devastation abounds as they rip
+trees up by the roots and eat every stray bush and fern to make room for new
+grasslands.
+~
+12250 12299 100-150
+2 0 dlmnp 0
+L
+1 e
+12250 -1 -1 -1
+9 bg bg
+L
+1 e
+12250 -1 -1 -1
+9 bg bg
+L
+1 e
+12250 -1 -1 -1
+9 bg bg
+L
+1 0
+12250 -1 -1 -1
+9 bg bg
+L
+6 0
+100 -1 -1 -1
+-1 0 0
+L
+5 0
+43200 -1 -1 -1
+-1 0 0
+L
+19 0
+-1 -1 -1 -1
+-1 l 0
+L
+20 0
+-1 -1 -1 -1
+-1 jk 0
+T 12251
+S
+$

@@ -149,12 +149,14 @@ struct olc_command_data {
 
 
 // olc.c helpers
+void build_trigger_link_page_display(char_data *ch, trig_data *trig, const char *header);
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void show_icons_display(char_data *ch, struct icon_data *list, bool send_output);
 void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_output);
 void show_resource_display(char_data *ch, struct resource_data *list, bool send_output);
 void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_output);
 int find_olc_type(char *name);
+const char *get_name_by_olc_type(bitvector_t type, any_vnum vnum);
 bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);
 char *one_icon_display(char *icon, char *base_color);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);

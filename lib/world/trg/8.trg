@@ -1,6 +1,6 @@
 #803
 Tarnished mirror look~
-1 c 3
+1 c 3 0
 look~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -11,7 +11,8 @@ end
 ~
 #804
 Lantern: Refill with candle using put~
-1 c 2
+1 c 2 1
+L w 851
 put~
 set max_light 48
 * basic args (pass back to normal 'put')
@@ -22,7 +23,7 @@ if !%candle_arg% || !%lantern_arg%
   halt
 elseif %actor.obj_target(%lantern_arg%)% != %self%
   return 0
-  halt  
+  halt
 end
 * will send errors from here, so set return
 return 1
@@ -60,7 +61,7 @@ nop %self.val0(%new_amount%)%
 ~
 #806
 Looking Glass reflection~
-1 c 3
+1 c 3 0
 look~
 if %actor.obj_target(%arg%)% != %self%
   return 0

@@ -33,4 +33,21 @@ anklebiter~
 T0
 Your anklebiter cooldown has ended.~
 S
+#9506
+netted~
+4 0
+0 0 0 0
+T0
+You manage to slip free of the net.~
+T1
+$n slips free of the net.~
+T2
+You're entangled in the net! Maybe you can cut yourself free? (cut net)~
+T3
+$n is entangled in the net!~
+T4
+$e is entangled in a net!~
+T5
+...$e's entangled in a net!~
+S
 $

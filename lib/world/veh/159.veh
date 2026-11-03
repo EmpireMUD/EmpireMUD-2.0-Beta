@@ -1,0 +1,215 @@
+#15900
+shipwreck wreck salvage~
+the shipwreck~
+There's a shipwreck here, half salvaged.~
+   From the wreckage, it appears the ship was going full speed when it hit the
+land. You can see where parts must have landed when they splintered off the
+hull, but most of the ship has been salvaged already, so there isn't a lot left
+to look at.
+~
+~
+uv 19 64 0 0 0 0 0 0 0 -1 0
+E
+hull~
+Very little of the hull is left.
+~
+P
+2
+S
+#15901
+tent ornate blue wavewhisperer's wavewhisperers wave-whisperer's wave-whisperer's whisperer's whisperers~
+the wavewhisperer's tent~
+A rather ornate blue tent stands on the crest of a hill.~
+   Rarely have you seen so rich a blue dye as the one used on this tent; it
+captures the mercurial essence of the sea, which can be a pacific calm one
+minute and a ravaging tsunami the next. The tent seems to be made from canvas,
+or something similar; the stitching is quite small, like goblincraft.
+~
+@.&a/\@.~
+uvwxF 19 4 0 0 0 0 0 1 0 -1 0
+B0
+&a/\~
+B1
+&aA~
+D
+15904 0 0
+P
+2
+S
+#15902
+tent orange reinforced pit crabherd's crabherds crab-herd's crab-herds herd's herds~
+the crabherd's tent~
+A reinforced orange tent covers a shallow pit.~
+   The tent is rather torn and frayed along the base which, you quickly notice,
+has been staked to the ground by dozens of wooden stakes, placed every few
+inches. Around the lower margins, you can see something pressing against the
+canvas -- lots of somethings. And they're moving.
+~
+@.&o/\@.~
+uvwxF 19 4 0 0 0 0 0 1 0 -1 0
+B0
+&o/\~
+B1
+&oA~
+D
+15902 0 0
+P
+2
+S
+#15903
+tent fuchsia small scribe's scribes~
+the scribe's tent~
+A small fuchsia tent stands before you.~
+   The bright fuchsia color of the tent is difficult to miss as it stands like
+a beacon to the raiding party. It isn't very large; you'll be stooped the
+entire time you're inside. Best to take a big breath before you enter, as the
+harsh smoke billowing from the top vent suggests inside will be thick with
+soot.
+~
+@.&m/\@.~
+uvwxF 19 4 0 0 0 0 0 1 0 -1 0
+B0
+&m/\~
+B1
+&mA~
+D
+15903 0 0
+P
+2
+S
+#15906
+tent goblin mess~
+a goblin mess tent~
+There is a goblin mess tent standing here.~
+   The tent stands tall, open on the sides but protected from the weather
+above. Perhaps surprisingly, the area beneath the tent is an orderly collection
+of foods of all types, from canned fruit to smoked meat.
+~
+@.&0MM&?@.~
+hmuwP 19 10 0 0 0 0 0 2 fw -1 0
+B0
+&0MM~
+B1
+&0M~
+C
+75 200
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
+L 0 nopst
+P
+2
+R
+1003 1 5 0
+U
+1 5114
+U
+1 5116
+U
+1 5119
+U
+1 5619
+U
+1 5215
+S
+#15907
+tent large goblin construction~
+a goblin construction tent~
+A large tent stands here, filled with construction material.~
+   The patchwork leather tent stretches wide, holding a great number of
+construction materials from wood to stone, and even some tools. The tent is
+open at the sides, but the top is stitched tight to prevent any of it from
+getting wet.
+~
+@.&0MM&?@.~
+hmuwP 19 10 0 0 0 0 0 4 fw -1 0
+B0
+&0MM~
+B1
+&0M~
+C
+75 200
+I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+L 0 nopst
+P
+2
+R
+1003 1 5 0
+U
+1 5118
+U
+1 5121
+U
+1 5117
+S
+#15918
+dirigible patchwork~
+the patchwork dirigible~
+A patchwork dirigible floats overhead.~
+   Though it looks like it's held together by a lot of leather and a little
+hope, the dirigible actually seems to be floating quite well. A rope ladder
+descends from the side of the basket.
+~
+&t(&g&u-&o-&0&T)~
+dimqt 27 32 200 0 0 1 0 0 0 -1 0
+B0
+&t(&T)~
+B1
+&tO~
+C
+75 200
+D
+15918 0 0
+E
+rope ladder~
+A long rope ladder drapes from the patchwork dirigible.
+~
+K
+3
+$n grabs the rope ladder and climbs up into $V.~
+K
+2
+$n climbs into $V.~
+K
+4
+$n descends the rope ladder out of $V.~
+K
+5
+$n climbs down the rope ladder out of $V.~
+P
+1
+R
+15915 1 5 0
+R
+15916 1 5 0
+R
+15917 1 5 0
+R
+15918 1 5 0
+S
+#15938
+tent hoard goblin great~
+a goblin hoard tent~
+A great goblin hoard tent stands here, gleaming.~
+   The well-appointed tent covers a trove of treasures and unique items, piled
+neatly for all to see. Though it's clearly goblincraft, it's in much better
+condition than most goblin items you come across.
+~
+@.&0MM&?@.~
+hmuwP 19 10 0 0 0 0 0 2 fw -1 0
+B0
+&0MM~
+B1
+&0M~
+C
+75 200
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
+L 0 nopst
+P
+2
+R
+1003 1 5 0
+U
+1 5193
+U
+1 5164
+S
+$

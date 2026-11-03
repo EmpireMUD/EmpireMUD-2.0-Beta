@@ -113,6 +113,13 @@ well-fed pet~
 3 0
 0 0 0 0
 S
+#16654
+winds of winter~
+3 0
+0 0 0 0
+T0
+Your winds of winter cooldown has ended.~
+S
 #16657
 dreidel~
 3 0
@@ -186,5 +193,37 @@ Krampus rage~
 0 0 0 0
 T5
 ...$e seems to be fighting through some serious rage!~
+S
+#16690
+naughty~
+4 0
+0 0 0 0
+T0
+You feel less naughty.~
+T2
+You feel ashamed of how naughty you've been.~
+S
+#16691
+naughty missile burst~
+4 0
+0 0 0 0
+T5
+...$e's firing missiles from $s torso!~
+S
+#16692
+merry massacre~
+4 0
+0 0 0 0
+T5
+...$e's spinning around with sawblades on $s arms!~
+S
+#16693
+jingleshock~
+4 0
+0 0 0 0
+T0
+Your head stops ringing from the jingleshock.~
+T2
+Your head is ringing!~
 S
 $

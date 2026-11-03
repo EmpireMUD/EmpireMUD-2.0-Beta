@@ -1,6 +1,7 @@
 #205
 Bodyguard refresh and cooldown on death~
-0 ft 100
+0 ftA 100 1
+L w 2030
 ~
 * partial copy of 9803
 * This script deletes a companion's entry when it dies.
@@ -8,27 +9,50 @@ Bodyguard refresh and cooldown on death~
 * get a fresh copy of the companion right away.
 set ch %self.companion%
 if %self.is_npc% && %ch% && !%ch.is_npc%
-  %ch.remove_companion(%self.vnum%)%
+  nop %ch.remove_companion(%self.vnum%)%
   nop %ch.set_cooldown(2030,180)%
+elseif %self.is_npc% && %self.var(leader_id)%
+  makeuid leader %self.var(leader_id)%
+  if %leader% && !%leader.is_npc%
+    if %leader.room% == %self.room% && (%leader.fighting% == %self% || %self.is_tagged_by(%leader%)%)
+      nop %leader.remove_companion(%self.vnum%)%
+      nop %leader.set_cooldown(2030,180)%
+    end
+  end
 end
 ~
 #221
 Stealth GM Bribe coins: Prevent~
-0 m 0
+0 m 0 1
+L q 4
 ~
-%send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+if %actor.skill(Stealth)% > 0
+  %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
+elseif !%ator.can_gain_new_skills%
+  %send% %actor% No point trying to bribe ~%self -- you can't learn a new skill tree right now.
+else
+  %send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+end
 return 0
 ~
 #222
 Stealth GM Bribe item: Prevent~
-0 j 100
+0 j 100 1
+L q 4
 ~
-%send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+if %actor.skill(Stealth)% > 0
+  %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
+elseif !%ator.can_gain_new_skills%
+  %send% %actor% No point trying to bribe ~%self -- you can't learn a new skill tree right now.
+else
+  %send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+end
 return 0
 ~
 #230
 Summon Thug load script~
-0 n 100
+0 n 100 1
+L f 230
 ~
 * cancels follow and sets loyalty to current room's empire
 if %self.leader%
@@ -44,7 +68,8 @@ detach 230 %self.id%
 ~
 #232
 Barrel of Fun: Setup command~
-1 c 6
+1 c 6 1
+L f 232
 setup~
 set room %actor.room%
 if %actor.obj_target(%arg.argument1%)% != %self%
@@ -87,7 +112,7 @@ detach 232 %self.id%
 ~
 #233
 Barrel of Fun: Block 2nd setup~
-1 c 4
+1 c 4 0
 setup~
 if %actor.obj_target(%arg.argument1%)% == %self%
   %send% %actor% It has already been set up.
@@ -98,7 +123,9 @@ end
 ~
 #250
 City Guard: Distract~
-0 k 50
+0 k 50 2
+L w 250
+L w 251
 ~
 if %self.cooldown(250)%
   halt
@@ -110,7 +137,8 @@ dg_affect #251 %actor% DISTRACTED on 30
 ~
 #251
 City Guard: Reinforcements~
-0 k 100
+0 k 100 1
+L w 250
 ~
 if %self.cooldown(250)%
   halt
@@ -155,13 +183,16 @@ while %num% <= %count%
     %own% %summon% %self.empire%
   end
   %echo% ~%summon% arrives!
-  %force% %summon% mkill %actor%
+  if %summon.can_fight(%actor%)%
+    %force% %summon% mkill %actor%
+  end
   eval num %num% + 1
 done
 ~
 #256
 Hestian Trinket~
-1 c 2
+1 c 2 1
+L w 256
 use~
 * HESTIAN TRINKET: basic timed teleport home; paramenters:
 * val0: cooldown vnum (-1 for none, defaults to 256 if 0)
@@ -231,10 +262,12 @@ set room_var %actor.room%
 set stop_command 0
 set stop_message_char You stop using %self.shortdesc%.
 set stop_message_room ~%actor% stops using %self.shortdesc%.
+set stop_room_lock %actor.room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * start going
 set to_ch %self.custom(script1,0)%
@@ -301,7 +334,9 @@ nop %actor.cancel_adventure_summon%
 ~
 #257
 Start Brick Tutorial~
-2 u 0
+2 u 0 2
+L t 102
+L t 2100
 ~
 * start chop tutorial
 if !%actor.completed_quest(2100)% && !%actor.on_quest(2100)%
@@ -314,7 +349,8 @@ end
 ~
 #258
 Peace Pipe Toker~
-1 c 2
+1 c 2 1
+L c 1201
 smoke~
 if !%arg%
   %send% %actor% Smoke what?
@@ -339,7 +375,8 @@ end
 ~
 #262
 Trinket of Conveyance~
-1 c 2
+1 c 2 1
+L w 262
 use~
 * TRINKET OF CONVEYANCE: teleports the player to a starting location; params:
 * val0: cooldown vnum (-1 for none, defaults to 262 if 0)
@@ -393,10 +430,12 @@ set room_var %actor.room%
 set stop_command 0
 set stop_message_char You stop using %self.shortdesc%.
 set stop_message_room ~%actor% stops using %self.shortdesc%.
+set stop_room_lock %actor.room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * start going
 set to_ch %self.custom(script1,0)%
@@ -460,11 +499,14 @@ if %cooldown_vnum% > 0 && %cooldown_time% > 0
 end
 nop %actor.cancel_adventure_summon%
 %force% %actor% stop cleardata
-%purge% %self%
+* trinket is one-use unless on a newbie island
+if !%room_var.island_flagged(NEWBIE)%
+  %purge% %self%
+end
 ~
 #263
 Letheian Icon use~
-1 c 2
+1 c 2 0
 use~
 set item %arg.argument1%
 set sk %arg.argument2%

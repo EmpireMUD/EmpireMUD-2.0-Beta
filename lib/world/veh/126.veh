@@ -1,0 +1,61 @@
+#12636
+complex buildings~
+the complex of buildings up in the jungle canopy~
+There's a complex of buildings up in the jungle canopy.~
+   Wooden walkways and ropes link a series of treehouses high in the jungle
+canopy, creating a multi-level, multi-trunk complex in the safety of the
+treetops. You can hardly see it until you're practically right underneath.
+~
+@.&t[]@.~
+hkmtwBCK 19 24 0 0 0 0 0 4 w -1 0
+B0
+&t[]~
+C
+25 150
+D
+12636 7 fm
+I 30 12637 100.00 1  # RUINS-TO-VEH: ruins of a complex of treehouses
+K
+3
+$n climbs the rope ladder up to the complex above.~
+K
+5
+$n descends the rope ladder down to the ground.~
+K
+2
+$n climbs into the complex.~
+K
+4
+$n climbs down the rope ladder and exits the complex.~
+K
+0
+There's a loud crack above and then the buildings up in the trees come crashing to the ground!~
+K
+1
+The tree complex comes crashing down to the ground!~
+L lq r
+P
+2
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
+#12637
+ruins complex treehouses houses~
+the ruins of a complex of treehouses~
+All around you lie the ruins of a complex of treehouses.~
+   The ruins of several wooden buildings lie scattered around the area. Each
+and all of them were once attached to the sides of mighty jungle trees, but
+they now lie in heaps on the ground.
+~
+@.&t/]@.~
+muwDF 19 3 0 0 0 -1 0 4 0 -1 0
+B0
+/]~
+D
+5016 0 0
+P
+2
+S
+$

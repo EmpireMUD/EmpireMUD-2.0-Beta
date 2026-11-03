@@ -239,6 +239,348 @@ The tiny broom splits into two smaller brooms, but the second one runs off.~
 T 9901
 T 9902
 S
+#12625
+plant sides walls strange bulbous~
+the side of the plant~
+The walls curve inward, veined and green, sweating droplets that drip onto your shoulders.
+~
+100 200 bdhnGL 0 6
+0 0 0 15 -1 -1
+D
+   The walls curve high around you in slick, glistening arcs of green. Each
+slope is ribbed with downward-pointing hairs, guiding anything that slips
+inside deeper toward the pool. Every attempt to climb the sides meets only the
+plant's treacherous sheen, leaving you to slide back down into the sweet pool
+of liquid at the bottom.
+~
+I 4 12639 10.00 1 s  # LOOT: vine and dandy clothes
+I 4 12632 25.00 1 s  # LOOT: unknown seedling
+I 4 12636 10.00 1 s  # LOOT: jungle tree complex design
+M
+0
+The walls drip with sour-smelling nectar.~
+M
+0
+Downward-facing hairs flex as you brush against them.~
+M
+0
+You hear a faint gurgle from deep below.~
+M
+4
+Green sunlight gleams through the curved walls of the plant.~
+M
+5
+The curved walls of the plant glimmer in the moonlight.~
+T 12631
+T 12629
+T 12643
+S
+#12626
+plant gleaming sundew dew strange broad glisten droplets leaves sparkle jewels beads shining leaf sticky pearls~
+the gleaming sundew plant~
+A very broad, very strange plant glistens in the light.
+~
+0 0 bdhnL cn 3
+0 0 0 15 -1 -1
+D
+   A broad mat of leaves sprawls across the jungle floor, each one glistening
+with thousands of bead-like droplets that glimmer in whatever light makes it
+through the canopy. The stems bristle with fine red hairs, bending slightly
+inward. There's a sweet scent emanating from the plant that seems to linger in
+the air, drawing you back to it.
+~
+I 4 12639 10.00 1 s  # LOOT: vine and dandy clothes
+I 4 12632 25.00 1 s  # LOOT: unknown seedling
+I 4 12636 10.00 1 s  # LOOT: jungle tree complex design
+M
+4
+Droplets on the leaves sparkle like jewels in the sunlight.~
+M
+5
+Droplets on the leaves sparkle like jewels in the dim light.~
+M
+0
+The air carries a faint, sugary fragrance.~
+M
+0
+The gleaming beads look almost inviting to touch.~
+M
+0
+The shining droplets quiver in the light breeze.~
+M
+0
+A fly lands on a leaf and is quickly caught in the sticky sap.~
+M
+4
+Sunlight scatters into tiny rainbows through the sticky beads on the plant.~
+M
+5
+The sundew catches the starlight, glowing like scattered pearls.~
+T 12626
+T 12631
+T 12632
+T 12635
+S
+#12627
+plant lantern cluster glowing pods strange vines slender tendrils brown~
+the lantern vine~
+A cluster of glowing pods sway from slender brown vines.
+~
+0 0 bdhnL cnM 3
+0 0 0 15 -1 -1
+D
+   From the canopy above, long, sinewy vines trail down like living ropes, each
+one tipped with a swollen pod that glows with a soft, shifting light. The vines
+look dry and fibrous, rasping faintly as they sway, while the glowing pods cast
+an ever-moving ghostly light across the undergrowth. Every part of the plant
+looks ready to burn at the lightest spark.
+~
+I 4 12639 10.00 1 s  # LOOT: vine and dandy clothes
+I 4 12632 25.00 1 s  # LOOT: unknown seedling
+I 4 12636 10.00 1 s  # LOOT: jungle tree complex design
+M
+0
+Hanging pods sway gently.~
+M
+5
+Vines dangle overhead, casting webbed shadows upward onto the canopy.~
+M
+0
+The air smells faintly sweet, metallic, and sharp.~
+M
+0
+Each pod pulses softly in a cascading rhythm.~
+M
+0
+A tendril twitches as you move too close.~
+M
+5
+The glowing pods cast a ghostly shimmer across the jungle floor.~
+M
+0
+The dry vines creak against each other.~
+M
+0
+A faint, woody dust falls from the swaing vines.~
+M
+0
+A rough and papery tendril brushes your shoulder.~
+T 12631
+T 12626
+T 12635
+T 12633
+S
+#12628
+plant bog maw dark water eddies eddy patch strange bubbles~
+the bog maw~
+Dark water eddies around a patch of strange bubbles.
+~
+0 0 bdhnL cn 3
+0 0 0 15 -1 -1
+D
+   At first, it looks like nothing more than a patch of swamp gas, a cluster of
+bubbles rising in slow bursts through the murky water. But as you lean closer,
+the pattern becomes too regular, too deliberate. The surface of the muck flexes
+almost like a skin.
+   The bog maw looks like it would eat anything. You can type 'stuff <item>' to
+stuff something from your inventory into its mouth.
+~
+I 4 12639 10.00 1 s  # LOOT: vine and dandy clothes
+I 4 12632 25.00 1 s  # LOOT: unknown seedling
+I 4 12636 10.00 1 s  # LOOT: jungle tree complex design
+M
+0
+Bubbles rise lazily through the dark swamp water.~
+M
+0
+A wet sigh escapes the muck.~
+M
+0
+A patch of water swirls.~
+M
+0
+The swamp exhales a slow, gurgling breath.~
+M
+0
+The muck trembles.~
+M
+0
+Foul-smelling gas seeps up in uneven bursts.~
+T 12631
+T 12635
+T 12626
+T 12647
+T 12634
+S
+#12630
+saki bearded monkey~
+a bearded saki~
+A bearded saki is sitting up high.
+~
+75 100 djoM c 3
+0 0 0 15 -1 -1
+D
+   This silly brown-black monkey has large tufts of hair on its head and chin
+that give it the almost comical appearance of a fashionable man. At the other
+end, its long, free-hanging tail is larger around than its arms or legs. It
+regards you cautiously through golden brown eyes.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 2  # SKIN: small skin
+M
+0
+$n scratches $s shaggy chin with $s long fingers.~
+M
+0
+$n leaps to another branch with its thick tail held out.~
+M
+0
+$n plucks a nut and cracks it loudly between $s teeth.~
+M
+0
+$n shakes $s head, swaying $s beard as $e chitters.~
+M
+0
+$n scampers low along a branch.~
+M
+0
+$n grooms $s thick fur.~
+M
+0
+$n chew noisily.~
+M
+0
+$n fixes you with a deep stare, then huffs through $s beard.~
+M
+0
+$n's beard bristles as $e chatters into the canopy.~
+M
+0
+$n crouches on a limb, brushing crumbs from $s whiskers.~
+T 9121
+S
+#12633
+langur gray grey monkey~
+a gray langur~
+A gray langur is sitting on the ground.
+~
+75 100 djoM c 3
+0 0 0 15 -1 -1
+D
+   This silly monkey has white and gray fur, with a buff color on its belly and
+backside, while its face and hands are black. It largely ignores you,
+preferring to pick at the ground.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 2  # SKIN: small skin
+M
+0
+$n picks at a plant on the ground.~
+M
+0
+$n sits back on $s haunches, chewing away at something.~
+M
+0
+$n scratches its side, then flicks away an insect.~
+M
+0
+$n clambers a few feet up a tree and peers around.~
+M
+0
+$n lets out a sharp bark.~
+M
+0
+$n's long tail swishes slowly.~
+M
+0
+$n plucks a twig and toys with it between its fingers.~
+M
+0
+$n pauses to sniff the air.~
+M
+0
+$n crouches low, eyes darting around the undergrowth.~
+M
+0
+$n chitters softly, tilting $s head from side to side.~
+M
+0
+$n bares $s teeth.~
+M
+0
+$n lies on $s belly, tail twitching lazily.~
+M
+0
+$n watches you for a moment, then deliberately looks away.~
+T 9121
+S
+#12638
+seedling~
+the seedling~
+A seedling is growing here.
+~
+1 1 bdoD nG 1
+0 0 33 15 -1 -1
+D
+It looks like it's sprouting into some kind of plant...
+~
+M
+0
+$n rustles.~
+M
+0
+$n tilts to one side~
+M
+0
+$n taps $s roots.~
+M
+0
+$n quivers softly.~
+M
+0
+There's a faint earthy smell in the air.~
+M
+0
+$n hops along, leaving a trail of soil.~
+M
+0
+There's a faint shimmer of dew across $n's surface.~
+M
+5
+$n snores.~
+M
+5
+$n snores.~
+M
+5
+$n snores.~
+M
+0
+$n sways happily.~
+M
+4
+$n leans toward the light.~
+M
+4
+$n leans toward the light.~
+M
+4
+$n leans toward the light.~
+T 12648
+T 12649
+S
+#12641
+plant damaged~
+the damaged plant~
+The plant is damaged enough to escape (toggle hassle off to prevent being teleported).
+~
+250 250 bd ln 3
+0 0 0 15 -1 -1
+D
+This mob teleports people out of the Strange Plant if they enter after it was completed.
+~
+T 12641
+S
 #12650
 mage grove hooded figure #n~
 a mage of the Grove~

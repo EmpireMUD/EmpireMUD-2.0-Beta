@@ -2289,7 +2289,7 @@ sculpture statue glass me self~
 the glass sculpture~
 A glass sculpture of YOU stands in the middle of the viney maze.~
    You walk all the way around the sculpture, stunned by its nose, its hair,
-it eyes. In every way, it looks like you -- every bone, every curve, every
+its eyes. In every way, it looks like you -- every bone, every curve, every
 scar and mole. Everything except the clothing. Some great master has sculpted
 you in the classical style, perhaps a little too realistically, but this is
 nevertheless a great work of art.
@@ -2519,11 +2519,14 @@ of the person the stone is attuned to. The process rarely succeeds at enriching
 the stone as the stone's power is easily absorbed by an injured soul rather
 than the other way around.
 ~
-15 0 a 0 0 10
+15 0 a 0 0 11
 1 2 0
 1 0
 C
 1 1
+M
+33
+It looks like this skystone failed to attune, but it's still worth a little money.~
 R
 4 5193 0
 S
@@ -2538,10 +2541,13 @@ and knapped into a rough circle.
 resemblance to the sky. When properly attuned, blue jade can also hold a
 tremendous amount of mana.
 ~
-3 p a 0 0 10
+3 p a 0 0 11
 0 0 0
 1 0
 C
 1 1
+M
+33
+It's the same color as an unattuned skystone.~
 S
 $

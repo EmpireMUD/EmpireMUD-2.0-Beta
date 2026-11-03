@@ -144,6 +144,9 @@ ACMD(do_mail) {
 	char *tmstr, **write, *replaced;
 	const char *msg;
 	obj_data *obj;
+	player_index_data *pindex;
+	
+	const int preview_width = 40;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -159,7 +162,22 @@ ACMD(do_mail) {
 	}
 	else if (is_abbrev(arg, "check")) {
 		if (GET_MAIL_PENDING(ch)) {
-			msg_to_char(ch, "%s\r\n", config_get_string("mail_available_message") ? config_get_string("mail_available_message") : "You have mail waiting for you.");
+			build_page_display_str(ch, (config_get_string("mail_available_message") ? config_get_string("mail_available_message") : "You have mail waiting for you."));
+			
+			// list:
+			LL_FOREACH(GET_MAIL_PENDING(ch), mail) {
+				strncpy(mail_buf, NULLSAFE(mail->body), preview_width);
+				mail_buf[preview_width] = '\0';
+				tmstr = str_replace("\n", " ", mail_buf);
+				replaced = str_replace("\r", "", tmstr);
+				
+				build_page_display(ch, " %s - %.40s%s", ((pindex = find_player_index_by_idnum(mail->from)) ? pindex->fullname : "(Unknown)"), trim(replaced), (strlen(mail->body) > 40 ? "..." : ""));
+				
+				free(replaced);
+				free(tmstr);
+			}
+			
+			send_page_display(ch);
 		}
 		else {
 			msg_to_char(ch, "%s\r\n", config_get_string("mail_not_available_message") ? config_get_string("mail_not_available_message") : "You don't seem to have any mail waiting for you.");
@@ -178,9 +196,21 @@ ACMD(do_mail) {
 		}
 		else {
 			while ((mail = GET_MAIL_PENDING(ch)) && amt-- && ++count) {
+				pindex = find_player_index_by_idnum(mail->from);
+				
 				obj = create_obj();
-				set_obj_keywords(obj, "letter small mail");
-				set_obj_short_desc(obj, "a small letter");
+				
+				if (pindex) {
+					safe_snprintf(part, sizeof(part), "letter small mail %s", pindex->fullname);
+					set_obj_keywords(obj, part);
+					
+					safe_snprintf(part, sizeof(part), "a letter from %s", pindex->fullname);
+					set_obj_short_desc(obj, part);
+				}
+				else {
+					set_obj_keywords(obj, "letter small mail");
+					set_obj_short_desc(obj, "a small letter");
+				}
 				set_obj_long_desc(obj, "Someone has left a small letter here.");
 				obj->proto_data->type_flag = ITEM_MAIL;
 				GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE | ITEM_WEAR_HOLD;
