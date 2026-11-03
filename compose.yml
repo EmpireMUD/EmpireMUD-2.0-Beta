@@ -1,34 +1,40 @@
-volumes:
-  mud_data:
-  mud_logs:
-  mud_maps:           
-
 services:
   mud:
-    build: .
-    container_name: empiremud-beta
+    build:
+      context: .
+    init: true
     ports:
-      - "4000:4000"
+      - "127.0.0.1:${EMPIRE_HOST_PORT:-4000}:4000"
     volumes:
-      - mud_data:/opt/empiremud/lib
+      - mud_lib:/opt/empiremud/lib
+      - mud_runtime:/opt/empiremud/data
       - mud_logs:/opt/empiremud/log
-      - mud_maps:/var/www/html
-    #command: > 
-     # sh -c 'cp /opt/empiremud/map /opt/empiremud/lib/world/wld/' 
+      - mud_maps:/srv/maps
     restart: unless-stopped
-    tty: true
+    stop_grace_period: 5m
+    ulimits:
+      stack:
+        soft: -1
+        hard: -1
 
   map:
-    image: php:8.3-apache
-    container_name: empiremap
-    depends_on: [mud]
+    image: php:8.3-apache-bookworm
+    depends_on:
+      - mud
     ports:
-      - "8081:80"
+      - "127.0.0.1:${EMPIRE_MAP_HOST_PORT:-8081}:80"
     volumes:
-      - mud_data:/opt/empiremud/lib
-      - mud_maps:/var/www/html
-    environment:
-      APACHE_RUN_USER: www-data
-      APACHE_RUN_GROUP: www-data
+      - mud_maps:/var/www/html:ro
     restart: unless-stopped
 
+volumes:
+  mud_lib:
+  mud_runtime:
+  mud_logs:
+  mud_maps:
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: "${EMPIRE_DOCKER_SUBNET:-10.253.240.64/28}"

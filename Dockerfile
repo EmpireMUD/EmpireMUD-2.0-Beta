@@ -1,74 +1,66 @@
-###########################################################
-# 1) TOOLCHAIN STAGE — compiler + apt caches + ccache     #
-###########################################################
-FROM debian:12-slim AS toolchain
+# syntax=docker/dockerfile:1.7
 
-# Writable apt caches (packages + lists) — only in this stage
-RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt \
-    --mount=type=cache,id=apt-lists,target=/var/lib/apt/lists \
-    mkdir -p /var/lib/apt/lists/partial && \
+FROM debian:12-slim AS build
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-        build-essential autoconf pkg-config \
-        libncurses5-dev libssl-dev \
-        cron php-cli php-gd \
-        ccache vim less && \
-    rm -rf /var/lib/apt/lists/*
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        build-essential \
+        libcrypt-dev
 
-# GCC flags for the legacy codebase
-ENV PATH="/usr/lib/ccache:${PATH}"
-ENV CFLAGS="-fcommon -fgnu89-inline -I.."
-
-###########################################################
-# 2) BUILD STAGE — compile EmpireMUD + helpers            #
-###########################################################
-FROM toolchain AS build
 WORKDIR /opt/empiremud
-
-# Copy source  (BuildKit uses zero-copy links, keeps cache)
 COPY . .
 
-# Ensure map helper output dir exists, then build everything
-RUN mkdir -p lib/world/wld && \
-    ./configure
+# Building or using EmpireMUD means accepting doc/license.doc. The normal
+# build prompt cannot be answered in an image build, so record acceptance
+# after copying the license into the image and keep the full license in the
+# runtime stage.
+RUN test -s doc/license.doc && \
+    touch src/.accepted && \
+    CFLAGS="-O2 -fcommon -fgnu89-inline" ./configure && \
+    make -C src -j4 all && \
+    cp lib/world/wld/map bin/map
 
-WORKDIR /opt/empiremud/src
-RUN make all
-RUN cp /opt/empiremud/lib/world/wld/map /opt/empiremud
 
-###########################################################
-# 3) RUNTIME STAGE — slim, final image                    #
-###########################################################
-FROM debian:12-slim
-ENV EMPIRE_DIR=/opt/empiremud
+FROM debian:12-slim AS runtime
 
-# Writable package cache (no lists cache ⇒ avoid lock conflicts)
-RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-        cron telnet php-cli php-gd && \
-    rm -rf /var/lib/apt/lists/*
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libcrypt1 \
+        php-cli \
+        php-gd && \
+    groupadd --gid 10001 empire && \
+    useradd --uid 10001 --gid empire --home-dir /opt/empiremud --no-create-home empire
 
-# Bring compiled game tree into the runtime image
-COPY --from=build ${EMPIRE_DIR} ${EMPIRE_DIR}
-
-# ------------------------------------------------------------------
-# Symlinks so auxiliary scripts resolve hard-coded paths
-# ------------------------------------------------------------------
-RUN mkdir -p /path/to/empireMUD \
-            /var/www/html && \
-    ln -sf /opt/empiremud/lib/world          /path/to/empireMUD/data && \
-    ln -sf /opt/empiremud/php/map-viewer.php /var/www/html/map-viewer.php
-
-# World-generation helper script (writes PNGs to /var/www/html)
-COPY scripts/new-world.sh /usr/local/bin/new-world
-RUN chmod +x /usr/local/bin/new-world
-
+ENV EMPIRE_DIR=/opt/empiremud
 WORKDIR ${EMPIRE_DIR}
+
+COPY --from=build --chown=empire:empire /opt/empiremud/bin ./bin
+COPY --from=build --chown=empire:empire /opt/empiremud/lib ./lib
+COPY --from=build --chown=empire:empire /opt/empiremud/data ./data
+COPY --from=build --chown=empire:empire /opt/empiremud/log ./log
+COPY --from=build --chown=empire:empire /opt/empiremud/php ./php
+COPY --from=build --chown=empire:empire /opt/empiremud/doc/license.doc ./doc/license.doc
+COPY --from=build --chown=empire:empire /opt/empiremud/README ./README
+COPY --chown=empire:empire scripts/new-world.sh /usr/local/bin/new-world
+COPY --chown=empire:empire scripts/render-maps.sh /usr/local/bin/render-maps
+COPY --chown=empire:empire scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+
+RUN chmod 0755 \
+        /usr/local/bin/new-world \
+        /usr/local/bin/render-maps \
+        /usr/local/bin/docker-entrypoint && \
+    mkdir -p /path/to /srv/maps && \
+    ln -s /opt/empiremud /path/to/empireMUD && \
+    chown empire:empire /srv/maps
+
+USER empire
+
 EXPOSE 4000/tcp
-VOLUME ["/opt/empiremud/lib", "/opt/empiremud/log"]
+VOLUME ["/opt/empiremud/lib", "/opt/empiremud/data", "/opt/empiremud/log", "/srv/maps"]
 
-CMD ["./autorun"]
-
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["bin/empire", "-q", "4000"]

@@ -1,39 +1,48 @@
-#!/usr/bin/env bash
-# Regenerates the EmpireMUD world, produces PNG maps, and copies them into the
-# shared mud_maps volume served by the “map” (PHP/Apache) container.
+#!/bin/sh
+# Generate the upstream-default EmpireMUD world inside the persistent lib
+# volume. This is non-destructive unless the caller explicitly passes --force.
 
-set -euo pipefail
+set -eu
 
-MUD_ROOT=/opt/empiremud
-WLD_DIR="${MUD_ROOT}/lib/world/wld"     # where the C helper writes map.txt
-OUT_DIR=/var/www/html                   # mud_maps volume (shared)
-PHP_MAP="${MUD_ROOT}/php/map.php"
+mud_root=${EMPIRE_DIR:-/opt/empiremud}
+world_dir="${mud_root}/lib/world/wld"
+map_binary="${world_dir}/map"
+saved_world="${world_dir}/binary_map"
+mode=${1:---if-empty}
 
-# Ensure the map helper exists
-if [[ ! -x "${WLD_DIR}/map" ]]; then
-  echo "[self-heal] copying map helper into ${WLD_DIR}"
-  cp /opt/empiremud/bin/map "${WLD_DIR}/"
+case "${mode}" in
+    --if-empty)
+        if [ -s "${saved_world}" ]; then
+            echo "Existing world found; initialization skipped."
+            exit 0
+        fi
+        ;;
+    --force)
+        echo "WARNING: replacing the saved world in ${world_dir}."
+        ;;
+    *)
+        echo "Usage: new-world [--if-empty|--force]" >&2
+        exit 2
+        ;;
+esac
+
+if [ ! -x "${map_binary}" ]; then
+    echo "Restoring the map generator to the persistent lib volume."
+    cp "${mud_root}/bin/map" "${map_binary}"
+    chmod 0755 "${map_binary}"
 fi
 
-echo ">> Regenerating map text + .wld files"
-cd "${WLD_DIR}"
-rm -f *.wld map.txt
-./map                                    # builds terrain + map.txt in wld/
+echo "Generating the upstream-default 1800x1000 EmpireMUD world..."
+(
+    cd "${world_dir}"
+    ulimit -s unlimited 2>/dev/null || true
+    ./map
+)
 
-# ----------------------------------------------------------------------
-# Move/copy data files so php/map.php finds what it expects
-# ----------------------------------------------------------------------
-mv map.txt ../map.txt                    #   …/lib/world/map.txt
-cp ../map.txt ../map-political.txt       #   …/lib/world/map-political.txt
+if [ ! -s "${saved_world}" ]; then
+    echo "World generation did not create ${saved_world}." >&2
+    exit 1
+fi
 
-# ----------------------------------------------------------------------
-# Produce PNGs for the viewer
-# ----------------------------------------------------------------------
-echo ">> Creating fresh PNGs for the viewer"
-mkdir -p "${OUT_DIR}"
-
-php "${PHP_MAP}"             > "${OUT_DIR}/map.png"
-php "${PHP_MAP}" political   > "${OUT_DIR}/map-political.png"
-cp -u /opt/empiremud/php/map-viewer.php /var/www/html/
-echo "✓  Done – restart MUD to load new terrain if it’s running."
-
+render-maps
+echo "World generation complete."
