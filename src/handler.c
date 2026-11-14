@@ -2298,7 +2298,7 @@ char_data *get_char_room(char *name, room_data *room) {
 */
 char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 	char copy[MAX_INPUT_LENGTH], *tmp = copy;
-	char_data *i;
+	char_data *i, *skip_companion = NULL;
 	int num;
 	
 	/* JE 7/18/94 :-) :-) */
@@ -2317,8 +2317,20 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 		return get_player_vis(ch, tmp, FIND_CHAR_ROOM);
 	}
 	
+	
+	// companion shortcut?
+	if (is_abbrev(name, "companion") && strlen(name) >= 4 && GET_COMPANION(ch) && IN_ROOM(GET_COMPANION(ch)) == IN_ROOM(ch)) {
+		if (*number == 1) {
+			return GET_COMPANION(ch);
+		}
+		else {
+			--*number;
+			skip_companion = GET_COMPANION(ch);
+		}
+	}
+	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM, NULL)) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && i != skip_companion && match_char_name(ch, i, tmp, MATCH_IN_ROOM, NULL)) {
 			if (--(*number) == 0) {
 				return i;
 			}
