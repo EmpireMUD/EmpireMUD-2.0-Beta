@@ -180,6 +180,11 @@ When using field - The variable returns:
 &cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
    room, or change it with %room.depletion(type,amount)%; 0 is not-depleted.
 &cdirection(target)&0 - The approximate direction to the target.
+  &csubdirection(target,abbrev)&0 - Can include approximates like east-northeast
+    or ene (abbrev argument is optional and may be 1/0 or true/false).
+  &csubdirection(target,abbrev,for-character)&0 Optional argument to rotate the
+    subdirection for a particular character (since subdirections can't be
+    processed by %character.dir()% for players without Navigation).
 &cdismantling&0 - True if the room is being dismantled.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.

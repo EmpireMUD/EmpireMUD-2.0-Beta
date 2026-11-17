@@ -6383,6 +6383,30 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "starboard")) {
 						direction_vars(r, STARBOARD, subfield, str, slen);
 					}
+					else if (!str_cmp(field, "subdirection")) {
+						if (subfield && *subfield) {
+							bool abbrev;
+							char arg1[256], arg2[256], arg3[256], temp_arg[256];
+							const char *subdir;
+							char_data *for_whom;
+							room_data *targ;
+							
+							comma_args(subfield, arg1, temp_arg);
+							comma_args(temp_arg, arg2, arg3);
+							abbrev = (*arg2 && (atoi(arg2) > 0 || !str_cmp(arg2, "true")));
+							for_whom = (*arg3 ? (*arg3 == UID_CHAR ? get_char(arg3) : get_char_in_room(r, arg3)) : NULL);
+							
+							if ((targ = get_room(r, arg1)) && (subdir = get_partial_direction_to(for_whom, r, targ, abbrev)) && *subdir) {
+								safe_snprintf(str, slen, "%s", subdir);
+							}
+							else {
+								*str = '\0';
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "subzone")) {
 						if (GET_ROOM_TEMPLATE(r) && GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)) != NOWHERE) {
 							safe_snprintf(str, slen, "%d", GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)));
