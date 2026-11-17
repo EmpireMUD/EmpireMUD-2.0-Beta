@@ -3066,7 +3066,7 @@ L c 16653
 L c 16654
 L c 16666
 upgrade~
-set max_level 400
+set max_level 425
 if !%arg%
   * Pass through to upgrade command
   return 0
